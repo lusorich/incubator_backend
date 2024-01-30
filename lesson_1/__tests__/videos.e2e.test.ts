@@ -1,5 +1,6 @@
 import supertest from "supertest";
-import { ENDPOINTS, app } from "../src/settings";
+import { ENDPOINTS } from "../src/constants";
+import { app } from "../src/settings";
 import { generateRandomVideo } from "../src/db";
 
 const req = supertest(app);

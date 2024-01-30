@@ -1,0 +1,8 @@
+export const SETTINGS = {
+  PORT: 3003,
+} as const;
+
+export enum ENDPOINTS {
+  VIDEOS = "/videos",
+  TESTING = "/testing/all-data",
+}

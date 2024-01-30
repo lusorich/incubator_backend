@@ -1,28 +1,27 @@
 import type { Express, Response } from "express";
 import { LocalDB } from "../db";
-
-const VIDEOS_MAIN_ROUTE = "/videos";
+import { ENDPOINTS } from "../constants";
 
 const db = new LocalDB();
 
 export const videosRoutes = (app: Express) => {
-  app.get(VIDEOS_MAIN_ROUTE, (_req, res: Response) => {
+  app.get(ENDPOINTS.VIDEOS, (_req, res: Response) => {
     res.send("get videos");
   });
 
-  app.get(`${VIDEOS_MAIN_ROUTE}/:id`, (req, res) => {
+  app.get(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     res.send(req.params.id);
   });
 
-  app.post(VIDEOS_MAIN_ROUTE, (req, res) => {
+  app.post(ENDPOINTS.VIDEOS, (req, res) => {
     res.send(req.body);
   });
 
-  app.put(`${VIDEOS_MAIN_ROUTE}/:id`, (req, res) => {
+  app.put(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     res.send("update video");
   });
 
-  app.delete(`${VIDEOS_MAIN_ROUTE}/:id`, (req, res) => {
+  app.delete(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     res.send("delete video");
   });
 };
