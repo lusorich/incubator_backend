@@ -1,3 +1,5 @@
+type Nullable<T> = null | T;
+
 type RESOLUTION =
   | "P144"
   | "P240"
@@ -8,13 +10,13 @@ type RESOLUTION =
   | "P1440"
   | "P2160";
 
-type VIDEO = {
+export type VIDEO = {
   id: number;
   title: string;
   author: string;
-  canBeDownloaded?: boolean;
-  minAgeRestriction?: number;
+  canBeDownloaded: boolean;
+  minAgeRestriction: Nullable<number>;
   createdAt?: Date;
   publicationDate?: Date;
-  availableResolutions?: RESOLUTION[];
+  availableResolutions: Nullable<RESOLUTION[]>;
 };
