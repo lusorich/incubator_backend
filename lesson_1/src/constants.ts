@@ -52,6 +52,10 @@ export const schema: Schema = {
     return true;
   },
   minAgeRestriction: (value) => {
+    if (value === null) {
+      return true;
+    }
+
     if (typeof value !== "number" || value > 18 || value < 1) {
       return false;
     }
