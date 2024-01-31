@@ -109,6 +109,6 @@ export class LocalDB {
       }
     }
 
-    return { isError, errorsMessages: errors };
+    return { isError, errorsMessages: errors.reverse() };
   }
 }
