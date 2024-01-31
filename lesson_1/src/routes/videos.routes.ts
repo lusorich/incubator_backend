@@ -32,7 +32,7 @@ export const videosRoutes = (app: Express) => {
     if ("isError" in result) {
       return res
         .status(HTTP_STATUS.INCORRECT)
-        .json({ errorMessages: result.errorsMessages })
+        .json({ errorsMessages: result.errorsMessages })
         .send();
     }
 
@@ -51,7 +51,7 @@ export const videosRoutes = (app: Express) => {
 
       return res
         .status(HTTP_STATUS.INCORRECT)
-        .json({ errorMessages: result.errorsMessages });
+        .json({ errorsMessages: result.errorsMessages });
     }
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
