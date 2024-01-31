@@ -1,15 +1,14 @@
 import { ERRORS, schema, validKeys } from "./constants";
-import { VIDEO, ValueOf } from "./types";
+import { RESOLUTION, VIDEO, ValueOf } from "./types";
 
 export const generateRandomVideo = () => ({
-  id: Math.round(Math.random() * 1000),
   title: "Test",
   author: "Test",
   canBeDownloaded: true,
   minAgeRestriction: null,
   createdAt: new Date().toISOString(),
   publicationDate: new Date().toISOString(),
-  availableResolutions: ["P144"],
+  availableResolutions: ["P144"] as RESOLUTION[],
 });
 
 export class LocalDB {

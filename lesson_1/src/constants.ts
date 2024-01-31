@@ -10,8 +10,8 @@ export const enum ENDPOINTS {
 }
 
 export const enum ERRORS {
-  FIELD_NOT_EXIST = "FIELSS_NOT_EXIST",
-  WRONG_VALUE = "WRONG_VALUE",
+  FIELD_NOT_EXIST = "fields not exists",
+  WRONG_VALUE = "wrong value",
 }
 
 export const enum HTTP_STATUS {
@@ -38,7 +38,7 @@ export const schema: Schema = {
     return true;
   },
   title: (value) => {
-    if (typeof value !== "string" || !value) {
+    if (typeof value !== "string" || !value || value.length > 40) {
       return false;
     }
 
