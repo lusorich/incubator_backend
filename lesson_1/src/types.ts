@@ -16,8 +16,8 @@ export type VIDEO = {
   id: number;
   title: string;
   author: string;
-  canBeDownloaded: boolean;
-  minAgeRestriction: Nullable<number>;
+  canBeDownloaded?: boolean;
+  minAgeRestriction?: Nullable<number>;
   createdAt?: Date;
   publicationDate?: Date;
   availableResolutions: Nullable<RESOLUTION[]>;

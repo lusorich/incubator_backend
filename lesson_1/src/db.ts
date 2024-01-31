@@ -30,11 +30,16 @@ export class LocalDB {
       return { isError, errorsMessages };
     }
 
-    const videoWithId = { ...video, id: Math.round(Math.random() * 1000) };
+    const videoWithDefaultParams = {
+      minAgeRestriction: null,
+      canBeDownloaded: false,
+      ...video,
+      id: Math.round(Math.random() * 1000),
+    };
 
-    this.db.push(videoWithId);
+    this.db.push(videoWithDefaultParams);
 
-    return videoWithId;
+    return videoWithDefaultParams;
   }
 
   deleteVideo(id: VIDEO["id"]) {
