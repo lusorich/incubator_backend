@@ -29,13 +29,13 @@ export const videosRoutes = (app: Express) => {
   app.post(ENDPOINTS.VIDEOS, (req: Request<VIDEO>, res) => {
     const result = db.addVideo(req.body);
 
-    if (!(result instanceof LocalDB)) {
+    if ("isError" in result) {
       return res
         .status(HTTP_STATUS.INCORRECT)
         .send({ errorMessages: result.errorsMessages });
     }
 
-    return res.status(HTTP_STATUS.CREATED).send(req.body);
+    return res.status(HTTP_STATUS.CREATED).send(result);
   });
 
   app.put(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
@@ -60,6 +60,8 @@ export const videosRoutes = (app: Express) => {
     if (!db.getVideoById(+req.params.id)) {
       return res.status(HTTP_STATUS.NOT_FOUND).send();
     }
+
+    db.deleteVideo(+req.params.id);
 
     return res.status(HTTP_STATUS.NO_CONTENT).send();
   });
