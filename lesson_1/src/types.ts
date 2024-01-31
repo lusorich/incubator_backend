@@ -18,8 +18,8 @@ export type VIDEO = {
   author: string;
   canBeDownloaded?: boolean;
   minAgeRestriction?: Nullable<number>;
-  createdAt?: Date;
-  publicationDate?: Date;
+  createdAt?: string;
+  publicationDate?: string;
   availableResolutions: Nullable<RESOLUTION[]>;
 };
 
