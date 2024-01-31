@@ -1,22 +1,36 @@
 import supertest from "supertest";
 import { ENDPOINTS } from "../src/constants";
 import { app } from "../src/settings";
-import { generateRandomVideo } from "../src/db";
+import { LocalDB, generateRandomVideo } from "../src/db";
 
 const req = supertest(app);
 
-describe("Testing video endpoints", () => {
-  it("Testing get all videos", async () => {
+let db = new LocalDB();
+
+afterEach(() => {
+  db = new LocalDB();
+});
+
+describe("Testing videos endpoints", () => {
+  it("Testing get with empty videos", async () => {
     const res = await req.get(ENDPOINTS.VIDEOS);
 
     expect(res.statusCode).toBe(200);
+    expect(res.body).toStrictEqual([]);
   });
 
-  it("Testing add new video", async () => {
-    const video = generateRandomVideo();
+  it("Testing get with 2 added video", async () => {
+    const firstAddReq = await req
+      .post(ENDPOINTS.VIDEOS)
+      .send(db.addVideo(generateRandomVideo()));
 
-    const res = await req.post(ENDPOINTS.VIDEOS).send(video);
+    const secondAddReq = await req
+      .post(ENDPOINTS.VIDEOS)
+      .send(db.addVideo(generateRandomVideo()));
 
-    expect(res.body).toStrictEqual(video);
+    const res = await req.get(ENDPOINTS.VIDEOS);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toStrictEqual([firstAddReq.body, secondAddReq.body]);
   });
 });

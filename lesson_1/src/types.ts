@@ -13,7 +13,7 @@ export type RESOLUTION =
   | "P2160";
 
 export type VIDEO = {
-  id: number;
+  id?: number;
   title: string;
   author: string;
   canBeDownloaded?: boolean;
