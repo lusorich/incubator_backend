@@ -45,6 +45,12 @@ export class LocalDB {
     return this._findVideoByKeyValue("id", id);
   }
 
+  clearDb() {
+    this.db = [];
+
+    return new LocalDB(this.db);
+  }
+
   updateVideoById(id: VIDEO["id"], updatedFields: VIDEO) {
     const found = this._findVideoByKeyValue("id", id);
 
