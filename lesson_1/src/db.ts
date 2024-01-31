@@ -30,7 +30,7 @@ export class LocalDB {
       return { isError, errorsMessages };
     }
 
-    this.db.push(video);
+    this.db.push({ ...video, id: Math.round(Math.random() * 1000) });
 
     return new LocalDB(this.db);
   }

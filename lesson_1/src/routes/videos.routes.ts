@@ -13,7 +13,7 @@ export const videosRoutes = (app: Express) => {
   app.delete(ENDPOINTS.TESTING, (req, res) => {
     db.clearDb();
 
-    return res.status(HTTP_STATUS.SUCCESS).send();
+    return res.status(HTTP_STATUS.NO_CONTENT).send();
   });
 
   app.get(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
