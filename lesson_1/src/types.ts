@@ -1,6 +1,8 @@
 type Nullable<T> = null | T;
 
-type RESOLUTION =
+export type ValueOf<T> = T[keyof T];
+
+export type RESOLUTION =
   | "P144"
   | "P240"
   | "P360"
@@ -20,3 +22,5 @@ export type VIDEO = {
   publicationDate?: Date;
   availableResolutions: Nullable<RESOLUTION[]>;
 };
+
+export type Schema = Record<keyof VIDEO, (val: unknown) => boolean>;

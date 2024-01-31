@@ -1,4 +1,5 @@
-import { VIDEO } from "./types";
+import { ERRORS, schema, validKeys } from "./constants";
+import { VIDEO, ValueOf } from "./types";
 
 export const generateRandomVideo = () => ({
   id: Math.round(Math.random() * 1000),
@@ -23,6 +24,12 @@ export class LocalDB {
   }
 
   addVideo(video: VIDEO) {
+    const { isError, errorsMessages } = this._validateAddVideo(video);
+
+    if (isError) {
+      return { isError, errorsMessages };
+    }
+
     this.db.push(video);
 
     return new LocalDB(this.db);
@@ -41,12 +48,47 @@ export class LocalDB {
   updateVideoById(id: VIDEO["id"], updatedFields: VIDEO) {
     const found = this._findVideoByKeyValue("id", id);
 
-    const updatedVideo = { ...found, ...updatedFields };
+    if (!found) {
+      return { isError: true };
+    }
 
-    //TODO: Сгенерировать новый массив с обновленным видео
+    const { isError, errorsMessages } = this._validateAddVideo(found);
+
+    if (isError) {
+      return { isError, errorsMessages };
+    }
+
+    const updatedVideo = { ...found, ...updatedFields };
+    const idx = this.db.findIndex((video) => video.id === id);
+    const newVideos = [...this.db.slice(0, idx), ...this.db.slice(idx + 1)];
+
+    newVideos.push(updatedVideo);
+
+    this.db = newVideos;
+
+    return new LocalDB(newVideos);
   }
 
   private _findVideoByKeyValue<K extends keyof VIDEO>(key: K, value: VIDEO[K]) {
     return this.db.find((video) => video[key] === value);
+  }
+
+  private _validateAddVideo(video: VIDEO) {
+    const entries = Object.entries(video) as [keyof VIDEO, ValueOf<VIDEO>][];
+
+    let isError = false;
+    const errors = [];
+
+    /** Проверяем что все значения удовлетворяют VIDEO */
+    for (let i = 0; i < entries.length; i++) {
+      const [key, val] = entries[i];
+
+      if (!schema[key](val)) {
+        isError = true;
+        errors.push({ message: ERRORS.WRONG_VALUE, field: key });
+      }
+    }
+
+    return { isError, errorsMessages: errors };
   }
 }
