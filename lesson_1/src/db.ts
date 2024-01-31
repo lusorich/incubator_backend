@@ -62,13 +62,14 @@ export class LocalDB {
       return { isError: true };
     }
 
-    const { isError, errorsMessages } = this._validateAddVideo(found);
+    const updatedVideo = { ...found, ...updatedFields };
+
+    const { isError, errorsMessages } = this._validateAddVideo(updatedVideo);
 
     if (isError) {
       return { isError, errorsMessages };
     }
 
-    const updatedVideo = { ...found, ...updatedFields };
     const idx = this.db.findIndex((video) => video.id === id);
     const newVideos = [...this.db.slice(0, idx), ...this.db.slice(idx + 1)];
 
