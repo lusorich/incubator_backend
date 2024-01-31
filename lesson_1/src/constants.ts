@@ -31,7 +31,7 @@ export const schema: Schema = {
     return true;
   },
   author: (value) => {
-    if (typeof value !== "string" || !value) {
+    if (typeof value !== "string" || !value || value.length > 20) {
       return false;
     }
 
