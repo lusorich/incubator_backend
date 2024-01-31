@@ -30,9 +30,13 @@ export class LocalDB {
       return { isError, errorsMessages };
     }
 
+    const date = new Date();
+
     const videoWithDefaultParams = {
       minAgeRestriction: null,
       canBeDownloaded: false,
+      createdAt: date.toISOString(),
+      publicationDate: new Date(date.getTime() + +86400000).toISOString(),
       ...video,
       id: Math.round(Math.random() * 1000),
     };
