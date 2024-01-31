@@ -30,13 +30,17 @@ export class LocalDB {
       return { isError, errorsMessages };
     }
 
-    this.db.push(video);
+    const videoWithId = { ...video, id: Math.round(Math.random() * 1000) };
 
-    return new LocalDB(this.db);
+    this.db.push(videoWithId);
+
+    return videoWithId;
   }
 
   deleteVideo(id: VIDEO["id"]) {
     const updatedDb = this.db.filter(({ id: videoId }) => videoId !== id);
+
+    this.db = updatedDb;
 
     return new LocalDB(updatedDb);
   }
