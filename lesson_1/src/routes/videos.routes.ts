@@ -23,7 +23,7 @@ export const videosRoutes = (app: Express) => {
       return res.status(HTTP_STATUS.NOT_FOUND).send();
     }
 
-    return res.status(HTTP_STATUS.SUCCESS).send(req.params.id);
+    return res.status(HTTP_STATUS.SUCCESS).send(result);
   });
 
   app.post(ENDPOINTS.VIDEOS, (req: Request<VIDEO>, res) => {
@@ -41,7 +41,7 @@ export const videosRoutes = (app: Express) => {
   app.put(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     const result = db.updateVideoById(+req.params.id, req.body);
 
-    if (!(result instanceof LocalDB)) {
+    if ('isError' in result) {
       const { isError, errorsMessages } = result;
 
       if (isError && !errorsMessages) {
