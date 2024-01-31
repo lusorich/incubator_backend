@@ -1,7 +1,7 @@
 import { Schema, RESOLUTION } from "./types";
 
 export const SETTINGS = {
-  PORT: 3003,
+  PORT: 5000,
 } as const;
 
 export const enum ENDPOINTS {
