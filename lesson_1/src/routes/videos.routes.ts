@@ -7,20 +7,20 @@ const db = new LocalDB();
 
 export const videosRoutes = (app: Express) => {
   app.get(ENDPOINTS.VIDEOS, (_req, res: Response) => {
-    return res.status(HTTP_STATUS.SUCCESS).send(db.getAllVideos());
+    res.status(HTTP_STATUS.SUCCESS).send(db.getAllVideos());
   });
 
   app.delete(ENDPOINTS.TESTING, (req, res) => {
     db.clearDb();
 
-    return res.status(HTTP_STATUS.NO_CONTENT).send();
+    res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
 
   app.get(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     const result = db.getVideoById(+req.params.id);
 
     if (!result) {
-      return res.status(HTTP_STATUS.NOT_FOUND).send();
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
     return res.status(HTTP_STATUS.SUCCESS).send(result);
@@ -32,7 +32,8 @@ export const videosRoutes = (app: Express) => {
     if ("isError" in result) {
       return res
         .status(HTTP_STATUS.INCORRECT)
-        .send({ errorMessages: result.errorsMessages });
+        .json({ errorMessages: result.errorsMessages })
+        .send();
     }
 
     return res.status(HTTP_STATUS.CREATED).send(result);
@@ -41,28 +42,28 @@ export const videosRoutes = (app: Express) => {
   app.put(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     const result = db.updateVideoById(+req.params.id, req.body);
 
-    if ('isError' in result) {
+    if ("isError" in result) {
       const { isError, errorsMessages } = result;
 
       if (isError && !errorsMessages) {
-        return res.status(HTTP_STATUS.NOT_FOUND).send();
+        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
       return res
         .status(HTTP_STATUS.INCORRECT)
-        .send({ errorMessages: result.errorsMessages });
+        .json({ errorMessages: result.errorsMessages });
     }
 
-    return res.status(HTTP_STATUS.NO_CONTENT).send();
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
 
   app.delete(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     if (!db.getVideoById(+req.params.id)) {
-      return res.status(HTTP_STATUS.NOT_FOUND).send();
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
     db.deleteVideo(+req.params.id);
 
-    return res.status(HTTP_STATUS.NO_CONTENT).send();
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
 };
