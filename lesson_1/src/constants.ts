@@ -16,6 +16,7 @@ export const enum ERRORS {
 
 export const enum HTTP_STATUS {
   SUCCESS = 200,
+  CREATED = 201,
   NOT_FOUND = 404,
   INCORRECT = 400,
   NO_CONTENT = 204,

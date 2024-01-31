@@ -10,6 +10,12 @@ export const videosRoutes = (app: Express) => {
     return res.status(HTTP_STATUS.SUCCESS).send(db.getAllVideos());
   });
 
+  app.delete(ENDPOINTS.TESTING, (req, res) => {
+    db.clearDb();
+
+    return res.status(HTTP_STATUS.SUCCESS).send();
+  });
+
   app.get(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
     const result = db.getVideoById(+req.params.id);
 
@@ -24,10 +30,12 @@ export const videosRoutes = (app: Express) => {
     const result = db.addVideo(req.body);
 
     if (!(result instanceof LocalDB)) {
-      return res.status(HTTP_STATUS.INCORRECT).send(result.errorsMessages);
+      return res
+        .status(HTTP_STATUS.INCORRECT)
+        .send({ errorMessages: result.errorsMessages });
     }
 
-    return res.status(HTTP_STATUS.SUCCESS).send(req.body);
+    return res.status(HTTP_STATUS.CREATED).send(req.body);
   });
 
   app.put(`${ENDPOINTS.VIDEOS}/:id`, (req, res) => {
@@ -40,7 +48,9 @@ export const videosRoutes = (app: Express) => {
         return res.status(HTTP_STATUS.NOT_FOUND).send();
       }
 
-      return res.status(HTTP_STATUS.INCORRECT).send(result.errorsMessages);
+      return res
+        .status(HTTP_STATUS.INCORRECT)
+        .send({ errorMessages: result.errorsMessages });
     }
 
     return res.status(HTTP_STATUS.NO_CONTENT).send();
