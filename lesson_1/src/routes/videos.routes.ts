@@ -7,7 +7,7 @@ const db = new LocalDB();
 
 export const videosRoutes = (app: Express) => {
   app.get(ENDPOINTS.VIDEOS, (_req, res: Response) => {
-    return res.status(HTTP_STATUS.SUCCESS).send(db.getAllVideos());
+    return res.status(HTTP_STATUS.NO_CONTENT).send(db.getAllVideos());
   });
 
   app.delete(ENDPOINTS.TESTING, (req, res) => {
