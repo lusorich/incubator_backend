@@ -1,7 +1,6 @@
 import supertest from "supertest";
 import { ENDPOINTS } from "../src/constants";
 import { app } from "../src/app";
-import { LocalDB } from "../src/db/db";
 import { BlogsRepository } from "../src/repositories/blogs.repository";
 
 const req = supertest(app);
@@ -13,10 +12,26 @@ beforeAll(() => {
 });
 
 describe("Testing blogs", () => {
-  it("[GET] get all should return all blogs", async () => {
+  it("[GET] should return [] if blogs is empty", async () => {
     const res = await req.get(ENDPOINTS.BLOGS);
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toStrictEqual([]);
+  });
+
+  it("[GET] should return array with all blogs, if blogs not empty", async () => {
+    const blog = {
+      name: "test",
+      description: "test",
+      websiteUrl: "https://test.com",
+    };
+
+    blogsRepository.addBlog(blog);
+    blogsRepository.addBlog(blog);
+
+    const res = await req.get(ENDPOINTS.BLOGS);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveLength(2);
   });
 });

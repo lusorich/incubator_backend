@@ -11,3 +11,12 @@ export interface BlogWithId extends Blog {
 export interface Database {
   blogs: BlogWithId[];
 }
+
+export type FieldError = {
+  message: string;
+  field: string;
+};
+
+export type ErrorsMessages = {
+  errorsMessages: FieldError[];
+};
