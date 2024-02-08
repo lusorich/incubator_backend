@@ -1,12 +1,15 @@
 import { type Express, type Response, type Request, Router } from "express";
-import { ENDPOINTS } from "../constants";
+import { ENDPOINTS, HTTP_STATUS } from "../constants";
+import { BlogsRepository } from "../repositories/blogs.repository";
 
 export const blogsRouter = Router({});
 
+const blogsRepository = new BlogsRepository();
+
 blogsRouter
   .route(ENDPOINTS.BLOGS)
-  .get((req, res) => {
-    res.send("get blogs");
+  .get((_req: Request, res: Response) => {
+    res.status(HTTP_STATUS.SUCCESS).json(blogsRepository.getAllBlogs());
   })
   .post((req, res) => {
     res.send("post blogs");

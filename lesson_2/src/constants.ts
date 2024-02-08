@@ -9,3 +9,11 @@ export const enum ENDPOINTS {
   POSTS_ID = "/posts/:id",
   TESTING = "/testing/all-data",
 }
+
+export const enum HTTP_STATUS {
+  SUCCESS = 200,
+  CREATED = 201,
+  NOT_FOUND = 404,
+  INCORRECT = 400,
+  NO_CONTENT = 204,
+}
