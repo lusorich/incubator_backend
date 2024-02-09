@@ -12,7 +12,7 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
     !req.originalUrl.includes("testing") &&
     req.method !== "GET" &&
     (!req.headers.authorization ||
-      req.headers.authorization !== "YWRtaW4gcXdlcnR5")
+      req.headers.authorization !== "Basic YWRtaW46cXdlcnR5")
   ) {
     return res.sendStatus(HTTP_STATUS.NO_AUTH);
   }
