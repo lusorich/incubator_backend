@@ -44,7 +44,7 @@ export const postsSchema = {
         if (db.getBlogById(value)) {
           return true;
         }
-        return value;
+        return false;
       },
       bail: true,
     },
