@@ -45,14 +45,7 @@ blogsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(foundBlog);
   })
   .put(
-    checkSchema(
-      {
-        name: { ...blogsSchema["name"], optional: true },
-        description: { ...blogsSchema["description"], optional: true },
-        websiteUrl: { ...blogsSchema["websiteUrl"], optional: true },
-      },
-      ["body"]
-    ),
+    checkSchema(blogsSchema, ["body"]),
     (req: Request, res: Response<ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
 
