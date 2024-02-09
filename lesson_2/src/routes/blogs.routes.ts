@@ -24,11 +24,11 @@ blogsRouter
       if (errors.length) {
         const formattedErrors = getFormattedErrors(errors);
 
-        res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
       const newBlog = blogsRepository.addBlog(req.body);
-      res.status(HTTP_STATUS.CREATED).send(newBlog);
+      return res.status(HTTP_STATUS.CREATED).send(newBlog);
     }
   );
 
@@ -59,26 +59,26 @@ blogsRouter
       if (errors.length) {
         const formattedErrors = getFormattedErrors(errors);
 
-        res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
       const isSuccess = blogsRepository.updateBlogById(req.params.id, req.body);
 
       if (!isSuccess) {
-        res.sendStatus(HTTP_STATUS.NOT_FOUND);
+        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
-      res.sendStatus(HTTP_STATUS.NO_CONTENT);
+      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }
   )
   .delete((req: Request, res: Response) => {
     const found = blogsRepository.getBlogById(req.params.id);
 
     if (!found) {
-      res.sendStatus(HTTP_STATUS.NOT_FOUND);
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
     blogsRepository.deleteBlogById(req.params.id);
 
-    res.sendStatus(HTTP_STATUS.NO_CONTENT);
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

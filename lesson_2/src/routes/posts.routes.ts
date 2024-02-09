@@ -26,11 +26,11 @@ postsRouter
       if (errors.length) {
         const formattedErrors = getFormattedErrors(errors);
 
-        res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
       const newPost = postsRepository.addPost(req.body);
-      res.status(HTTP_STATUS.CREATED).send(newPost);
+      return res.status(HTTP_STATUS.CREATED).send(newPost);
     }
   );
 
@@ -65,26 +65,26 @@ postsRouter
       if (errors.length) {
         const formattedErrors = getFormattedErrors(errors);
 
-        res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
       const isSuccess = postsRepository.updatePostById(req.params.id, req.body);
 
       if (!isSuccess) {
-        res.sendStatus(HTTP_STATUS.NOT_FOUND);
+        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
-      res.sendStatus(HTTP_STATUS.NO_CONTENT);
+      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }
   )
   .delete((req: Request, res: Response) => {
     const found = postsRepository.getPostById(req.params.id);
 
     if (!found) {
-      res.sendStatus(HTTP_STATUS.NOT_FOUND);
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
     postsRepository.deletePostById(req.params.id);
 
-    res.sendStatus(HTTP_STATUS.NO_CONTENT);
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

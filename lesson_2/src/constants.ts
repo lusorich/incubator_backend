@@ -16,4 +16,5 @@ export const enum HTTP_STATUS {
   NOT_FOUND = 404,
   INCORRECT = 400,
   NO_CONTENT = 204,
+  NO_AUTH = 401,
 }
