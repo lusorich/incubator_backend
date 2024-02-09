@@ -1,19 +1,15 @@
-import { type Express, type Response, type Request, Router } from "express";
+import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { BlogsRepository } from "../repositories/blogs.repository";
-import {
-  ValidationError,
-  body,
-  checkSchema,
-  validationResult,
-} from "express-validator";
+import { checkSchema, validationResult } from "express-validator";
 import { Blog, BlogWithId, ErrorsMessages } from "../types";
 import { getFormattedErrors } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
+import { db } from "../db/db";
 
 export const blogsRouter = Router({});
 
-const blogsRepository = new BlogsRepository();
+const blogsRepository = new BlogsRepository(db);
 
 blogsRouter
   .route(ENDPOINTS.BLOGS)
@@ -66,9 +62,9 @@ blogsRouter
         res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const found = blogsRepository.getBlogById(req.params.id);
+      const isSuccess = blogsRepository.updateBlogById(req.params.id, req.body);
 
-      if (!found) {
+      if (!isSuccess) {
         res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
@@ -81,6 +77,8 @@ blogsRouter
     if (!found) {
       res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
+
+    blogsRepository.deleteBlogById(req.params.id);
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

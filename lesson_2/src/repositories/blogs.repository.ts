@@ -4,8 +4,8 @@ import { Blog, BlogWithId, Database } from "../types";
 export class BlogsRepository {
   db: LocalDB;
 
-  constructor() {
-    this.db = new LocalDB();
+  constructor(initDb: LocalDB) {
+    this.db = initDb;
   }
 
   addBlog(blog: Blog) {
