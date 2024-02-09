@@ -47,18 +47,7 @@ postsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(foundPost);
   })
   .put(
-    checkSchema(
-      {
-        title: { ...postsSchema["title"], optional: true },
-        shortDescription: {
-          ...postsSchema["shortDescription"],
-          optional: true,
-        },
-        content: { ...postsSchema["content"], optional: true },
-        blogId: { ...postsSchema["blogId"], optional: true },
-      },
-      ["body"]
-    ),
+    checkSchema(postsSchema, ["body"]),
     (req: Request, res: Response<ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
 

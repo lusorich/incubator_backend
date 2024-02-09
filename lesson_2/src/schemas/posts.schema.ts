@@ -30,7 +30,7 @@ export const postsSchema = {
       },
     },
     isString: true,
-    isLength: { options: { min: 1, max: 10000 } },
+    isLength: { options: { min: 1, max: 1000 } },
     errorMessage: "Wrong content",
   },
   blogId: {
