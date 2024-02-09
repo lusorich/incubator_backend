@@ -46,7 +46,6 @@ export const postsSchema = {
         }
         return false;
       },
-      bail: true,
     },
     isString: true,
     errorMessage: "Wrong blogId",
