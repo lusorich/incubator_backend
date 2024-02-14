@@ -1,5 +1,3 @@
-import { db } from "../db/db";
-
 export const postTitleValidator = {
   customSanitizer: {
     options: (value: string) => {
@@ -37,14 +35,6 @@ export const postsSchema = {
     customSanitizer: {
       options: (value: string) => {
         return value?.trim();
-      },
-    },
-    custom: {
-      options: (value: string) => {
-        if (db.getBlogById(value)) {
-          return true;
-        }
-        return false;
       },
     },
     isString: true,

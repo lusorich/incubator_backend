@@ -1,63 +1,85 @@
-import { LocalDB } from "../db/db";
-import { Blog, BlogWithId, Database } from "../types";
+import { Collection, ObjectId, WithId } from "mongodb";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
+import { client } from "../db/db";
+import { Blog, BlogWithId } from "../types";
 
 export class BlogsRepository {
-  db: LocalDB;
+  coll: Collection<BlogWithId>;
 
-  constructor(initDb: LocalDB) {
-    this.db = initDb;
+  constructor() {
+    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
   }
 
-  addBlog(blog: Blog) {
+  async addBlog(blog: Blog) {
     const newBlog: BlogWithId = {
       ...blog,
+      isMembership: false,
+      createdAt: new Date(),
       id: String(Math.round(Math.random() * 1000)),
     };
 
-    this.db.addBlog(newBlog);
+    await this.coll.insertOne(newBlog);
 
-    return newBlog;
+    return this.map(newBlog as WithId<BlogWithId>);
   }
 
-  getAllBlogs() {
-    return this.db.getAllBlogs();
+  async getAllBlogs() {
+    const allBlogs = await this.coll.find().toArray();
+
+    if (allBlogs.length > 0) {
+      return allBlogs.map(this.map);
+    }
+
+    return allBlogs;
   }
 
-  getBlogById(id: BlogWithId["id"]) {
-    const found = this.db.getAllBlogs().find((blog) => blog.id === id);
-
-    return found ?? null;
-  }
-
-  updateBlogById(id: BlogWithId["id"], props: Partial<Blog>) {
-    let found = this.getBlogById(id);
-    const index = this.getAllBlogs().findIndex((blog) => blog.id === id);
+  async getBlogById(id: BlogWithId["id"]) {
+    const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
     if (!found) {
       return null;
     }
 
-    const updatedBlog = { ...found, ...props };
-    this.db.updateBlogByIndex(index, updatedBlog);
-
-    return true;
+    return this.map(found);
   }
 
-  deleteBlogById(id: BlogWithId["id"]) {
-    const foundIdx = this.db.getAllBlogs().findIndex((blog) => blog.id === id);
+  async updateBlogById(id: BlogWithId["id"], props: Partial<Blog>) {
+    let found = await this.coll.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { ...props } }
+    );
 
-    if (foundIdx < 0) {
+    if (!found.matchedCount) {
       return null;
     }
 
-    this.db.deleteBlogById(id);
+    return true;
+  }
+
+  async deleteBlogById(id: BlogWithId["id"]) {
+    const found = await this.coll.deleteOne({ _id: new ObjectId(id) });
+
+    if (!found.deletedCount) {
+      return null;
+    }
 
     return true;
   }
 
-  clearBlogs() {
-    this.db.clearBlogs();
+  async clearBlogs() {
+    await this.coll.drop();
 
     return this;
+  }
+
+  map(blog: WithId<BlogWithId>): BlogWithId {
+    return {
+      id: blog._id.toString(),
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      isMembership: blog.isMembership,
+      createdAt: blog.createdAt,
+    };
   }
 }

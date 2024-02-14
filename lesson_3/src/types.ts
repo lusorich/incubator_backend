@@ -6,6 +6,8 @@ export interface Blog {
 
 export interface BlogWithId extends Blog {
   id: string;
+  createdAt: Date;
+  isMembership: boolean;
 }
 
 export interface Post {

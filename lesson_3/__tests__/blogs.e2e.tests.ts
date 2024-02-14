@@ -2,14 +2,13 @@ import supertest from "supertest";
 import { ENDPOINTS } from "../src/constants";
 import { app } from "../src/app";
 import { BlogsRepository } from "../src/repositories/blogs.repository";
-import { db } from "../src/db/db";
 
 const req = supertest(app);
 
-let blogsRepository = new BlogsRepository(db);
+let blogsRepository = new BlogsRepository();
 
 beforeAll(() => {
-  blogsRepository = new BlogsRepository(db);
+  blogsRepository = new BlogsRepository();
 });
 
 describe("Testing blogs", () => {

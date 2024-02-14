@@ -18,3 +18,10 @@ export const enum HTTP_STATUS {
   NO_CONTENT = 204,
   NO_AUTH = 401,
 }
+
+export const MONGO_DB_NAME = "kamasutra";
+
+export const enum MONGO_COLLECTIONS {
+  BLOGS = "blogs",
+  POSTS = "posts",
+}

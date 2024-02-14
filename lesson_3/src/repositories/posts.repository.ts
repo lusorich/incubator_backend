@@ -1,64 +1,92 @@
-import { LocalDB } from "../db/db";
-import { Post, PostWithId } from "../types";
+import { Collection, ObjectId, WithId } from "mongodb";
+import { BlogWithId, Post, PostWithId } from "../types";
+import { client } from "../db/db";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 
 export class PostsRepository {
-  db: LocalDB;
+  coll: Collection<PostWithId>;
+  blogsColl: Collection<BlogWithId>;
 
-  constructor(initDb: LocalDB) {
-    this.db = initDb;
+  constructor() {
+    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.POSTS);
+    this.blogsColl = client
+      .db(MONGO_DB_NAME)
+      .collection(MONGO_COLLECTIONS.BLOGS);
   }
 
-  getAllPosts() {
-    return this.db.getAllPosts();
+  async getAllPosts() {
+    const allPosts = await this.coll.find().toArray();
+
+    if (allPosts.length > 0) {
+      return allPosts.map(this.map);
+    }
+
+    return allPosts;
   }
 
-  addPost(post: Post) {
+  async addPost(post: Post) {
+    const parentBlog = await this.blogsColl.findOne({
+      _id: new ObjectId(post.blogId),
+    });
+
     const newPost: PostWithId = {
       ...post,
       id: String(Math.round(Math.random() * 1000)),
-      blogName: this.db.getBlogById(post.blogId)?.name || "",
+      blogName: parentBlog?.name || "",
     };
 
-    this.db.addPost(newPost);
+    await this.coll.insertOne(newPost);
 
-    return newPost;
+    return this.map(newPost as WithId<PostWithId>);
   }
 
-  getPostById(id: PostWithId["id"]) {
-    const found = this.db.getAllPosts().find((post) => post.id === id);
-
-    return found ?? null;
-  }
-
-  updatePostById(id: PostWithId["id"], props: Partial<Post>) {
-    let found = this.getPostById(id);
-    const index = this.getAllPosts().findIndex((post) => post.id === id);
+  async getPostById(id: PostWithId["id"]) {
+    const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
     if (!found) {
       return null;
     }
 
-    const updatedPost = { ...found, ...props };
-    this.db.updatePostByIndex(index, updatedPost);
-
-    return true;
+    return this.map(found);
   }
 
-  deletePostById(id: PostWithId["id"]) {
-    const foundIdx = this.db.getAllPosts().findIndex((post) => post.id === id);
+  async updatePostById(id: PostWithId["id"], props: Partial<Post>) {
+    let found = await this.coll.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { ...props } }
+    );
 
-    if (foundIdx < 0) {
+    if (!found.matchedCount) {
       return null;
     }
 
-    this.db.deletePostById(id);
+    return true;
+  }
+
+  async deletePostById(id: PostWithId["id"]) {
+    const found = await this.coll.deleteOne({ _id: new ObjectId(id) });
+
+    if (!found.deletedCount) {
+      return null;
+    }
 
     return true;
   }
 
-  clearPosts() {
-    this.db.clearPosts();
+  async clearPosts() {
+    await this.coll.drop();
 
     return this;
+  }
+
+  map(post: WithId<PostWithId>): PostWithId {
+    return {
+      id: post._id.toString(),
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+    };
   }
 }
