@@ -19,6 +19,7 @@ export interface Post {
 
 export interface PostWithId extends Post {
   id: string;
+  createdAt: Date;
   blogName: string;
 }
 

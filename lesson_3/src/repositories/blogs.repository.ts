@@ -67,7 +67,7 @@ export class BlogsRepository {
   }
 
   async clearBlogs() {
-    await this.coll.drop();
+    await this.coll.deleteMany({});
 
     return this;
   }

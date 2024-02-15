@@ -33,6 +33,7 @@ export class PostsRepository {
       ...post,
       id: String(Math.round(Math.random() * 1000)),
       blogName: parentBlog?.name || "",
+      createdAt: new Date(),
     };
 
     await this.coll.insertOne(newPost);
@@ -74,7 +75,7 @@ export class PostsRepository {
   }
 
   async clearPosts() {
-    await this.coll.drop();
+    await this.coll.deleteMany({});
 
     return this;
   }
@@ -87,6 +88,7 @@ export class PostsRepository {
       content: post.content,
       blogId: post.blogId,
       blogName: post.blogName,
+      createdAt: post.createdAt,
     };
   }
 }
