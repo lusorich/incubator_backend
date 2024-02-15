@@ -2,7 +2,11 @@ import { MongoClient } from "mongodb";
 import { BlogsRepository } from "../repositories/blogs.repository";
 import { PostsRepository } from "../repositories/posts.repository";
 
-export const client = new MongoClient("mongodb://localhost:27017");
+const local = "mongodb://localhost:27017";
+const remote =
+  "mongodb+srv://dreamonaut:vgfo102jKWUp4Ekb@cluster0.4wf0ecu.mongodb.net/?retryWrites=true&w=majority";
+
+export const client = new MongoClient(remote);
 
 export const blogsRepository = new BlogsRepository();
 export const postsRepository = new PostsRepository();
