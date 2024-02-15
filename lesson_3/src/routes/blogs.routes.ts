@@ -28,7 +28,7 @@ blogsRouter
 
       const newBlog = await blogsRepository.addBlog(req.body);
 
-      return res.status(HTTP_STATUS.CREATED).send(newBlog);
+      return res.status(HTTP_STATUS.CREATED).json(newBlog);
     }
   )
   .delete(async (_req, res: Response) => {

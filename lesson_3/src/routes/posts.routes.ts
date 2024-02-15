@@ -50,7 +50,7 @@ postsRouter
 
       const newPost = await postsRepository.addPost(req.body);
 
-      return res.status(HTTP_STATUS.CREATED).send(newPost);
+      return res.status(HTTP_STATUS.CREATED).json(newPost);
     }
   )
   .delete(async (_req, res: Response) => {
