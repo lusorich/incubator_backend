@@ -2,7 +2,6 @@ import express from "express";
 import routes from "./routes/routes";
 import { HTTP_STATUS, SETTINGS } from "./constants";
 import { type Response, type Request, NextFunction } from "express";
-import { MongoClient } from "mongodb";
 import { runDb } from "./db/db";
 
 export const app = express();
