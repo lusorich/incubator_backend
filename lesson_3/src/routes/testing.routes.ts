@@ -10,5 +10,5 @@ testingRouter
     blogsRepository.clearBlogs();
     postsRepository.clearPosts();
 
-    res.send(HTTP_STATUS.NO_CONTENT);
+    res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
