@@ -1,8 +1,9 @@
-import { Collection, ObjectId, WithId } from "mongodb";
+import { Collection } from "mongodb";
 import { Blog, BlogWithId } from "../types";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 import { client } from "../db/db";
-import { blogsRepository } from "../repositories/blogs.repository";
+import { blogsQueryRepository } from "../repositories/blogs.query.repository";
+import { blogsCommandsRepository } from "../repositories/blogs.commands.repository";
 
 export class BlogsService {
   coll: Collection<BlogWithId>;
@@ -19,31 +20,19 @@ export class BlogsService {
       id: String(Math.round(Math.random() * 1000)),
     };
 
-    return await blogsRepository.addBlog(newBlog);
-  }
-
-  async getAllBlogs() {
-    const allBlogs = await this.coll.find().toArray();
-
-    return allBlogs;
-  }
-
-  async getBlogById(id: BlogWithId["id"]) {
-    const foundBlog = await blogsRepository.getBlogById(id);
-
-    return foundBlog;
+    return await blogsCommandsRepository.addBlog(newBlog);
   }
 
   async updateBlogById(id: BlogWithId["id"], props: Partial<Blog>) {
-    return await blogsRepository.updateBlogById(id, props);
+    return await blogsCommandsRepository.updateBlogById(id, props);
   }
 
   async deleteBlogById(id: BlogWithId["id"]) {
-    return await blogsRepository.deleteBlogById(id);
+    return await blogsCommandsRepository.deleteBlogById(id);
   }
 
   async clearBlogs() {
-    await blogsRepository.clearBlogs();
+    await blogsCommandsRepository.clearBlogs();
 
     return this;
   }

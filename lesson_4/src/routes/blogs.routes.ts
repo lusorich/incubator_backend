@@ -5,13 +5,14 @@ import { Blog, BlogWithId, ErrorsMessages } from "../types";
 import { getFormattedErrors } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
 import { blogsService } from "../domain/blogs.service";
+import { blogsQueryRepository } from "../repositories/blogs.query.repository";
 
 export const blogsRouter = Router({});
 
 blogsRouter
   .route(ENDPOINTS.BLOGS)
   .get(async (_req: Request, res: Response) => {
-    const allBlogs = await blogsService.getAllBlogs();
+    const allBlogs = await blogsQueryRepository.getAllBlogs();
 
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })
@@ -28,7 +29,7 @@ blogsRouter
 
       const newBlog = await blogsService.addBlog(req.body);
 
-      return res.status(HTTP_STATUS.CREATED).json(newBlog);
+      return res.status(HTTP_STATUS.CREATED).json(newBlog || undefined);
     }
   )
   .delete(async (_req, res: Response) => {
@@ -41,7 +42,7 @@ blogsRouter
   .route(ENDPOINTS.BLOGS_ID)
   .get(async (req: Request, res: Response<BlogWithId | void>) => {
     const { id } = req.params;
-    const foundBlog = await blogsService.getBlogById(id);
+    const foundBlog = await blogsQueryRepository.getBlogById(id);
 
     if (!foundBlog) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
@@ -73,7 +74,7 @@ blogsRouter
     }
   )
   .delete(async (req: Request, res: Response) => {
-    const found = await blogsService.getBlogById(req.params.id);
+    const found = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!found) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);

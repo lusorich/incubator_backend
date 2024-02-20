@@ -6,8 +6,9 @@ import { Blog, ErrorsMessages, Post, PostWithId } from "../types";
 import { getFormattedErrors } from "../helpers";
 
 import { postsSchema } from "../schemas/posts.schema";
-import { postsRepository } from "../db/db";
-import { blogsRepository } from "../repositories/blogs.repository";
+
+import { blogsQueryRepository } from "../repositories/blogs.query.repository";
+import { postsRepository } from "../repositories/posts.repository";
 
 export const postsRouter = Router({});
 
@@ -26,7 +27,7 @@ postsRouter
           ...postsSchema["blogId"],
           custom: {
             options: async (value: string) => {
-              const parentBlog = await blogsRepository.getBlogById(value);
+              const parentBlog = await blogsQueryRepository.getBlogById(value);
 
               if (parentBlog) {
                 return true;
@@ -79,7 +80,7 @@ postsRouter
           ...postsSchema["blogId"],
           custom: {
             options: async (value: string) => {
-              const parentBlog = await blogsRepository.getBlogById(value);
+              const parentBlog = await blogsQueryRepository.getBlogById(value);
 
               if (parentBlog) {
                 return true;
