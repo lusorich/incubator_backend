@@ -73,6 +73,7 @@ blogsRouter
       return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }
   )
+  //TODO: возможно нет смысла сначала искать, достаточно делать удаление и проверять было ли что то удалено
   .delete(async (req: Request, res: Response) => {
     const found = await blogsQueryRepository.getBlogById(req.params.id);
 

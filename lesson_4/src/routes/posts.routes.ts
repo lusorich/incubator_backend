@@ -2,20 +2,21 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 
 import { checkSchema, validationResult } from "express-validator";
-import { Blog, ErrorsMessages, Post, PostWithId } from "../types";
+import { ErrorsMessages, Post, PostWithId } from "../types";
 import { getFormattedErrors } from "../helpers";
 
 import { postsSchema } from "../schemas/posts.schema";
 
 import { blogsQueryRepository } from "../repositories/blogs.query.repository";
-import { postsRepository } from "../repositories/posts.repository";
+import { postsQueryRepository } from "../repositories/posts.query.repository";
+import { postsCommandsRepository } from "../repositories/posts.commands.repository";
 
 export const postsRouter = Router({});
 
 postsRouter
   .route(ENDPOINTS.POSTS)
   .get(async (_req: Request, res: Response) => {
-    const allBlogs = await postsRepository.getAllPosts();
+    const allBlogs = await postsQueryRepository.getAllPosts();
 
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })
@@ -49,13 +50,13 @@ postsRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const newPost = await postsRepository.addPost(req.body);
+      const newPost = await postsCommandsRepository.addPost(req.body);
 
       return res.status(HTTP_STATUS.CREATED).json(newPost);
     }
   )
   .delete(async (_req, res: Response) => {
-    await postsRepository.clearPosts();
+    await postsCommandsRepository.clearPosts();
 
     res.sendStatus(HTTP_STATUS.SUCCESS);
   });
@@ -64,7 +65,7 @@ postsRouter
   .route(ENDPOINTS.POSTS_ID)
   .get(async (req: Request, res: Response<PostWithId | void>) => {
     const { id } = req.params;
-    const foundPost = await postsRepository.getPostById(id);
+    const foundPost = await postsQueryRepository.getPostById(id);
 
     if (!foundPost) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
@@ -104,7 +105,7 @@ postsRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const isSuccess = await postsRepository.updatePostById(
+      const isSuccess = await postsCommandsRepository.updatePostById(
         req.params.id,
         req.body
       );
@@ -117,13 +118,13 @@ postsRouter
     }
   )
   .delete(async (req: Request, res: Response) => {
-    const found = await postsRepository.getPostById(req.params.id);
+    const found = await postsQueryRepository.getPostById(req.params.id);
 
     if (!found) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
-    await postsRepository.deletePostById(req.params.id);
+    await postsCommandsRepository.deletePostById(req.params.id);
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

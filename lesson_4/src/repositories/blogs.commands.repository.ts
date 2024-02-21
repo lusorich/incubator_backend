@@ -26,7 +26,7 @@ export class BlogsCommandsRepository {
     );
 
     if (!found.matchedCount) {
-      return null;
+      return false;
     }
 
     return true;
@@ -36,7 +36,7 @@ export class BlogsCommandsRepository {
     const found = await this.coll.deleteOne({ _id: new ObjectId(id) });
 
     if (!found.deletedCount) {
-      return null;
+      return false;
     }
 
     return true;
