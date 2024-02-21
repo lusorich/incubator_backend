@@ -36,3 +36,12 @@ export type FieldError = {
 export type ErrorsMessages = {
   errorsMessages: FieldError[];
 };
+
+export type Pagination = {
+  pageNumber?: number;
+  pageSize?: number;
+};
+
+export interface GetAllBlogsQueryParams {
+  pagination?: Pagination;
+}

@@ -1,7 +1,7 @@
 import { Collection, ObjectId, WithId } from "mongodb";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 import { client } from "../db/db";
-import { BlogWithId } from "../types";
+import { BlogWithId, GetAllBlogsQueryParams } from "../types";
 
 export class BlogsQueryRepository {
   coll: Collection<BlogWithId>;
@@ -10,8 +10,14 @@ export class BlogsQueryRepository {
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
   }
 
-  async getAllBlogs() {
-    const allBlogs = await this.coll.find().toArray();
+  async getAllBlogs({ pagination = {} }: GetAllBlogsQueryParams) {
+    const { pageSize = 1, pageNumber = 10 } = pagination;
+
+    const allBlogs = await this.coll
+      .find()
+      .limit(pageSize)
+      .skip((pageNumber - 1) * pageSize)
+      .toArray();
 
     if (allBlogs.length > 0) {
       return allBlogs.map(this._mapToBlogViewModel);

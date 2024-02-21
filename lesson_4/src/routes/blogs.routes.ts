@@ -11,8 +11,13 @@ export const blogsRouter = Router({});
 
 blogsRouter
   .route(ENDPOINTS.BLOGS)
-  .get(async (_req: Request, res: Response) => {
-    const allBlogs = await blogsQueryRepository.getAllBlogs();
+  .get(async (req: Request, res: Response) => {
+    const pagination = {
+      pageNumber: +(req.query.pageNumber || 1),
+      pageSize: +(req.query.pageSize || 10),
+    };
+
+    const allBlogs = await blogsQueryRepository.getAllBlogs({ pagination });
 
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })
