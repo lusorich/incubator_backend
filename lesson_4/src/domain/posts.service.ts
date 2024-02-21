@@ -1,18 +1,8 @@
-import { Collection, ObjectId, WithId } from "mongodb";
-import { BlogWithId, Post, PostWithId } from "../types";
-import { client } from "../db/db";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
-import { postsQueryRepository } from "../repositories/posts.query.repository";
+import { Post, PostWithId } from "../types";
 import { postsCommandsRepository } from "../repositories/posts.commands.repository";
 import { blogsQueryRepository } from "../repositories/blogs.query.repository";
 
-export class PostsRepository {
-  async getAllPosts() {
-    const allPosts = await postsQueryRepository.getAllPosts();
-
-    return allPosts;
-  }
-
+export class PostsService {
   async addPost(post: Post) {
     const parentBlog = await blogsQueryRepository.getBlogById(post.blogId);
 
@@ -26,12 +16,6 @@ export class PostsRepository {
     const newViewPost = await postsCommandsRepository.addPost(newPost);
 
     return newViewPost;
-  }
-
-  async getPostById(id: PostWithId["id"]) {
-    const found = await postsQueryRepository.getPostById(id);
-
-    return found;
   }
 
   async updatePostById(id: PostWithId["id"], props: Partial<Post>) {
@@ -53,4 +37,4 @@ export class PostsRepository {
   }
 }
 
-export const postsRepository = new PostsRepository();
+export const postsService = new PostsService();

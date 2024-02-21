@@ -2,7 +2,6 @@ import { Collection } from "mongodb";
 import { Blog, BlogWithId } from "../types";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 import { client } from "../db/db";
-import { blogsQueryRepository } from "../repositories/blogs.query.repository";
 import { blogsCommandsRepository } from "../repositories/blogs.commands.repository";
 
 export class BlogsService {

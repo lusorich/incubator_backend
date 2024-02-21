@@ -10,6 +10,7 @@ import { postsSchema } from "../schemas/posts.schema";
 import { blogsQueryRepository } from "../repositories/blogs.query.repository";
 import { postsQueryRepository } from "../repositories/posts.query.repository";
 import { postsCommandsRepository } from "../repositories/posts.commands.repository";
+import { postsService } from "../domain/posts.service";
 
 export const postsRouter = Router({});
 
@@ -50,13 +51,13 @@ postsRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const newPost = await postsCommandsRepository.addPost(req.body);
+      const newPost = await postsService.addPost(req.body);
 
       return res.status(HTTP_STATUS.CREATED).json(newPost);
     }
   )
   .delete(async (_req, res: Response) => {
-    await postsCommandsRepository.clearPosts();
+    await postsService.clearPosts();
 
     res.sendStatus(HTTP_STATUS.SUCCESS);
   });
@@ -105,7 +106,7 @@ postsRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const isSuccess = await postsCommandsRepository.updatePostById(
+      const isSuccess = await postsService.updatePostById(
         req.params.id,
         req.body
       );
@@ -124,7 +125,7 @@ postsRouter
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
-    await postsCommandsRepository.deletePostById(req.params.id);
+    await postsService.deletePostById(req.params.id);
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
