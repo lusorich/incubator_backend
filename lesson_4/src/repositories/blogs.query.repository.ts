@@ -18,6 +18,9 @@ export class BlogsQueryRepository {
   }: GetAllBlogsQueryParams) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
+    const allBlogsWithoutSorting = await this.coll.find().toArray();
+    const allBlogsCount = allBlogsWithoutSorting.length - 1;
+
     const allBlogs = await this.coll
       .find({
         name: {
@@ -30,11 +33,19 @@ export class BlogsQueryRepository {
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .toArray();
 
+    let allBlogsToView: (BlogWithId | null)[] = [];
+
     if (allBlogs.length > 0) {
-      return allBlogs.map(this._mapToBlogViewModel);
+      allBlogsToView = allBlogs.map(this._mapToBlogViewModel);
     }
 
-    return allBlogs;
+    return {
+      pagesCount: Math.round(allBlogsCount / pageSize),
+      totalCount: allBlogsCount,
+      pageSize,
+      page: pageNumber,
+      items: allBlogsToView,
+    };
   }
 
   async getBlogById(id: BlogWithId["id"]) {

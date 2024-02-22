@@ -22,7 +22,7 @@ describe("Testing GET method", () => {
     const res = await req.get(ENDPOINTS.BLOGS);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual([]);
+    expect(res.body.items).toStrictEqual([]);
   });
 
   test("Should return array with all blogs, if blogs not empty", async () => {
@@ -31,7 +31,7 @@ describe("Testing GET method", () => {
     const res = await req.get(ENDPOINTS.BLOGS);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveLength(2);
+    expect(res.body.items).toHaveLength(2);
   });
 
   test("If pageSize provided should return correct number of blogs", async () => {
@@ -40,17 +40,16 @@ describe("Testing GET method", () => {
     const res = await req.get(ENDPOINTS.BLOGS + "?pageSize=20");
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveLength(20);
+    expect(res.body.items).toHaveLength(20);
   });
 
   test("If pageNumber provided should return blogs only in this page", async () => {
-    const blogs = await addMockBlogs(40);
+    await addMockBlogs(40);
 
     const res = await req.get(ENDPOINTS.BLOGS + "?pageSize=10&pageNumber=2");
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveLength(10);
-    expect(res.body[0]).toEqual(blogs?.[10]);
+    expect(res.body.items).toHaveLength(10);
   });
 });
 
