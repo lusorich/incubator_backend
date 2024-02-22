@@ -10,13 +10,24 @@ export class BlogsQueryRepository {
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
   }
 
-  async getAllBlogs({ pagination = {} }: GetAllBlogsQueryParams) {
-    const { pageSize = 1, pageNumber = 10 } = pagination;
+  async getAllBlogs({
+    pagination = {},
+    sortBy = "createdAt",
+    sortDirection = "desc",
+    searchNameTerm = null,
+  }: GetAllBlogsQueryParams) {
+    const { pageSize = 10, pageNumber = 1 } = pagination;
 
     const allBlogs = await this.coll
-      .find()
+      .find({
+        name: {
+          $regex: searchNameTerm || /./,
+          $options: "i",
+        },
+      })
       .limit(pageSize)
       .skip((pageNumber - 1) * pageSize)
+      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .toArray();
 
     if (allBlogs.length > 0) {

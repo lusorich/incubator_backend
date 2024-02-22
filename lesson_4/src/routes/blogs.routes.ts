@@ -17,7 +17,24 @@ blogsRouter
       pageSize: +(req.query.pageSize || 10),
     };
 
-    const allBlogs = await blogsQueryRepository.getAllBlogs({ pagination });
+    const sortDirection = () => {
+      if (req.query.sortDirection === "asc") {
+        return "asc";
+      }
+
+      return "desc";
+    };
+
+    const sortBy = String(req.query.sortBy) || "createdAt";
+    const searchNameTerm =
+      (req.query.searchNameTerm as string | undefined) || null;
+
+    const allBlogs = await blogsQueryRepository.getAllBlogs({
+      pagination,
+      sortDirection: sortDirection(),
+      sortBy,
+      searchNameTerm,
+    });
 
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })

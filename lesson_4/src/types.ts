@@ -42,6 +42,11 @@ export type Pagination = {
   pageSize?: number;
 };
 
+export type SortDirection = "asc" | "desc";
+
 export interface GetAllBlogsQueryParams {
   pagination?: Pagination;
+  sortDirection?: SortDirection;
+  sortBy?: string | keyof BlogWithId;
+  searchNameTerm?: string | null;
 }
