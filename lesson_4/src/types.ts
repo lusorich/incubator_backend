@@ -44,9 +44,9 @@ export type Pagination = {
 
 export type SortDirection = "asc" | "desc";
 
-export interface GetAllBlogsQueryParams {
+export interface QueryParams {
   pagination?: Pagination;
   sortDirection?: SortDirection;
-  sortBy?: string | keyof BlogWithId;
+  sortBy?: string | keyof BlogWithId | keyof PostWithId;
   searchNameTerm?: string | null;
 }

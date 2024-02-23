@@ -1,5 +1,5 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { BlogWithId, Post, PostWithId } from "../types";
+import { BlogWithId, Post, PostWithId, QueryParams } from "../types";
 import { client } from "../db/db";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 
@@ -14,14 +14,44 @@ export class PostsQueryRepository {
       .collection(MONGO_COLLECTIONS.BLOGS);
   }
 
-  async getAllPosts() {
-    const allPosts = await this.coll.find().toArray();
+  async getAllPosts({
+    pagination = {},
+    sortBy = "createdAt",
+    sortDirection = "desc",
+    blogId,
+  }: QueryParams & { blogId?: PostWithId["blogId"] }) {
+    const { pageSize = 10, pageNumber = 1 } = pagination;
+
+    const allPostsWithoutSorting = await this.coll.find().toArray();
+    const allPostsCount = allPostsWithoutSorting.length - 1;
+
+    const allPosts = await this.coll
+      .find({
+        blogId: {
+          $regex: blogId || /./,
+          $options: "i",
+        },
+      })
+      .limit(pageSize)
+      .skip((pageNumber - 1) * pageSize)
+      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .toArray();
+
+    console.log("blogId", blogId);
+
+    let allPostsToView: (PostWithId | null)[] = [];
 
     if (allPosts.length > 0) {
-      return allPosts.map(this._mapToPostViewModel);
+      allPostsToView = allPosts.map(this._mapToPostViewModel);
     }
 
-    return allPosts;
+    return {
+      pagesCount: Math.ceil(allPostsCount / pageSize),
+      totalCount: allPostsCount,
+      pageSize,
+      page: pageNumber,
+      items: allPostsToView,
+    };
   }
 
   async getPostById(id: PostWithId["id"]) {

@@ -6,6 +6,7 @@ export const enum ENDPOINTS {
   BLOGS = "/blogs",
   POSTS = "/posts",
   BLOGS_ID = "/blogs/:id",
+  POSTS_BY_BLOG_ID = "/blogs/:id/posts",
   POSTS_ID = "/posts/:id",
   TESTING = "/testing/all-data",
 }

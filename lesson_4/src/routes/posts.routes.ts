@@ -17,7 +17,7 @@ export const postsRouter = Router({});
 postsRouter
   .route(ENDPOINTS.POSTS)
   .get(async (_req: Request, res: Response) => {
-    const allBlogs = await postsQueryRepository.getAllPosts();
+    const allBlogs = await postsQueryRepository.getAllPosts({});
 
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })

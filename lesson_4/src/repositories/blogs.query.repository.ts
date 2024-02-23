@@ -1,7 +1,8 @@
 import { Collection, ObjectId, WithId } from "mongodb";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 import { client } from "../db/db";
-import { BlogWithId, GetAllBlogsQueryParams } from "../types";
+import { BlogWithId, PostWithId, QueryParams } from "../types";
+import { postsQueryRepository } from "./posts.query.repository";
 
 export class BlogsQueryRepository {
   coll: Collection<BlogWithId>;
@@ -15,7 +16,7 @@ export class BlogsQueryRepository {
     sortBy = "createdAt",
     sortDirection = "desc",
     searchNameTerm = null,
-  }: GetAllBlogsQueryParams) {
+  }: QueryParams) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
     const allBlogsWithoutSorting = await this.coll.find().toArray();
@@ -40,12 +41,28 @@ export class BlogsQueryRepository {
     }
 
     return {
-      pagesCount: Math.round(allBlogsCount / pageSize),
+      pagesCount: Math.ceil(allBlogsCount / pageSize),
       totalCount: allBlogsCount,
       pageSize,
       page: pageNumber,
       items: allBlogsToView,
     };
+  }
+
+  async getBlogPosts({
+    pagination = {},
+    sortBy = "createdAt",
+    sortDirection = "desc",
+    blogId,
+  }: QueryParams & { blogId: PostWithId["blogId"] }) {
+    const postsByBlogId = await postsQueryRepository.getAllPosts({
+      pagination,
+      sortBy,
+      sortDirection,
+      blogId,
+    });
+
+    return postsByBlogId;
   }
 
   async getBlogById(id: BlogWithId["id"]) {
