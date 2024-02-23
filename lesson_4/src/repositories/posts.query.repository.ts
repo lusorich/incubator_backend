@@ -37,8 +37,6 @@ export class PostsQueryRepository {
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .toArray();
 
-    console.log("blogId", blogId);
-
     let allPostsToView: (PostWithId | null)[] = [];
 
     if (allPosts.length > 0) {
