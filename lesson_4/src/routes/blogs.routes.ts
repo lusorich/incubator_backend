@@ -169,7 +169,7 @@ const getFilters = (query: ParsedQs) => {
     return "desc";
   };
 
-  const sortBy = String(query.sortBy) || "createdAt";
+  const sortBy = (query.sortBy && String(query.sortBy)) || "createdAt";
   const searchNameTerm = (query.searchNameTerm as string | undefined) || null;
 
   return { pagination, sortDirection: sortDirection(), sortBy, searchNameTerm };

@@ -20,7 +20,7 @@ export class BlogsQueryRepository {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
     const allBlogsWithoutSorting = await this.coll.find().toArray();
-    const allBlogsCount = allBlogsWithoutSorting.length - 1;
+    const allBlogsCount = allBlogsWithoutSorting.length;
 
     const allBlogs = await this.coll
       .find({
@@ -38,6 +38,16 @@ export class BlogsQueryRepository {
 
     if (allBlogs.length > 0) {
       allBlogsToView = allBlogs.map(this._mapToBlogViewModel);
+    }
+
+    if (searchNameTerm) {
+      return {
+        pagesCount: Math.ceil(allBlogs.length / pageSize),
+        totalCount: allBlogs.length,
+        pageSize,
+        page: pageNumber,
+        items: allBlogsToView,
+      };
     }
 
     return {

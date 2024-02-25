@@ -2,8 +2,9 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 
 import { checkSchema, validationResult } from "express-validator";
-import { ErrorsMessages, Post, PostWithId } from "../types";
+import { ErrorsMessages, Post, PostWithId, SortDirection } from "../types";
 import { getFormattedErrors } from "../helpers";
+import { ParsedQs } from "qs";
 
 import { postsSchema } from "../schemas/posts.schema";
 
@@ -16,10 +17,16 @@ export const postsRouter = Router({});
 
 postsRouter
   .route(ENDPOINTS.POSTS)
-  .get(async (_req: Request, res: Response) => {
-    const allBlogs = await postsQueryRepository.getAllPosts({});
+  .get(async (req: Request, res: Response) => {
+    const { pagination, sortDirection, sortBy } = getFilters(req.query);
 
-    res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
+    const allPosts = await postsQueryRepository.getAllPosts({
+      pagination,
+      sortDirection,
+      sortBy,
+    });
+
+    res.status(HTTP_STATUS.SUCCESS).json(allPosts);
   })
   .post(
     checkSchema(
@@ -129,3 +136,22 @@ postsRouter
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
+
+const getFilters = (query: ParsedQs) => {
+  const pagination = {
+    pageNumber: +(query.pageNumber || 1),
+    pageSize: +(query.pageSize || 10),
+  };
+
+  const sortDirection = (): SortDirection => {
+    if (query.sortDirection === "asc") {
+      return "asc";
+    }
+
+    return "desc";
+  };
+
+  const sortBy = (query.sortBy && String(query.sortBy)) || "createdAt";
+
+  return { pagination, sortDirection: sortDirection(), sortBy };
+};

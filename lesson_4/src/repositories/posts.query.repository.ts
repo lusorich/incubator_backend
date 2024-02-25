@@ -22,8 +22,16 @@ export class PostsQueryRepository {
   }: QueryParams & { blogId?: PostWithId["blogId"] }) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
-    const allPostsWithoutSorting = await this.coll.find().toArray();
-    const allPostsCount = allPostsWithoutSorting.length - 1;
+    const allPostsWithoutSorting = await this.coll
+      .find({
+        blogId: {
+          $regex: blogId || /./,
+          $options: "i",
+        },
+      })
+      .toArray();
+
+    const allPostsCount = allPostsWithoutSorting.length;
 
     const allPosts = await this.coll
       .find({
