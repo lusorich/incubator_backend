@@ -1,12 +1,20 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
-import { body, checkSchema, validationResult } from "express-validator";
-import { Blog, BlogWithId, ErrorsMessages, SortDirection } from "../types";
+import { checkSchema, validationResult } from "express-validator";
+import {
+  Blog,
+  BlogWithId,
+  ErrorsMessages,
+  Post,
+  SortDirection,
+} from "../types";
 import { getFormattedErrors } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
 import { blogsService } from "../domain/blogs.service";
 import { blogsQueryRepository } from "../repositories/blogs.query.repository";
 import { ParsedQs } from "qs";
+import { postsSchema } from "../schemas/posts.schema";
+import { postsService } from "../domain/posts.service";
 
 export const blogsRouter = Router({});
 
@@ -114,7 +122,38 @@ blogsRouter
     }
 
     return res.status(HTTP_STATUS.SUCCESS).json(posts);
-  });
+  })
+  .post(
+    checkSchema(
+      {
+        content: postsSchema["content"],
+        title: postsSchema["title"],
+        shortDescription: postsSchema["shortDescription"],
+      },
+      ["body"]
+    ),
+    async (req: Request, res: Response<Post | ErrorsMessages>) => {
+      const errors = validationResult(req).array({ onlyFirstError: true });
+
+      if (errors.length) {
+        const formattedErrors = getFormattedErrors(errors);
+
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+      }
+
+      const blogId = req.params.id;
+
+      const blog = await blogsQueryRepository.getBlogById(blogId);
+
+      if (!blog) {
+        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
+      }
+
+      const newPost = await postsService.addPost({ ...req.body, blogId });
+
+      return res.status(HTTP_STATUS.CREATED).json(newPost || undefined);
+    }
+  );
 
 const getFilters = (query: ParsedQs) => {
   const pagination = {

@@ -1,5 +1,5 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { BlogWithId, Post, PostWithId, QueryParams } from "../types";
+import { BlogWithId, PostWithId, QueryParams } from "../types";
 import { client } from "../db/db";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
 
