@@ -4,7 +4,17 @@ import { client } from "../db/db";
 import { Blog, BlogWithId } from "../types";
 import { blogsQueryRepository } from "./blogs.query.repository";
 
-export class BlogsCommandsRepository {
+export interface IBblogsCommandsRepository {
+  addBlog: (newBlob: BlogWithId) => Promise<BlogWithId | null>;
+  updateBlogById: (
+    id: BlogWithId["id"],
+    props: Partial<Blog>
+  ) => Promise<boolean>;
+  deleteBlogById: (id: BlogWithId["id"]) => Promise<boolean>;
+  clearBlogs: () => Promise<this>;
+}
+
+export class BlogsCommandsRepository implements IBblogsCommandsRepository {
   coll: Collection<BlogWithId>;
 
   constructor() {
