@@ -1,14 +1,8 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { checkSchema, validationResult } from "express-validator";
-import {
-  Blog,
-  BlogWithId,
-  ErrorsMessages,
-  Post,
-  SortDirection,
-} from "../types";
-import { getFormattedErrors } from "../helpers";
+import { Blog, BlogWithId, ErrorsMessages, Post } from "../types";
+import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
 import { blogsService } from "../domain/blogs.service";
 import { blogsQueryRepository } from "../repositories/blogs.query.repository";
@@ -21,9 +15,8 @@ export const blogsRouter = Router({});
 blogsRouter
   .route(ENDPOINTS.BLOGS)
   .get(async (req: Request, res: Response) => {
-    const { pagination, sortDirection, sortBy, searchNameTerm } = getFilters(
-      req.query
-    );
+    const { pagination, sortDirection, sortBy, searchNameTerm } =
+      getFiltersFromQuery(req.query);
 
     const allBlogs = await blogsQueryRepository.getAllBlogs({
       pagination,
@@ -107,7 +100,9 @@ blogsRouter
 blogsRouter
   .route(ENDPOINTS.POSTS_BY_BLOG_ID)
   .get(async (req: Request, res: Response) => {
-    const { pagination, sortBy, sortDirection } = getFilters(req.query);
+    const { pagination, sortBy, sortDirection } = getFiltersFromQuery(
+      req.query
+    );
     const blogId = req.params.id;
 
     const posts = await blogsQueryRepository.getBlogPosts({
@@ -154,23 +149,3 @@ blogsRouter
       return res.status(HTTP_STATUS.CREATED).json(newPost || undefined);
     }
   );
-
-const getFilters = (query: ParsedQs) => {
-  const pagination = {
-    pageNumber: +(query.pageNumber || 1),
-    pageSize: +(query.pageSize || 10),
-  };
-
-  const sortDirection = (): SortDirection => {
-    if (query.sortDirection === "asc") {
-      return "asc";
-    }
-
-    return "desc";
-  };
-
-  const sortBy = (query.sortBy && String(query.sortBy)) || "createdAt";
-  const searchNameTerm = (query.searchNameTerm as string | undefined) || null;
-
-  return { pagination, sortDirection: sortDirection(), sortBy, searchNameTerm };
-};

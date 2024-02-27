@@ -1,5 +1,5 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME, SortDirection } from "../constants";
 import { client } from "../db/db";
 import { BlogWithId, PostWithId, QueryParams } from "../types";
 import { postsQueryRepository } from "./posts.query.repository";
@@ -14,7 +14,7 @@ export class BlogsQueryRepository {
   async getAllBlogs({
     pagination = {},
     sortBy = "createdAt",
-    sortDirection = "desc",
+    sortDirection,
     searchNameTerm = null,
   }: QueryParams) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
@@ -31,7 +31,7 @@ export class BlogsQueryRepository {
       })
       .limit(pageSize)
       .skip((pageNumber - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 })
       .toArray();
 
     let allBlogsToView: (BlogWithId | null)[] = [];
@@ -62,7 +62,7 @@ export class BlogsQueryRepository {
   async getBlogPosts({
     pagination = {},
     sortBy = "createdAt",
-    sortDirection = "desc",
+    sortDirection,
     blogId,
   }: QueryParams & { blogId: PostWithId["blogId"] }) {
     const postsByBlogId = await postsQueryRepository.getAllPosts({

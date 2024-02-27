@@ -1,7 +1,7 @@
 import { Collection, ObjectId, WithId } from "mongodb";
 import { BlogWithId, PostWithId, QueryParams } from "../types";
 import { client } from "../db/db";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME, SortDirection } from "../constants";
 
 export class PostsQueryRepository {
   coll: Collection<PostWithId>;
@@ -17,7 +17,7 @@ export class PostsQueryRepository {
   async getAllPosts({
     pagination = {},
     sortBy = "createdAt",
-    sortDirection = "desc",
+    sortDirection,
     blogId,
   }: QueryParams & { blogId?: PostWithId["blogId"] }) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
@@ -42,7 +42,7 @@ export class PostsQueryRepository {
       })
       .limit(pageSize)
       .skip((pageNumber - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 })
       .toArray();
 
     let allPostsToView: (PostWithId | null)[] = [];

@@ -1,3 +1,5 @@
+import { SortDirection } from "./constants";
+
 export interface Blog {
   name: string;
   description: string;
@@ -41,8 +43,6 @@ export type Pagination = {
   pageNumber?: number;
   pageSize?: number;
 };
-
-export type SortDirection = "asc" | "desc";
 
 export interface QueryParams {
   pagination?: Pagination;

@@ -26,3 +26,8 @@ export const enum MONGO_COLLECTIONS {
   BLOGS = "blogs",
   POSTS = "posts",
 }
+
+export enum SortDirection {
+  ASC = "asc",
+  DESC = "desc",
+}
