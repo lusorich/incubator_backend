@@ -1,18 +1,13 @@
-import { Collection } from "mongodb";
-import { Blog, BlogWithId } from "../types";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
-import { client } from "../db/db";
+import { Blog, BlogWithId } from "../../types";
 import {
   IBblogsCommandsRepository,
   blogsCommandsRepository,
-} from "../repositories/blogs.commands.repository";
+} from "../../repositories/commands/blogs.commands.repository";
 
 export class BlogsService {
-  coll: Collection<BlogWithId>;
   blogsCommandsRepository: IBblogsCommandsRepository;
 
   constructor() {
-    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
     this.blogsCommandsRepository = blogsCommandsRepository;
   }
 

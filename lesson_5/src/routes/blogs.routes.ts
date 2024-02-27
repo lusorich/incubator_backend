@@ -4,11 +4,11 @@ import { checkSchema, validationResult } from "express-validator";
 import { Blog, BlogWithId, ErrorsMessages, Post } from "../types";
 import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
-import { blogsService } from "../domain/blogs.service";
-import { blogsQueryRepository } from "../repositories/blogs.query.repository";
+import { blogsService } from "../domain/services/blogs.service";
+import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
 import { ParsedQs } from "qs";
 import { postsSchema } from "../schemas/posts.schema";
-import { postsService } from "../domain/posts.service";
+import { postsService } from "../domain/services/posts.service";
 
 export const blogsRouter = Router({});
 

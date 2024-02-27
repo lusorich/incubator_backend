@@ -40,13 +40,13 @@ export type ErrorsMessages = {
 };
 
 export type Pagination = {
-  pageNumber?: number;
-  pageSize?: number;
+  pageNumber: number;
+  pageSize: number;
 };
 
 export interface QueryParams {
-  pagination?: Pagination;
-  sortDirection?: SortDirection;
-  sortBy?: string | keyof BlogWithId | keyof PostWithId;
+  pagination: Pagination;
+  sortDirection: SortDirection;
+  sortBy: string | keyof BlogWithId | keyof PostWithId;
   searchNameTerm?: string | null;
 }

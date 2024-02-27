@@ -1,7 +1,11 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME, SortDirection } from "../constants";
-import { client } from "../db/db";
-import { BlogWithId, PostWithId, QueryParams } from "../types";
+import {
+  MONGO_COLLECTIONS,
+  MONGO_DB_NAME,
+  SortDirection,
+} from "../../constants";
+import { client } from "../../db/db";
+import { BlogWithId, PostWithId, QueryParams } from "../../types";
 import { postsQueryRepository } from "./posts.query.repository";
 
 export class BlogsQueryRepository {
@@ -12,8 +16,8 @@ export class BlogsQueryRepository {
   }
 
   async getAllBlogs({
-    pagination = {},
-    sortBy = "createdAt",
+    pagination,
+    sortBy,
     sortDirection,
     searchNameTerm = null,
   }: QueryParams) {
@@ -60,8 +64,8 @@ export class BlogsQueryRepository {
   }
 
   async getBlogPosts({
-    pagination = {},
-    sortBy = "createdAt",
+    pagination,
+    sortBy,
     sortDirection,
     blogId,
   }: QueryParams & { blogId: PostWithId["blogId"] }) {

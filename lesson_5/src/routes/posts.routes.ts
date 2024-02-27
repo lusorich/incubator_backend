@@ -4,13 +4,12 @@ import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { checkSchema, validationResult } from "express-validator";
 import { ErrorsMessages, Post, PostWithId } from "../types";
 import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
-import { ParsedQs } from "qs";
 
 import { postsSchema } from "../schemas/posts.schema";
 
-import { blogsQueryRepository } from "../repositories/blogs.query.repository";
-import { postsQueryRepository } from "../repositories/posts.query.repository";
-import { postsService } from "../domain/posts.service";
+import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
+import { postsQueryRepository } from "../repositories/query/posts.query.repository";
+import { postsService } from "../domain/services/posts.service";
 
 export const postsRouter = Router({});
 

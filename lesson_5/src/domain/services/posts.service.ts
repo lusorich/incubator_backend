@@ -1,6 +1,6 @@
-import { Post, PostWithId } from "../types";
-import { postsCommandsRepository } from "../repositories/posts.commands.repository";
-import { blogsQueryRepository } from "../repositories/blogs.query.repository";
+import { Post, PostWithId } from "../../types";
+import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
+import { blogsQueryRepository } from "../../repositories/query/blogs.query.repository";
 
 export class PostsService {
   async addPost(post: Post) {

@@ -1,7 +1,7 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
-import { blogsCommandsRepository } from "../repositories/blogs.commands.repository";
-import { postsCommandsRepository } from "../repositories/posts.commands.repository";
+import { blogsCommandsRepository } from "../repositories/commands/blogs.commands.repository";
+import { postsCommandsRepository } from "../repositories/commands/posts.commands.repository";
 
 export const testingRouter = Router({});
 
