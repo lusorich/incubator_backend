@@ -10,6 +10,7 @@ import { postsSchema } from "../schemas/posts.schema";
 import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
 import { postsQueryRepository } from "../repositories/query/posts.query.repository";
 import { postsService } from "../domain/services/posts.service";
+import { checkAuth } from "../auth.middleware";
 
 export const postsRouter = Router({});
 
@@ -29,6 +30,7 @@ postsRouter
     res.status(HTTP_STATUS.SUCCESS).json(allPosts);
   })
   .post(
+    checkAuth,
     checkSchema(
       {
         ...postsSchema,
@@ -49,7 +51,7 @@ postsRouter
       },
       ["body"]
     ),
-    async (req: Request<Post>, res: Response<Post | ErrorsMessages>) => {
+    async (req: Request, res: Response<Post | ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
 
       if (errors.length) {
@@ -63,7 +65,7 @@ postsRouter
       return res.status(HTTP_STATUS.CREATED).json(newPost);
     }
   )
-  .delete(async (_req, res: Response) => {
+  .delete(checkAuth, async (_req, res: Response) => {
     await postsService.clearPosts();
 
     res.sendStatus(HTTP_STATUS.SUCCESS);
@@ -82,6 +84,7 @@ postsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(foundPost);
   })
   .put(
+    checkAuth,
     checkSchema(
       {
         ...postsSchema,
@@ -125,7 +128,7 @@ postsRouter
       return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }
   )
-  .delete(async (req: Request, res: Response) => {
+  .delete(checkAuth, async (req: Request, res: Response) => {
     const found = await postsQueryRepository.getPostById(req.params.id);
 
     if (!found) {

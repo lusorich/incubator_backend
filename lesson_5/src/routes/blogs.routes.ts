@@ -9,6 +9,7 @@ import { blogsQueryRepository } from "../repositories/query/blogs.query.reposito
 import { ParsedQs } from "qs";
 import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
+import { checkAuth } from "../auth.middleware";
 
 export const blogsRouter = Router({});
 
@@ -28,8 +29,9 @@ blogsRouter
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })
   .post(
+    checkAuth,
     checkSchema(blogsSchema, ["body"]),
-    async (req: Request<Blog>, res: Response<Blog | ErrorsMessages>) => {
+    async (req: Request, res: Response<Blog | ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
 
       if (errors.length) {
@@ -43,7 +45,7 @@ blogsRouter
       return res.status(HTTP_STATUS.CREATED).json(newBlog || undefined);
     }
   )
-  .delete(async (_req, res: Response) => {
+  .delete(checkAuth, async (_req, res: Response) => {
     await blogsService.clearBlogs();
 
     res.sendStatus(HTTP_STATUS.SUCCESS);
@@ -62,6 +64,7 @@ blogsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(foundBlog);
   })
   .put(
+    checkAuth,
     checkSchema(blogsSchema, ["body"]),
     async (req: Request, res: Response<ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
@@ -85,7 +88,7 @@ blogsRouter
     }
   )
   //TODO: возможно нет смысла сначала искать, достаточно делать удаление и проверять было ли что то удалено
-  .delete(async (req: Request, res: Response) => {
+  .delete(checkAuth, async (req: Request, res: Response) => {
     const found = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!found) {
@@ -119,6 +122,7 @@ blogsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(posts);
   })
   .post(
+    checkAuth,
     checkSchema(
       {
         content: postsSchema["content"],

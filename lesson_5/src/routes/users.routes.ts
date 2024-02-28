@@ -5,12 +5,13 @@ import { usersQueryRepository } from "../repositories/query/users.query.reposito
 import { checkSchema, validationResult } from "express-validator";
 import { usersSchema } from "../schemas/users.schema";
 import { usersService } from "../domain/services/users.service";
+import { checkAuth } from "../auth.middleware";
 
 export const usersRouter = Router({});
 
 usersRouter
   .route(ENDPOINTS.USERS)
-  .get(async (req: Request, res: Response) => {
+  .get(checkAuth, async (req: Request, res: Response) => {
     const {
       sortBy,
       sortDirection,
@@ -30,6 +31,7 @@ usersRouter
     res.status(HTTP_STATUS.SUCCESS).json(users);
   })
   .post(
+    checkAuth,
     checkSchema(usersSchema, ["body"]),
     async (req: Request, res: Response) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
@@ -48,7 +50,7 @@ usersRouter
 
 usersRouter
   .route(ENDPOINTS.USERS_ID)
-  .delete(async (req: Request, res: Response) => {
+  .delete(checkAuth, async (req: Request, res: Response) => {
     const found = await usersQueryRepository.getUserById(req.params.id);
 
     if (!found) {
