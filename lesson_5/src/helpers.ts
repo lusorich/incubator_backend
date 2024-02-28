@@ -38,6 +38,15 @@ export const getFiltersFromQuery = (query: ParsedQs) => {
 
   const sortBy = (query.sortBy && String(query.sortBy)) || "createdAt";
   const searchNameTerm = (query.searchNameTerm as string | undefined) || null;
+  const searchLoginTerm = (query.searchLoginTerm as string | undefined) || null;
+  const searchEmailTerm = (query.searchEmailTerm as string | undefined) || null;
 
-  return { pagination, sortDirection: sortDirection(), sortBy, searchNameTerm };
+  return {
+    pagination,
+    sortDirection: sortDirection(),
+    sortBy,
+    searchNameTerm,
+    searchEmailTerm,
+    searchLoginTerm,
+  };
 };

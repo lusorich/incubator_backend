@@ -6,10 +6,20 @@ export interface Blog {
   websiteUrl: string;
 }
 
+export interface User {
+  login: string;
+  email: string;
+  createdAt: Date;
+}
+
 export interface BlogWithId extends Blog {
   id: string;
   createdAt: Date;
   isMembership: boolean;
+}
+
+export interface UserWithId extends User {
+  id: string;
 }
 
 export interface Post {
@@ -49,4 +59,6 @@ export interface QueryParams {
   sortDirection: SortDirection;
   sortBy: string | keyof BlogWithId | keyof PostWithId;
   searchNameTerm?: string | null;
+  searchLoginTerm?: string | null;
+  searchEmailTerm?: string | null;
 }
