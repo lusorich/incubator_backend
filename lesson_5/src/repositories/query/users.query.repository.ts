@@ -5,10 +5,10 @@ import {
   SortDirection,
 } from "../../constants";
 import { client } from "../../db/db";
-import { QueryParams, UserWithId } from "../../types";
+import { QueryParams, UserDb, UserViewWithId } from "../../types";
 
 export class UsersQueryRepository {
-  coll: Collection<UserWithId>;
+  coll: Collection<UserDb>;
 
   constructor() {
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.USERS);
@@ -48,7 +48,7 @@ export class UsersQueryRepository {
       .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 })
       .toArray();
 
-    let usersToView: (UserWithId | null)[] = [];
+    let usersToView: (UserViewWithId | null)[] = [];
 
     if (users.length > 0) {
       usersToView = users.map(this._mapToUserViewModel);
@@ -73,7 +73,7 @@ export class UsersQueryRepository {
     };
   }
 
-  async getUserById(id: UserWithId["id"]) {
+  async getUserById(id: UserViewWithId["id"]) {
     const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
     if (!found) {
@@ -83,7 +83,9 @@ export class UsersQueryRepository {
     return this._mapToUserViewModel(found);
   }
 
-  _mapToUserViewModel(user: WithId<UserWithId> | null): UserWithId | null {
+  _mapToUserViewModel(
+    user: WithId<UserDb> | null
+  ): UserViewWithId | null {
     if (!user) {
       return null;
     }

@@ -6,7 +6,15 @@ export interface Blog {
   websiteUrl: string;
 }
 
-export interface User {
+export interface UserDb extends UserViewWithId {
+  hash: string;
+  password: string;
+}
+
+export interface UserViewWithId extends UserView {
+  id: string;
+}
+export interface UserView {
   login: string;
   email: string;
   createdAt: Date;
@@ -16,10 +24,6 @@ export interface BlogWithId extends Blog {
   id: string;
   createdAt: Date;
   isMembership: boolean;
-}
-
-export interface UserWithId extends User {
-  id: string;
 }
 
 export interface Post {

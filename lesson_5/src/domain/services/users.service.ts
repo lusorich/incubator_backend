@@ -2,7 +2,8 @@ import {
   IUsersCommandsRepository,
   usersCommandsRepository,
 } from "../../repositories/commands/users.commands.repository";
-import { User, UserWithId } from "../../types";
+import { UserDb, UserViewWithId } from "../../types";
+import { cryptService } from "./crypt.service";
 
 export class UsersService {
   usersCommandsRepository: IUsersCommandsRepository;
@@ -11,9 +12,16 @@ export class UsersService {
     this.usersCommandsRepository = usersCommandsRepository;
   }
 
-  async addUser(user: User) {
-    const newUser: UserWithId = {
+  async addUser(user: Omit<UserDb, "id">) {
+    const salt = await cryptService.getSalt();
+    const userHash = await cryptService.getHash({
+      password: user.password || "",
+      salt,
+    });
+
+    const newUser: UserDb = {
       ...user,
+      hash: userHash,
       createdAt: new Date(),
       id: String(Math.round(Math.random() * 1000)),
     };
@@ -21,7 +29,7 @@ export class UsersService {
     return await this.usersCommandsRepository.addUser(newUser);
   }
 
-  async deleteUserById(id: UserWithId["id"]) {
+  async deleteUserById(id: UserViewWithId["id"]) {
     return await this.usersCommandsRepository.deleteUserById(id);
   }
 
