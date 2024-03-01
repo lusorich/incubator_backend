@@ -35,3 +35,9 @@ export enum SortDirection {
   ASC = "asc",
   DESC = "desc",
 }
+
+export const REGEXP = {
+  EMAIL: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+  LOGIN: /^[a-zA-Z0-9_-]*$/,
+  URL: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+};

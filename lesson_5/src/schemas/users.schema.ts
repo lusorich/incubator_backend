@@ -1,3 +1,4 @@
+import { REGEXP } from "../constants";
 import { trimSanitizer, getCommonErrorMsg } from "../helpers";
 
 const loginValidator = {
@@ -6,7 +7,7 @@ const loginValidator = {
   isLength: { options: { min: 3, max: 10 } },
   errorMessage: getCommonErrorMsg("login"),
   matches: {
-    options: /^[a-zA-Z0-9_-]*$/,
+    options: REGEXP.LOGIN,
   },
 };
 
@@ -22,7 +23,7 @@ const emailValidator = {
   isString: true,
   errorMessage: getCommonErrorMsg("email"),
   matches: {
-    options: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+    options: REGEXP.EMAIL,
   },
 };
 

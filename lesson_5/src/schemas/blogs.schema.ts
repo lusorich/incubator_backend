@@ -1,3 +1,4 @@
+import { REGEXP } from "../constants";
 import { trimSanitizer, getCommonErrorMsg } from "../helpers";
 
 export const blogNameValidator = {
@@ -20,8 +21,7 @@ export const websiteUrlValidator = {
   isLength: { options: { min: 1, max: 100 } },
   errorMessage: getCommonErrorMsg("websiteUrl"),
   matches: {
-    options:
-      /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+    options: REGEXP.URL,
   },
 };
 
