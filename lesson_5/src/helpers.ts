@@ -53,8 +53,8 @@ export const getFiltersFromQuery = (query: ParsedQs) => {
 
 export const getCommonErrorMsg = (fieldName: string) => `Wrong ${fieldName}`;
 
-export const trimSanitizer = () => ({
-  options: (value: string) => {
+export const trimSanitizer = {
+  options: (value?: string) => {
     return value?.trim();
   },
-});
+};
