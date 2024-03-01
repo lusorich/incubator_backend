@@ -1,36 +1,26 @@
+import { trimSanitizer, getCommonErrorMsg } from "../helpers";
+
 const loginValidator = {
-  customSanitizer: {
-    options: (value: string) => {
-      return value?.trim();
-    },
-  },
+  customSanitizer: trimSanitizer,
   isString: true,
   isLength: { options: { min: 3, max: 10 } },
-  errorMessage: "Wrong login",
+  errorMessage: getCommonErrorMsg("login"),
   matches: {
     options: /^[a-zA-Z0-9_-]*$/,
   },
 };
 
 const passwordValidator = {
-  customSanitizer: {
-    options: (value: string) => {
-      return value?.trim();
-    },
-  },
+  customSanitizer: trimSanitizer,
   isString: true,
   isLength: { options: { min: 6, max: 20 } },
-  errorMessage: "Wrong Password",
+  errorMessage: getCommonErrorMsg("password"),
 };
 
 const emailValidator = {
-  customSanitizer: {
-    options: (value: string) => {
-      return value?.trim();
-    },
-  },
+  customSanitizer: trimSanitizer,
   isString: true,
-  errorMessage: "Wrong Email",
+  errorMessage: getCommonErrorMsg("email"),
   matches: {
     options: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
   },

@@ -2,6 +2,7 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { blogsCommandsRepository } from "../repositories/commands/blogs.commands.repository";
 import { postsCommandsRepository } from "../repositories/commands/posts.commands.repository";
+import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
 
 export const testingRouter = Router({});
 
@@ -10,6 +11,7 @@ testingRouter
   .delete((_req: Request, res: Response) => {
     blogsCommandsRepository.clearBlogs();
     postsCommandsRepository.clearPosts();
+    usersCommandsRepository.clearUsers();
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

@@ -12,7 +12,7 @@ export class UsersService {
     this.usersCommandsRepository = usersCommandsRepository;
   }
 
-  async addUser(user: Omit<UserDb, "id">) {
+  async addUser(user: Omit<UserDb & { password: string }, "id">) {
     const salt = await cryptService.getSalt();
     const userHash = await cryptService.getHash({
       password: user.password || "",
@@ -20,7 +20,8 @@ export class UsersService {
     });
 
     const newUser: UserDb = {
-      ...user,
+      login: user.login,
+      email: user.email,
       hash: userHash,
       createdAt: new Date(),
       id: String(Math.round(Math.random() * 1000)),

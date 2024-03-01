@@ -11,7 +11,7 @@ export const enum ENDPOINTS {
   TESTING = "/testing/all-data",
   USERS = "/users",
   USERS_ID = "/users/:id",
-  LOGIN = "/login",
+  AUTH_LOGIN = "/auth/login",
 }
 
 export const enum HTTP_STATUS {

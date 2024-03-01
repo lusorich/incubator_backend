@@ -28,7 +28,7 @@ export class UsersQueryRepository {
 
     const users = await this.coll
       .find({
-        $and: [
+        $or: [
           {
             login: {
               $regex: searchLoginTerm || /./,
@@ -56,8 +56,8 @@ export class UsersQueryRepository {
 
     if (searchLoginTerm || searchEmailTerm) {
       return {
-        pagesCount: Math.ceil(users.length / pageSize),
-        totalCount: users.length,
+        pagesCount: Math.ceil(usersToView.length / pageSize),
+        totalCount: usersToView.length,
         pageSize,
         page: pageNumber,
         items: usersToView,
@@ -83,9 +83,27 @@ export class UsersQueryRepository {
     return this._mapToUserViewModel(found);
   }
 
-  _mapToUserViewModel(
-    user: WithId<UserDb> | null
-  ): UserViewWithId | null {
+  async findUserByEmail(email: UserViewWithId["email"]) {
+    const found = await this.coll.findOne({ email: email });
+
+    if (!found) {
+      return null;
+    }
+
+    return found;
+  }
+
+  async findUserByLogin(login: UserViewWithId["login"]) {
+    const found = await this.coll.findOne({ login: login });
+
+    if (!found) {
+      return null;
+    }
+
+    return found;
+  }
+
+  _mapToUserViewModel(user: WithId<UserDb> | null): UserViewWithId | null {
     if (!user) {
       return null;
     }

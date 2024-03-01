@@ -50,3 +50,11 @@ export const getFiltersFromQuery = (query: ParsedQs) => {
     searchLoginTerm,
   };
 };
+
+export const getCommonErrorMsg = (fieldName: string) => `Wrong ${fieldName}`;
+
+export const trimSanitizer = () => ({
+  options: (value: string) => {
+    return value?.trim();
+  },
+});

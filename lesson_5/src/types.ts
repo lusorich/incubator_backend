@@ -8,7 +8,6 @@ export interface Blog {
 
 export interface UserDb extends UserViewWithId {
   hash: string;
-  password: string;
 }
 
 export interface UserViewWithId extends UserView {
