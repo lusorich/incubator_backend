@@ -1,43 +1,35 @@
-export const postTitleValidator = {
-  customSanitizer: {
-    options: (value: string) => {
-      return value?.trim();
-    },
-  },
+import { trimSanitizer, getCommonErrorMsg } from "../helpers";
+
+export const titleValidator = {
+  customSanitizer: trimSanitizer,
   isString: true,
   isLength: { options: { min: 1, max: 30 } },
-  errorMessage: "Wrong title",
+  errorMessage: getCommonErrorMsg("title"),
+};
+
+export const shortDescriptionValidator = {
+  customSanitizer: trimSanitizer,
+  isString: true,
+  isLength: { options: { min: 1, max: 100 } },
+  errorMessage: getCommonErrorMsg("short description"),
+};
+
+export const contentValidator = {
+  customSanitizer: trimSanitizer,
+  isString: true,
+  isLength: { options: { min: 1, max: 1000 } },
+  errorMessage: getCommonErrorMsg("content"),
+};
+
+export const blogIdValidator = {
+  customSanitizer: trimSanitizer,
+  isString: true,
+  errorMessage: getCommonErrorMsg("blogId"),
 };
 
 export const postsSchema = {
-  title: postTitleValidator,
-  shortDescription: {
-    customSanitizer: {
-      options: (value: string) => {
-        return value?.trim();
-      },
-    },
-    isString: true,
-    isLength: { options: { min: 1, max: 100 } },
-    errorMessage: "Wrong short description",
-  },
-  content: {
-    customSanitizer: {
-      options: (value: string) => {
-        return value?.trim();
-      },
-    },
-    isString: true,
-    isLength: { options: { min: 1, max: 1000 } },
-    errorMessage: "Wrong content",
-  },
-  blogId: {
-    customSanitizer: {
-      options: (value: string) => {
-        return value?.trim();
-      },
-    },
-    isString: true,
-    errorMessage: "Wrong blogId",
-  },
+  title: titleValidator,
+  shortDescription: shortDescriptionValidator,
+  content: contentValidator,
+  blogId: blogIdValidator,
 };

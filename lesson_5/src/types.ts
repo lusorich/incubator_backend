@@ -1,10 +1,25 @@
-export interface Blog {
+import { SortDirection } from "./constants";
+
+export interface BlogInput {
   name: string;
   description: string;
   websiteUrl: string;
 }
 
-export interface BlogWithId extends Blog {
+export interface UserDb extends UserViewWithId {
+  hash: string;
+}
+
+export interface UserViewWithId extends UserView {
+  id: string;
+}
+export interface UserView {
+  login: string;
+  email: string;
+  createdAt: Date;
+}
+
+export interface BlogWithId extends BlogInput {
   id: string;
   createdAt: Date;
   isMembership: boolean;
@@ -38,15 +53,15 @@ export type ErrorsMessages = {
 };
 
 export type Pagination = {
-  pageNumber?: number;
-  pageSize?: number;
+  pageNumber: number;
+  pageSize: number;
 };
 
-export type SortDirection = "asc" | "desc";
-
 export interface QueryParams {
-  pagination?: Pagination;
-  sortDirection?: SortDirection;
-  sortBy?: string | keyof BlogWithId | keyof PostWithId;
+  pagination: Pagination;
+  sortDirection: SortDirection;
+  sortBy: string | keyof BlogWithId | keyof PostWithId;
   searchNameTerm?: string | null;
+  searchLoginTerm?: string | null;
+  searchEmailTerm?: string | null;
 }

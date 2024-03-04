@@ -1,8 +1,8 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { BlogWithId, Post, PostWithId } from "../types";
-import { client } from "../db/db";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
-import { postsQueryRepository } from "./posts.query.repository";
+import { BlogWithId, Post, PostWithId } from "../../types";
+import { client } from "../../db/db";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
+import { postsQueryRepository } from "../query/posts.query.repository";
 
 export class PostsCommandsRepository {
   coll: Collection<PostWithId>;

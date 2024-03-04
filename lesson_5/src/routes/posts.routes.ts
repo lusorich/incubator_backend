@@ -2,23 +2,24 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 
 import { checkSchema, validationResult } from "express-validator";
-import { ErrorsMessages, Post, PostWithId, SortDirection } from "../types";
-import { getFormattedErrors } from "../helpers";
-import { ParsedQs } from "qs";
+import { ErrorsMessages, Post, PostWithId } from "../types";
+import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
 
 import { postsSchema } from "../schemas/posts.schema";
 
-import { blogsQueryRepository } from "../repositories/blogs.query.repository";
-import { postsQueryRepository } from "../repositories/posts.query.repository";
-import { postsCommandsRepository } from "../repositories/posts.commands.repository";
-import { postsService } from "../domain/posts.service";
+import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
+import { postsQueryRepository } from "../repositories/query/posts.query.repository";
+import { postsService } from "../domain/services/posts.service";
+import { checkAuth } from "../auth.middleware";
 
 export const postsRouter = Router({});
 
 postsRouter
   .route(ENDPOINTS.POSTS)
   .get(async (req: Request, res: Response) => {
-    const { pagination, sortDirection, sortBy } = getFilters(req.query);
+    const { pagination, sortDirection, sortBy } = getFiltersFromQuery(
+      req.query
+    );
 
     const allPosts = await postsQueryRepository.getAllPosts({
       pagination,
@@ -29,6 +30,7 @@ postsRouter
     res.status(HTTP_STATUS.SUCCESS).json(allPosts);
   })
   .post(
+    checkAuth,
     checkSchema(
       {
         ...postsSchema,
@@ -49,7 +51,7 @@ postsRouter
       },
       ["body"]
     ),
-    async (req: Request<Post>, res: Response<Post | ErrorsMessages>) => {
+    async (req: Request, res: Response<Post | ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
 
       if (errors.length) {
@@ -63,7 +65,7 @@ postsRouter
       return res.status(HTTP_STATUS.CREATED).json(newPost);
     }
   )
-  .delete(async (_req, res: Response) => {
+  .delete(checkAuth, async (_req, res: Response) => {
     await postsService.clearPosts();
 
     res.sendStatus(HTTP_STATUS.SUCCESS);
@@ -82,6 +84,7 @@ postsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(foundPost);
   })
   .put(
+    checkAuth,
     checkSchema(
       {
         ...postsSchema,
@@ -125,7 +128,7 @@ postsRouter
       return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }
   )
-  .delete(async (req: Request, res: Response) => {
+  .delete(checkAuth, async (req: Request, res: Response) => {
     const found = await postsQueryRepository.getPostById(req.params.id);
 
     if (!found) {
@@ -136,22 +139,3 @@ postsRouter
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
-
-const getFilters = (query: ParsedQs) => {
-  const pagination = {
-    pageNumber: +(query.pageNumber || 1),
-    pageSize: +(query.pageSize || 10),
-  };
-
-  const sortDirection = (): SortDirection => {
-    if (query.sortDirection === "asc") {
-      return "asc";
-    }
-
-    return "desc";
-  };
-
-  const sortBy = (query.sortBy && String(query.sortBy)) || "createdAt";
-
-  return { pagination, sortDirection: sortDirection(), sortBy };
-};

@@ -1,14 +1,14 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../constants";
-import { client } from "../db/db";
-import { Blog, BlogWithId } from "../types";
-import { blogsQueryRepository } from "./blogs.query.repository";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
+import { client } from "../../db/db";
+import { BlogInput, BlogWithId } from "../../types";
+import { blogsQueryRepository } from "../query/blogs.query.repository";
 
 export interface IBblogsCommandsRepository {
   addBlog: (newBlob: BlogWithId) => Promise<BlogWithId | null>;
   updateBlogById: (
     id: BlogWithId["id"],
-    props: Partial<Blog>
+    props: Partial<BlogInput>
   ) => Promise<boolean>;
   deleteBlogById: (id: BlogWithId["id"]) => Promise<boolean>;
   clearBlogs: () => Promise<this>;
@@ -29,7 +29,7 @@ export class BlogsCommandsRepository implements IBblogsCommandsRepository {
     );
   }
 
-  async updateBlogById(id: BlogWithId["id"], props: Partial<Blog>) {
+  async updateBlogById(id: BlogWithId["id"], props: Partial<BlogInput>) {
     let found = await this.coll.updateOne(
       { _id: new ObjectId(id) },
       { $set: { ...props } }

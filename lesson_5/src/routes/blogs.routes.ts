@@ -1,29 +1,22 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { checkSchema, validationResult } from "express-validator";
-import {
-  Blog,
-  BlogWithId,
-  ErrorsMessages,
-  Post,
-  SortDirection,
-} from "../types";
-import { getFormattedErrors } from "../helpers";
+import { BlogInput, BlogWithId, ErrorsMessages, Post } from "../types";
+import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
-import { blogsService } from "../domain/blogs.service";
-import { blogsQueryRepository } from "../repositories/blogs.query.repository";
-import { ParsedQs } from "qs";
+import { blogsService } from "../domain/services/blogs.service";
+import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
 import { postsSchema } from "../schemas/posts.schema";
-import { postsService } from "../domain/posts.service";
+import { postsService } from "../domain/services/posts.service";
+import { checkAuth } from "../auth.middleware";
 
 export const blogsRouter = Router({});
 
 blogsRouter
   .route(ENDPOINTS.BLOGS)
   .get(async (req: Request, res: Response) => {
-    const { pagination, sortDirection, sortBy, searchNameTerm } = getFilters(
-      req.query
-    );
+    const { pagination, sortDirection, sortBy, searchNameTerm } =
+      getFiltersFromQuery(req.query);
 
     const allBlogs = await blogsQueryRepository.getAllBlogs({
       pagination,
@@ -35,8 +28,12 @@ blogsRouter
     res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
   })
   .post(
+    checkAuth,
     checkSchema(blogsSchema, ["body"]),
-    async (req: Request<Blog>, res: Response<Blog | ErrorsMessages>) => {
+    async (
+      req: Request<Partial<BlogInput>>,
+      res: Response<BlogInput | ErrorsMessages>
+    ) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
 
       if (errors.length) {
@@ -50,7 +47,7 @@ blogsRouter
       return res.status(HTTP_STATUS.CREATED).json(newBlog || undefined);
     }
   )
-  .delete(async (_req, res: Response) => {
+  .delete(checkAuth, async (_req, res: Response) => {
     await blogsService.clearBlogs();
 
     res.sendStatus(HTTP_STATUS.SUCCESS);
@@ -69,6 +66,7 @@ blogsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(foundBlog);
   })
   .put(
+    checkAuth,
     checkSchema(blogsSchema, ["body"]),
     async (req: Request, res: Response<ErrorsMessages>) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
@@ -92,7 +90,7 @@ blogsRouter
     }
   )
   //TODO: возможно нет смысла сначала искать, достаточно делать удаление и проверять было ли что то удалено
-  .delete(async (req: Request, res: Response) => {
+  .delete(checkAuth, async (req: Request, res: Response) => {
     const found = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!found) {
@@ -107,7 +105,9 @@ blogsRouter
 blogsRouter
   .route(ENDPOINTS.POSTS_BY_BLOG_ID)
   .get(async (req: Request, res: Response) => {
-    const { pagination, sortBy, sortDirection } = getFilters(req.query);
+    const { pagination, sortBy, sortDirection } = getFiltersFromQuery(
+      req.query
+    );
     const blogId = req.params.id;
 
     const posts = await blogsQueryRepository.getBlogPosts({
@@ -124,6 +124,7 @@ blogsRouter
     return res.status(HTTP_STATUS.SUCCESS).json(posts);
   })
   .post(
+    checkAuth,
     checkSchema(
       {
         content: postsSchema["content"],
@@ -154,23 +155,3 @@ blogsRouter
       return res.status(HTTP_STATUS.CREATED).json(newPost || undefined);
     }
   );
-
-const getFilters = (query: ParsedQs) => {
-  const pagination = {
-    pageNumber: +(query.pageNumber || 1),
-    pageSize: +(query.pageSize || 10),
-  };
-
-  const sortDirection = (): SortDirection => {
-    if (query.sortDirection === "asc") {
-      return "asc";
-    }
-
-    return "desc";
-  };
-
-  const sortBy = (query.sortBy && String(query.sortBy)) || "createdAt";
-  const searchNameTerm = (query.searchNameTerm as string | undefined) || null;
-
-  return { pagination, sortDirection: sortDirection(), sortBy, searchNameTerm };
-};

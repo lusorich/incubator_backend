@@ -9,6 +9,9 @@ export const enum ENDPOINTS {
   POSTS_BY_BLOG_ID = "/blogs/:id/posts",
   POSTS_ID = "/posts/:id",
   TESTING = "/testing/all-data",
+  USERS = "/users",
+  USERS_ID = "/users/:id",
+  AUTH_LOGIN = "/auth/login",
 }
 
 export const enum HTTP_STATUS {
@@ -25,4 +28,16 @@ export const MONGO_DB_NAME = "kamasutra";
 export const enum MONGO_COLLECTIONS {
   BLOGS = "blogs",
   POSTS = "posts",
+  USERS = "users",
 }
+
+export enum SortDirection {
+  ASC = "asc",
+  DESC = "desc",
+}
+
+export const REGEXP = {
+  EMAIL: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+  LOGIN: /^[a-zA-Z0-9_-]*$/,
+  URL: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+};
