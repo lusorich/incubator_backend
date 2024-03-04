@@ -1,4 +1,4 @@
-import { Blog, BlogWithId } from "../../types";
+import { BlogInput, BlogWithId } from "../../types";
 import {
   IBblogsCommandsRepository,
   blogsCommandsRepository,
@@ -11,7 +11,7 @@ export class BlogsService {
     this.blogsCommandsRepository = blogsCommandsRepository;
   }
 
-  async addBlog(blog: Blog) {
+  async addBlog(blog: BlogInput) {
     const newBlog: BlogWithId = {
       ...blog,
       isMembership: false,
@@ -22,7 +22,7 @@ export class BlogsService {
     return await this.blogsCommandsRepository.addBlog(newBlog);
   }
 
-  async updateBlogById(id: BlogWithId["id"], props: Partial<Blog>) {
+  async updateBlogById(id: BlogWithId["id"], props: Partial<BlogInput>) {
     return await this.blogsCommandsRepository.updateBlogById(id, props);
   }
 

@@ -13,4 +13,5 @@ routes(app);
 const port = process.env.PORT || SETTINGS.PORT;
 
 app.listen(port);
+
 runDb();

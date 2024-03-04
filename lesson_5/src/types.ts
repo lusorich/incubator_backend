@@ -1,6 +1,6 @@
 import { SortDirection } from "./constants";
 
-export interface Blog {
+export interface BlogInput {
   name: string;
   description: string;
   websiteUrl: string;
@@ -19,7 +19,7 @@ export interface UserView {
   createdAt: Date;
 }
 
-export interface BlogWithId extends Blog {
+export interface BlogWithId extends BlogInput {
   id: string;
   createdAt: Date;
   isMembership: boolean;
