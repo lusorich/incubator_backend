@@ -3,7 +3,7 @@ import {
   usersCommandsRepository,
 } from "../../repositories/commands/users.commands.repository";
 import { UserDb, UserViewWithId } from "../../types";
-import { cryptService } from "./crypt.service";
+import { cryptService } from "../../common/services/crypt.service";
 
 export class UsersService {
   usersCommandsRepository: IUsersCommandsRepository;

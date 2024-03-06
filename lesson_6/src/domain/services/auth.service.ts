@@ -1,7 +1,7 @@
 import * as bcrypt from "bcrypt";
 import { usersQueryRepository } from "../../repositories/query/users.query.repository";
-import { cryptService } from "./crypt.service";
-
+import { cryptService } from "../../common/services/crypt.service";
+//TODO: сервис не должен обращаться к квери репозиторию
 export class AuthService {
   async auth({
     loginOrEmail,

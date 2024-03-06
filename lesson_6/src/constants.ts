@@ -1,5 +1,12 @@
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
 export const SETTINGS = {
-  PORT: "3003",
+  PORT: process.env.PORT,
+  MONGO_URL: process.env.MONGO_URL || "",
+  DB_NAME: process.env.DB_NAME || "",
+  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY || "",
 } as const;
 
 export const enum ENDPOINTS {

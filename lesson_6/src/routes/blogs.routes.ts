@@ -9,6 +9,7 @@ import { blogsQueryRepository } from "../repositories/query/blogs.query.reposito
 import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth } from "../auth.middleware";
+import { jwtService } from "../common/services/jwt.service";
 
 export const blogsRouter = Router({});
 
@@ -17,6 +18,10 @@ blogsRouter
   .get(async (req: Request, res: Response) => {
     const { pagination, sortDirection, sortBy, searchNameTerm } =
       getFiltersFromQuery(req.query);
+
+    const jw = jwtService.create("121");
+    const decoded = jwtService.decode(jw);
+    console.log(decoded);
 
     const allBlogs = await blogsQueryRepository.getAllBlogs({
       pagination,
