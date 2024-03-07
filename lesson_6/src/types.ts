@@ -19,6 +19,8 @@ export interface UserView {
   createdAt: Date;
 }
 
+export type UserAuthView = Omit<UserView, "createdAt"> & { userId: string };
+
 export interface BlogWithId extends BlogInput {
   id: string;
   createdAt: Date;

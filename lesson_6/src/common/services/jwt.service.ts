@@ -14,7 +14,7 @@ export class JwtService {
     return token;
   }
 
-  verify(token: string) {
+  isValid(token: string) {
     try {
       const decoded = jwt.verify(token, SETTINGS.JWT_SECRET_KEY);
 

@@ -33,8 +33,8 @@ export const checkJwtAuth = async (
 
     req.userId = user ? user.id : null;
 
-    next();
+    return next();
   }
 
-  next();
+  return next();
 };

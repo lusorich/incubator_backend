@@ -5,6 +5,13 @@ import { checkSchema, validationResult } from "express-validator";
 import { getFormattedErrors } from "../helpers";
 import { authService } from "../domain/services/auth.service";
 import { authSchema } from "../schemas/auth.schema";
+import { checkJwtAuth } from "../auth.middleware";
+import { UserAuthView, UserView } from "../types";
+import {
+  UsersQueryRepository,
+  usersQueryRepository,
+} from "../repositories/query/users.query.repository";
+import { jwtService } from "../common/services/jwt.service";
 
 export const authRouter = Router({});
 
@@ -23,12 +30,34 @@ authRouter
 
       const { loginOrEmail, password } = req.body;
 
-      const isSuccess = await authService.auth({ loginOrEmail, password });
+      const authResult = await authService.auth({ loginOrEmail, password });
 
-      if (!isSuccess) {
+      if (!authResult) {
         return res.sendStatus(HTTP_STATUS.NO_AUTH);
       }
 
-      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+      const token = jwtService.create(authResult.id);
+
+      return res.status(HTTP_STATUS.SUCCESS).send(token);
     }
   );
+
+authRouter
+  .route(ENDPOINTS.AUTH_ME)
+  .get(checkJwtAuth, async (req: Request, res: Response<UserAuthView>) => {
+    const userIdFromRequest = req.userId;
+
+    if (!userIdFromRequest) {
+      return res.sendStatus(HTTP_STATUS.NO_AUTH);
+    }
+
+    const user = await usersQueryRepository.getUserById(userIdFromRequest);
+
+    if (!user) {
+      return res.sendStatus(HTTP_STATUS.NO_AUTH);
+    }
+
+    const { id: userId, email, login } = user;
+
+    return res.status(HTTP_STATUS.SUCCESS).json({ userId, email, login });
+  });

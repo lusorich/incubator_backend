@@ -13,7 +13,7 @@ export class CryptService {
     return this.provider.genSalt();
   }
 
-  async isHashValid({ password, hash }: { password: string; hash: string }) {
+  async isValid({ password, hash }: { password: string; hash: string }) {
     return this.provider.compare(password, hash);
   }
 }
