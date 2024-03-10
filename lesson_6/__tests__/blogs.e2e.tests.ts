@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { ENDPOINTS, HTTP_STATUS } from "../src/constants";
-import { app } from "../src/app";
+import { app, server } from "../src/app";
 
 import { blogsService } from "../src/domain/services/blogs.service";
 import {
@@ -14,6 +14,10 @@ const req = supertest(app);
 
 beforeEach(async () => {
   await blogsService.clearBlogs();
+});
+
+afterAll(() => {
+  server.close();
 });
 
 describe("Testing blogs GET methods", () => {

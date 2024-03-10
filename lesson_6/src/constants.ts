@@ -20,6 +20,7 @@ export const enum ENDPOINTS {
   USERS_ID = "/users/:id",
   AUTH_LOGIN = "/auth/login",
   AUTH_ME = "/auth/me",
+  POSTS_ID_COMMENTS = "/posts/:id/comments",
 }
 
 export const enum HTTP_STATUS {

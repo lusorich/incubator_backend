@@ -36,9 +36,9 @@ authRouter
         return res.sendStatus(HTTP_STATUS.NO_AUTH);
       }
 
-      const token = jwtService.create(authResult.id);
+      const accessToken = jwtService.create(authResult._id.toString());
 
-      return res.status(HTTP_STATUS.SUCCESS).send(token);
+      return res.status(HTTP_STATUS.SUCCESS).json({ accessToken });
     }
   );
 

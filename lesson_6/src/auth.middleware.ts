@@ -29,11 +29,13 @@ export const checkJwtAuth = async (
   const id = jwtService.getIdFromToken(token);
 
   if (id) {
-    const user = await usersQueryRepository.getUserById(id);
+    try {
+      const user = await usersQueryRepository.getUserById(id);
 
-    req.userId = user ? user.id : null;
-
-    return next();
+      req.userId = user ? user.id : null;
+    } catch (e) {
+      return res.sendStatus(HTTP_STATUS.NO_AUTH);
+    }
   }
 
   return next();

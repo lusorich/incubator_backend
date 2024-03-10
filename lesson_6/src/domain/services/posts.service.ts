@@ -1,4 +1,4 @@
-import { Post, PostWithId } from "../../types";
+import { Post, PostWithId, UserViewWithId } from "../../types";
 import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
 import { blogsQueryRepository } from "../../repositories/query/blogs.query.repository";
 
@@ -28,6 +28,27 @@ export class PostsService {
     const isDelete = await postsCommandsRepository.deletePostById(id);
 
     return isDelete;
+  }
+
+  async addCommentToPost({
+    user,
+    post,
+    content,
+  }: {
+    user: UserViewWithId;
+    post: PostWithId;
+    content: string;
+  }) {
+    const comment = {
+      id: String(Math.round(Math.random() * 1000)),
+      content,
+      commentatorInfo: {
+        userId: user.id,
+        userLogin: user.login,
+      },
+      createdAt: new Date(),
+      postId: post.id,
+    };
   }
 
   async clearPosts() {

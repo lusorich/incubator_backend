@@ -19,10 +19,6 @@ blogsRouter
     const { pagination, sortDirection, sortBy, searchNameTerm } =
       getFiltersFromQuery(req.query);
 
-    const jw = jwtService.create("121");
-    const decoded = jwtService.decode(jw);
-    console.log(decoded);
-
     const allBlogs = await blogsQueryRepository.getAllBlogs({
       pagination,
       sortDirection,

@@ -85,6 +85,15 @@ export class PostsQueryRepository {
       createdAt: post.createdAt,
     };
   }
+  //TODO: TS
+  _mapToPostCommentViewModel(comment: any) {
+    return {
+      id: comment._id.toString(),
+      content: comment.content,
+      commentatorInfo: comment.commentatorInfo,
+      createdAt: comment.createdAt,
+    };
+  }
 }
 
 export const postsQueryRepository = new PostsQueryRepository();
