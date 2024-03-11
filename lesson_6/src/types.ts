@@ -19,6 +19,21 @@ export interface UserView {
   createdAt: Date;
 }
 
+export interface CommentatorInfo {
+  userId: string;
+  userLogin: string;
+}
+export interface CommentView {
+  content: string;
+  id: string;
+  commentatorInfo: CommentatorInfo;
+  createdAt: Date;
+}
+
+export interface CommentDb extends CommentView {
+  postId: PostWithId["id"];
+}
+
 export type UserAuthView = Omit<UserView, "createdAt"> & { userId: string };
 
 export interface BlogWithId extends BlogInput {

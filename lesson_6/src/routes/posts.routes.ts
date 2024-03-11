@@ -12,6 +12,8 @@ import { postsQueryRepository } from "../repositories/query/posts.query.reposito
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth, checkJwtAuth } from "../auth.middleware";
 import { usersQueryRepository } from "../repositories/query/users.query.repository";
+import { commentsService } from "../domain/services/comments.service";
+import { commentsQueryRepository } from "../repositories/query/comments.query.repository";
 
 export const postsRouter = Router({});
 
@@ -176,10 +178,32 @@ postsRouter
         return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
-      await postsService.addCommentToPost({
+      const comment = await commentsService.addComment({
         user,
         post,
         content: req.body.content,
       });
+
+      return res.status(HTTP_STATUS.SUCCESS).json(comment);
     }
-  );
+  )
+  .get(async (req: Request, res: Response) => {
+    const { pagination, sortDirection, sortBy } = getFiltersFromQuery(
+      req.query
+    );
+
+    const postId = req.params.id;
+
+    const comments = await commentsQueryRepository.getCommentsByPostId({
+      pagination,
+      sortDirection,
+      sortBy,
+      postId,
+    });
+
+    if (!comments.items.length) {
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
+    }
+
+    res.status(HTTP_STATUS.SUCCESS).json(comments);
+  });

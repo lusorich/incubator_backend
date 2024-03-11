@@ -30,27 +30,6 @@ export class PostsService {
     return isDelete;
   }
 
-  async addCommentToPost({
-    user,
-    post,
-    content,
-  }: {
-    user: UserViewWithId;
-    post: PostWithId;
-    content: string;
-  }) {
-    const comment = {
-      id: String(Math.round(Math.random() * 1000)),
-      content,
-      commentatorInfo: {
-        userId: user.id,
-        userLogin: user.login,
-      },
-      createdAt: new Date(),
-      postId: post.id,
-    };
-  }
-
   async clearPosts() {
     await postsCommandsRepository.clearPosts();
 
