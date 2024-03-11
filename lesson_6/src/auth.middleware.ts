@@ -36,6 +36,8 @@ export const checkJwtAuth = async (
     } catch (e) {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
+  } else {
+    return res.sendStatus(HTTP_STATUS.NO_AUTH);
   }
 
   return next();

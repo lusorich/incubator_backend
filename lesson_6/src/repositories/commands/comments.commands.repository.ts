@@ -30,6 +30,22 @@ export class CommentsCommandsRepository {
     return true;
   }
 
+  async updateCommentById(
+    id: CommentView["id"],
+    newContent: CommentView["content"]
+  ) {
+    let found = await this.coll.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { content: newContent } }
+    );
+
+    if (!found.matchedCount) {
+      return false;
+    }
+
+    return true;
+  }
+
   async clearComments() {
     await this.coll.deleteMany({});
 

@@ -184,7 +184,7 @@ postsRouter
         content: req.body.content,
       });
 
-      return res.status(HTTP_STATUS.SUCCESS).json(comment);
+      return res.status(HTTP_STATUS.CREATED).json(comment);
     }
   )
   .get(async (req: Request, res: Response) => {
@@ -205,5 +205,5 @@ postsRouter
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
-    res.status(HTTP_STATUS.SUCCESS).json(comments);
+    return res.status(HTTP_STATUS.SUCCESS).json(comments);
   });

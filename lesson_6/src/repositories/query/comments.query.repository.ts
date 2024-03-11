@@ -29,8 +29,9 @@ export class CommentsQueryRepository {
   }: QueryParams & { postId: PostWithId["id"] }) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
-    const allCommentsWithoutSorting = await this.coll.find().toArray();
-    const allCommentsCount = allCommentsWithoutSorting.length;
+    const allCommentsWithoutLimit = await this.coll
+      .find({ postId: { $regex: postId, $options: "i" } })
+      .toArray();
 
     const allComments = await this.coll
       .find({ postId: { $regex: postId, $options: "i" } })
@@ -46,8 +47,8 @@ export class CommentsQueryRepository {
     }
 
     return {
-      pagesCount: Math.ceil(allCommentsCount / pageSize),
-      totalCount: allCommentsCount,
+      pagesCount: Math.ceil(allCommentsWithoutLimit.length / pageSize),
+      totalCount: allCommentsWithoutLimit.length,
       pageSize,
       page: pageNumber,
       items: allCommentsToView,
@@ -55,13 +56,17 @@ export class CommentsQueryRepository {
   }
 
   async getCommentById(id: BlogWithId["id"]) {
-    const found = await this.coll.findOne({ _id: new ObjectId(id) });
+    try {
+      const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
-    if (!found) {
+      if (!found) {
+        return null;
+      }
+
+      return this._mapToCommentViewModel(found);
+    } catch (e) {
       return null;
     }
-
-    return this._mapToCommentViewModel(found);
   }
 
   _mapToCommentViewModel(

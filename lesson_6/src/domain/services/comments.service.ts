@@ -1,17 +1,29 @@
-import { CommentDb, Post, PostWithId, UserViewWithId } from "../../types";
+import {
+  CommentDb,
+  CommentView,
+  Post,
+  PostWithId,
+  UserViewWithId,
+} from "../../types";
 import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
 import { blogsQueryRepository } from "../../repositories/query/blogs.query.repository";
 import { commentsCommandsRepository } from "../../repositories/commands/comments.commands.repository";
 
 export class CommentsService {
-  async updateCommentById(id: PostWithId["id"], props: Partial<Post>) {
-    const isFound = await postsCommandsRepository.updatePostById(id, props);
+  async updateCommentById(
+    id: CommentView["id"],
+    props: CommentView["content"]
+  ) {
+    const isFound = await commentsCommandsRepository.updateCommentById(
+      id,
+      props
+    );
 
     return isFound;
   }
 
   async deleteCommentById(id: PostWithId["id"]) {
-    const isDelete = await postsCommandsRepository.deletePostById(id);
+    const isDelete = await commentsCommandsRepository.deleteCommentById(id);
 
     return isDelete;
   }

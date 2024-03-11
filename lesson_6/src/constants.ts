@@ -21,6 +21,7 @@ export const enum ENDPOINTS {
   AUTH_LOGIN = "/auth/login",
   AUTH_ME = "/auth/me",
   POSTS_ID_COMMENTS = "/posts/:id/comments",
+  COMMENTS_ID = "/comments/:id",
 }
 
 export const enum HTTP_STATUS {
@@ -30,6 +31,7 @@ export const enum HTTP_STATUS {
   INCORRECT = 400,
   NO_CONTENT = 204,
   NO_AUTH = 401,
+  INCORRECT_OWNER = 403,
 }
 
 export const MONGO_DB_NAME = "kamasutra";
