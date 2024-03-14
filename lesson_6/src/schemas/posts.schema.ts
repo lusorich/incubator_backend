@@ -27,9 +27,20 @@ export const blogIdValidator = {
   errorMessage: getCommonErrorMsg("blogId"),
 };
 
+export const postCommentContentValidator = {
+  customSanitizer: trimSanitizer,
+  isString: true,
+  isLength: { options: { min: 20, max: 300 } },
+  errorMessage: getCommonErrorMsg("content"),
+};
+
 export const postsSchema = {
   title: titleValidator,
   shortDescription: shortDescriptionValidator,
   content: contentValidator,
   blogId: blogIdValidator,
+};
+
+export const postsAddCommentSchema = {
+  content: postCommentContentValidator,
 };

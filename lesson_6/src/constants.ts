@@ -1,5 +1,12 @@
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
 export const SETTINGS = {
-  PORT: "3003",
+  PORT: process.env.PORT,
+  MONGO_URL: process.env.MONGO_URL || "",
+  DB_NAME: process.env.DB_NAME || "",
+  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY || "",
 } as const;
 
 export const enum ENDPOINTS {
@@ -12,6 +19,9 @@ export const enum ENDPOINTS {
   USERS = "/users",
   USERS_ID = "/users/:id",
   AUTH_LOGIN = "/auth/login",
+  AUTH_ME = "/auth/me",
+  POSTS_ID_COMMENTS = "/posts/:id/comments",
+  COMMENTS_ID = "/comments/:id",
 }
 
 export const enum HTTP_STATUS {
@@ -21,6 +31,7 @@ export const enum HTTP_STATUS {
   INCORRECT = 400,
   NO_CONTENT = 204,
   NO_AUTH = 401,
+  INCORRECT_OWNER = 403,
 }
 
 export const MONGO_DB_NAME = "kamasutra";
@@ -29,6 +40,7 @@ export const enum MONGO_COLLECTIONS {
   BLOGS = "blogs",
   POSTS = "posts",
   USERS = "users",
+  COMMENTS = "comments",
 }
 
 export enum SortDirection {

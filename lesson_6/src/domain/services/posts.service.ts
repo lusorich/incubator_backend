@@ -1,4 +1,4 @@
-import { Post, PostWithId } from "../../types";
+import { Post, PostWithId, UserViewWithId } from "../../types";
 import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
 import { blogsQueryRepository } from "../../repositories/query/blogs.query.repository";
 

@@ -9,6 +9,7 @@ import { blogsQueryRepository } from "../repositories/query/blogs.query.reposito
 import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth } from "../auth.middleware";
+import { jwtService } from "../common/services/jwt.service";
 
 export const blogsRouter = Router({});
 

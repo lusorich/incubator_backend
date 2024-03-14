@@ -1,8 +1,38 @@
 import * as bcrypt from "bcrypt";
 import { usersQueryRepository } from "../../repositories/query/users.query.repository";
-import { cryptService } from "./crypt.service";
+import { cryptService } from "../../common/services/crypt.service";
+import { WithId } from "mongodb";
+import { UserDb } from "../../types";
+//TODO: сервис не должен обращаться к квери репозиторию
 
-export class AuthService {
+// единый интерфейс для AuthService, но разная зависимость для сервиса
+
+export interface IAuthService {
+  auth: ({
+    loginOrEmail,
+    password,
+  }: {
+    loginOrEmail: string;
+    password: string;
+  }) => Promise<WithId<UserDb> | boolean>;
+
+  authWithEmail: ({
+    password,
+    email,
+  }: {
+    password: string;
+    email: string;
+  }) => Promise<WithId<UserDb> | boolean>;
+
+  authWithLogin: ({
+    password,
+    login,
+  }: {
+    password: string;
+    login: string;
+  }) => Promise<WithId<UserDb> | boolean>;
+}
+export class AuthService implements IAuthService {
   async auth({
     loginOrEmail,
     password,
@@ -15,19 +45,19 @@ export class AuthService {
     )?.length;
 
     if (isEmail) {
-      const isSuccess = await this.authWithEmail({
+      const result = await this.authWithEmail({
         email: loginOrEmail,
         password,
       });
 
-      return isSuccess;
+      return result;
     } else {
-      const isSuccess = await this.authWithLogin({
+      const result = await this.authWithLogin({
         login: loginOrEmail,
         password,
       });
 
-      return isSuccess;
+      return result;
     }
   }
 
@@ -44,10 +74,16 @@ export class AuthService {
       return false;
     }
 
-    return await cryptService.isHashValid({
+    const isHashValid = await cryptService.isValid({
       password,
       hash: found.hash,
     });
+
+    if (!isHashValid) {
+      return false;
+    }
+
+    return found;
   }
 
   async authWithLogin({
@@ -63,10 +99,16 @@ export class AuthService {
       return false;
     }
 
-    return await cryptService.isHashValid({
+    const isHashValid = await cryptService.isValid({
       password,
       hash: found.hash,
     });
+
+    if (!isHashValid) {
+      return false;
+    }
+
+    return found;
   }
 }
 
