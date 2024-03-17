@@ -4,7 +4,7 @@ import { client } from "../../db/db";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
 import { postsQueryRepository } from "../query/posts.query.repository";
 import { usersQueryRepository } from "../query/users.query.repository";
-import { UserDb, UserViewWithId } from "../../types";
+import { UserDb, UserEmailConfirmation, UserViewWithId } from "../../types";
 
 export interface IUsersCommandsRepository {
   addUser: (newUser: UserDb) => Promise<UserViewWithId | null>;
@@ -39,6 +39,48 @@ export class UsersCommandsRepository {
     await this.coll.deleteMany({});
 
     return this;
+  }
+
+  //TODO: Maybe in service
+  async setUserIsConfirmed(id: ObjectId) {
+    let found = await this.coll.updateOne(
+      { _id: id },
+      {
+        $set: {
+          emailConfirmation: {
+            isConfirmed: true,
+            confirmationCode: null,
+            expire: null,
+          },
+        },
+      }
+    );
+
+    if (!found.matchedCount) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async updateEmailConfirmation(
+    id: ObjectId,
+    emailConfirmation: UserEmailConfirmation
+  ) {
+    let found = await this.coll.updateOne(
+      { _id: id },
+      {
+        $set: {
+          emailConfirmation,
+        },
+      }
+    );
+
+    if (!found.matchedCount) {
+      return false;
+    }
+
+    return true;
   }
 }
 

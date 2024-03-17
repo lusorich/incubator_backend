@@ -18,7 +18,7 @@ const passwordValidator = {
   errorMessage: getCommonErrorMsg("password"),
 };
 
-const emailValidator = {
+export const emailValidator = {
   customSanitizer: trimSanitizer,
   isString: true,
   errorMessage: getCommonErrorMsg("email"),
