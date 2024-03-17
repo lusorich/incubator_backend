@@ -2,7 +2,7 @@ import {
   IUsersCommandsRepository,
   usersCommandsRepository,
 } from "../../repositories/commands/users.commands.repository";
-import { UserDb, UserViewWithId } from "../../types";
+import { UserDb, UserEmailConfirmation, UserViewWithId } from "../../types";
 import { cryptService } from "../../common/services/crypt.service";
 
 export class UsersService {
@@ -12,7 +12,10 @@ export class UsersService {
     this.usersCommandsRepository = usersCommandsRepository;
   }
 
-  async addUser(user: Omit<UserDb & { password: string }, "id">) {
+  async addUser(
+    user: Omit<UserDb & { password: string }, "id">,
+    emailConfirmationInfo?: UserEmailConfirmation
+  ) {
     const salt = await cryptService.getSalt();
     const userHash = await cryptService.getHash({
       password: user.password || "",
@@ -24,6 +27,7 @@ export class UsersService {
       email: user.email,
       hash: userHash,
       createdAt: new Date(),
+      emailConfirmation: emailConfirmationInfo,
       id: String(Math.round(Math.random() * 1000)),
     };
 

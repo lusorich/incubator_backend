@@ -8,6 +8,7 @@ export interface BlogInput {
 
 export interface UserDb extends UserViewWithId {
   hash: string;
+  emailConfirmation?: UserEmailConfirmation;
 }
 
 export interface UserViewWithId extends UserView {
@@ -17,6 +18,12 @@ export interface UserView {
   login: string;
   email: string;
   createdAt: Date;
+}
+
+export interface UserEmailConfirmation {
+  confirmationCode: string | null;
+  expire: Date | null;
+  isConfirmed: boolean;
 }
 
 export interface CommentatorInfo {

@@ -7,6 +7,7 @@ export const SETTINGS = {
   MONGO_URL: process.env.MONGO_URL || "",
   DB_NAME: process.env.DB_NAME || "",
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY || "",
+  MAIL_KEY: process.env.MAIL_KEY || "",
 } as const;
 
 export const enum ENDPOINTS {
@@ -22,6 +23,9 @@ export const enum ENDPOINTS {
   AUTH_ME = "/auth/me",
   POSTS_ID_COMMENTS = "/posts/:id/comments",
   COMMENTS_ID = "/comments/:id",
+  REGISTRATION_CONFIRMATION = "/auth/registration-confirmation",
+  REGISTRATION = "/auth/registration",
+  REGISTRATION_EMAIL_RESENDING = "/auth/registration-email-resending",
 }
 
 export const enum HTTP_STATUS {

@@ -6,6 +6,7 @@ import {
 } from "../../constants";
 import { client } from "../../db/db";
 import { QueryParams, UserDb, UserViewWithId } from "../../types";
+import { usersCommandsRepository } from "../commands/users.commands.repository";
 
 export class UsersQueryRepository {
   coll: Collection<UserDb>;
@@ -95,6 +96,18 @@ export class UsersQueryRepository {
 
   async findUserByLogin(login: UserViewWithId["login"]) {
     const found = await this.coll.findOne({ login: login });
+
+    if (!found) {
+      return null;
+    }
+
+    return found;
+  }
+
+  async findUserByConfirmationCode(code: string) {
+    const found = await this.coll.findOne({
+      "emailConfirmation.confirmationCode": code,
+    });
 
     if (!found) {
       return null;
