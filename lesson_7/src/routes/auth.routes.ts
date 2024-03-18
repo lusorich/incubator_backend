@@ -80,6 +80,33 @@ authRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
+      const isUserWithUsernameExist =
+        await usersQueryRepository.findUserByLogin(req.body?.login);
+      const isUserWithEmailExist = await usersQueryRepository.findUserByEmail(
+        req.body?.email
+      );
+
+      if (isUserWithUsernameExist || isUserWithEmailExist) {
+        const errors: { errorsMessages: { field: string; message: string }[] } =
+          { errorsMessages: [] };
+
+        if (isUserWithEmailExist) {
+          errors.errorsMessages.push({
+            field: "email",
+            message: "Wrong Email",
+          });
+        }
+
+        if (isUserWithUsernameExist) {
+          errors.errorsMessages.push({
+            field: "login",
+            message: "Wrong Login",
+          });
+        }
+
+        return res.status(HTTP_STATUS.INCORRECT).json(errors);
+      }
+
       const emailService = new EmailService();
       const emailConfirmationInfo = emailService.generateEmailConfirmation();
       const emailTemplate = emailService.generateEmailTemplate({
@@ -103,17 +130,23 @@ authRouter
     const code = req.params?.code || req.body?.code || null;
 
     if (!code) {
-      return res.sendStatus(HTTP_STATUS.INCORRECT);
+      return res
+        .status(HTTP_STATUS.INCORRECT)
+        .json({ errorsMessages: [{ message: "Wrong code", field: "code" }] });
     }
 
     const found = await usersQueryRepository.findUserByConfirmationCode(code);
-    const isExpired = isAfter(
-      new Date(),
-      found?.emailConfirmation?.expire || ""
-    );
 
-    if (!found || isExpired || found.emailConfirmation?.isConfirmed) {
-      return res.sendStatus(HTTP_STATUS.INCORRECT);
+    if (!found) {
+      return res
+        .status(HTTP_STATUS.INCORRECT)
+        .json({ errorsMessages: [{ message: "Wrong code", field: "code" }] });
+    }
+
+    if (found.emailConfirmation?.isConfirmed) {
+      return res.status(HTTP_STATUS.INCORRECT).json({
+        errorsMessages: [{ message: "Wrong code", field: "code" }],
+      });
     }
 
     await usersCommandsRepository.setUserIsConfirmed(found._id);
@@ -136,7 +169,9 @@ authRouter
       }
 
       if (!found || found?.emailConfirmation?.isConfirmed) {
-        return res.sendStatus(HTTP_STATUS.INCORRECT);
+        return res.status(HTTP_STATUS.INCORRECT).json({
+          errorsMessages: [{ message: "Wrong email", field: "email" }],
+        });
       }
 
       const emailService = new EmailService();
