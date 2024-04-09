@@ -9,7 +9,7 @@ export class PostsService {
     const newPost: PostWithId = {
       ...post,
       id: String(Math.round(Math.random() * 1000)),
-      blogName: parentBlog?.name || "",
+      blogName: parentBlog?.data?.name || "",
       createdAt: new Date(),
     };
 

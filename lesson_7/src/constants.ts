@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { COMMON_RESULT_STATUSES } from "./common/types/common.types";
 
 dotenv.config();
 
@@ -56,4 +57,12 @@ export const REGEXP = {
   EMAIL: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
   LOGIN: /^[a-zA-Z0-9_-]*$/,
   URL: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+};
+
+export enum ErrorsMsg {
+  NOT_FOUND,
+}
+
+export const ERROR_MSG = {
+  [COMMON_RESULT_STATUSES.NOT_FOUND]: "Not found",
 };

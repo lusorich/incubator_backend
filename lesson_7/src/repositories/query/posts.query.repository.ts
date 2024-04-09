@@ -1,17 +1,22 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { BlogWithId, PostWithId, QueryParams } from "../../types";
+import { BlogWithId, PostView, PostWithId, QueryParams } from "../../types";
 import { client } from "../../db/db";
 import {
+  ERROR_MSG,
   MONGO_COLLECTIONS,
   MONGO_DB_NAME,
   SortDirection,
 } from "../../constants";
+import { ResultObject } from "../../common/helpers/result.helper";
+import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
+import { getCommonErrorMsg } from "../../helpers";
 
-export class PostsQueryRepository {
+export class PostsQueryRepository extends ResultObject {
   coll: Collection<PostWithId>;
   blogsColl: Collection<BlogWithId>;
 
   constructor() {
+    super();
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.POSTS);
     this.blogsColl = client
       .db(MONGO_DB_NAME)
@@ -55,26 +60,35 @@ export class PostsQueryRepository {
       allPostsToView = allPosts.map(this._mapToPostViewModel);
     }
 
-    return {
-      pagesCount: Math.ceil(allPostsCount / pageSize),
-      totalCount: allPostsCount,
-      pageSize,
-      page: pageNumber,
-      items: allPostsToView,
-    };
+    return this.getResult({
+      data: {
+        pagesCount: Math.ceil(allPostsCount / pageSize),
+        totalCount: allPostsCount,
+        pageSize,
+        page: pageNumber,
+        items: allPostsToView,
+      },
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   async getPostById(id: PostWithId["id"]) {
     const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
-    if (!found) {
+    return this.getResult({
+      data: this._mapToPostViewModel(found),
+      status: !found
+        ? COMMON_RESULT_STATUSES.NOT_FOUND
+        : COMMON_RESULT_STATUSES.SUCCESS,
+      errorMessage: ERROR_MSG[COMMON_RESULT_STATUSES.NOT_FOUND],
+    });
+  }
+
+  _mapToPostViewModel(post: WithId<PostWithId> | null): PostWithId | null {
+    if (!post) {
       return null;
     }
 
-    return this._mapToPostViewModel(found);
-  }
-
-  _mapToPostViewModel(post: WithId<PostWithId>): PostWithId {
     return {
       id: post._id.toString(),
       title: post.title,

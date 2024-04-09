@@ -2,8 +2,12 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 
 import { checkSchema, validationResult } from "express-validator";
-import { ErrorsMessages, Post, PostWithId } from "../types";
-import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
+import { ErrorsMessages, Post, PostView, PostWithId } from "../types";
+import {
+  getFiltersFromQuery,
+  getFormattedErrors,
+  isDataInResult,
+} from "../helpers";
 
 import { postsAddCommentSchema, postsSchema } from "../schemas/posts.schema";
 
@@ -14,6 +18,7 @@ import { checkAuth, checkJwtAuth } from "../auth.middleware";
 import { usersQueryRepository } from "../repositories/query/users.query.repository";
 import { commentsService } from "../domain/services/comments.service";
 import { commentsQueryRepository } from "../repositories/query/comments.query.repository";
+import { COMMON_RESULT_STATUSES, Result } from "../common/types/common.types";
 
 export const postsRouter = Router({});
 
@@ -30,7 +35,7 @@ postsRouter
       sortBy,
     });
 
-    res.status(HTTP_STATUS.SUCCESS).json(allPosts);
+    res.status(HTTP_STATUS.SUCCESS).json(allPosts.data);
   })
   .post(
     checkAuth,
@@ -65,7 +70,11 @@ postsRouter
 
       const newPost = await postsService.addPost(req.body);
 
-      return res.status(HTTP_STATUS.CREATED).json(newPost);
+      if (newPost) {
+        return res.status(HTTP_STATUS.CREATED).json(newPost);
+      }
+
+      return;
     }
   )
   .delete(checkAuth, async (_req, res: Response) => {
@@ -80,11 +89,11 @@ postsRouter
     const { id } = req.params;
     const foundPost = await postsQueryRepository.getPostById(id);
 
-    if (!foundPost) {
+    if (!isDataInResult<PostWithId | null>(foundPost)) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
-    return res.status(HTTP_STATUS.SUCCESS).json(foundPost);
+    return res.status(HTTP_STATUS.SUCCESS).json(foundPost.data);
   })
   .put(
     checkAuth,
@@ -174,13 +183,13 @@ postsRouter
 
       const post = await postsQueryRepository.getPostById(postId);
 
-      if (!post) {
+      if (!isDataInResult<(typeof post)["data"]>(post)) {
         return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
       const comment = await commentsService.addComment({
         user,
-        post,
+        post: post.data,
         content: req.body.content,
       });
 
