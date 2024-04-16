@@ -1,15 +1,7 @@
-import { COMMON_RESULT_STATUSES } from "../types/common.types";
+import { Result } from "../types/common.types";
 
 export class ResultObject {
-  getResult<T>({
-    data,
-    status,
-    errorMessage,
-  }: {
-    data: T;
-    status: COMMON_RESULT_STATUSES;
-    errorMessage?: string;
-  }) {
+  getResult<T>({ data, status, errorMessage }: Result<T>) {
     if (!data) {
     }
     return {

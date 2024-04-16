@@ -14,6 +14,7 @@ import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth } from "../auth.middleware";
 import { jwtService } from "../common/services/jwt.service";
+import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 
 export const blogsRouter = Router({});
 
@@ -49,7 +50,7 @@ blogsRouter
 
       const newBlog = await blogsService.addBlog(req.body);
 
-      return res.status(HTTP_STATUS.CREATED).json(newBlog as BlogWithId);
+      return res.status(HTTP_STATUS.CREATED).json(newBlog.data);
     }
   )
   .delete(checkAuth, async (_req, res: Response) => {
@@ -82,12 +83,12 @@ blogsRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const isSuccess = await blogsService.updateBlogById(
+      const updateResult = await blogsService.updateBlogById(
         req.params.id,
         req.body
       );
 
-      if (!isSuccess) {
+      if (updateResult.status === COMMON_RESULT_STATUSES.NOT_FOUND) {
         return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
