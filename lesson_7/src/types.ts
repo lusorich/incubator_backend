@@ -89,3 +89,19 @@ export interface QueryParams {
   searchLoginTerm?: string | null;
   searchEmailTerm?: string | null;
 }
+
+export type BlogView = {
+  pagesCount: number;
+  totalCount: number;
+  pageSize: number;
+  page: number;
+  items: (BlogWithId | null)[];
+};
+
+export type PostView = {
+  pagesCount: number;
+  totalCount: number;
+  pageSize: number;
+  page: number;
+  items: (PostWithId | null)[];
+};

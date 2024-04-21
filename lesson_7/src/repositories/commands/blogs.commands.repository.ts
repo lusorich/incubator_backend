@@ -1,32 +1,44 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
+import { ERROR_MSG, MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
 import { client } from "../../db/db";
 import { BlogInput, BlogWithId } from "../../types";
 import { blogsQueryRepository } from "../query/blogs.query.repository";
+import { ResultObject } from "../../common/helpers/result.helper";
+import {
+  COMMON_RESULT_STATUSES,
+  Result,
+} from "../../common/types/common.types";
 
 export interface IBblogsCommandsRepository {
-  addBlog: (newBlob: BlogWithId) => Promise<BlogWithId | null>;
+  addBlog: (newBlob: BlogWithId) => Promise<Result<BlogWithId>>;
   updateBlogById: (
     id: BlogWithId["id"],
     props: Partial<BlogInput>
-  ) => Promise<boolean>;
-  deleteBlogById: (id: BlogWithId["id"]) => Promise<boolean>;
+  ) => Promise<Result<null>>;
+  deleteBlogById: (id: BlogWithId["id"]) => Promise<Result<null>>;
   clearBlogs: () => Promise<this>;
 }
 
-export class BlogsCommandsRepository implements IBblogsCommandsRepository {
+export class BlogsCommandsRepository
+  extends ResultObject
+  implements IBblogsCommandsRepository
+{
   coll: Collection<BlogWithId>;
 
   constructor() {
+    super();
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
   }
 
   async addBlog(newBlog: BlogWithId) {
     await this.coll.insertOne(newBlog);
 
-    return blogsQueryRepository._mapToBlogViewModel(
-      newBlog as WithId<BlogWithId>
-    );
+    return this.getResult<BlogWithId>({
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+      data: blogsQueryRepository._mapToBlogViewModel(
+        newBlog as WithId<BlogWithId>
+      ) as BlogWithId,
+    });
   }
 
   async updateBlogById(id: BlogWithId["id"], props: Partial<BlogInput>) {
@@ -36,20 +48,34 @@ export class BlogsCommandsRepository implements IBblogsCommandsRepository {
     );
 
     if (!found.matchedCount) {
-      return false;
+      return this.getResult({
+        data: null,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+        errorMessage: ERROR_MSG[2],
+      });
     }
 
-    return true;
+    return this.getResult({
+      data: null,
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   async deleteBlogById(id: BlogWithId["id"]) {
     const found = await this.coll.deleteOne({ _id: new ObjectId(id) });
 
     if (!found.deletedCount) {
-      return false;
+      return this.getResult({
+        data: null,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+        errorMessage: ERROR_MSG[2],
+      });
     }
 
-    return true;
+    return this.getResult({
+      data: null,
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   async clearBlogs() {

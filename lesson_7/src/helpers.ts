@@ -2,6 +2,7 @@ import { ValidationError } from "express-validator";
 import { FieldError } from "./types";
 import { ParsedQs } from "qs";
 import { SortDirection } from "./constants";
+import { COMMON_RESULT_STATUSES, Result } from "./common/types/common.types";
 
 export const getFormattedErrors = (errors: ValidationError[]) => {
   const formattedErrors = errors.reduce<{ errorsMessages: FieldError[] }>(
@@ -57,4 +58,14 @@ export const trimSanitizer = {
   options: (value?: string) => {
     return value?.trim();
   },
+};
+
+export const isDataInResult = <T>(
+  data: Result<T>
+): data is Result<NonNullable<T>> => {
+  if (data.status === COMMON_RESULT_STATUSES.SUCCESS && data?.data) {
+    return true;
+  }
+
+  return false;
 };

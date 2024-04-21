@@ -1,17 +1,22 @@
 import { Collection, ObjectId, WithId } from "mongodb";
 import {
+  ERROR_MSG,
   MONGO_COLLECTIONS,
   MONGO_DB_NAME,
   SortDirection,
 } from "../../constants";
 import { client } from "../../db/db";
-import { BlogWithId, PostWithId, QueryParams } from "../../types";
+import { BlogView, BlogWithId, PostWithId, QueryParams } from "../../types";
 import { postsQueryRepository } from "./posts.query.repository";
+import { ResultObject } from "../../common/helpers/result.helper";
+import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
+import { getCommonErrorMsg } from "../../helpers";
 
-export class BlogsQueryRepository {
+export class BlogsQueryRepository extends ResultObject {
   coll: Collection<BlogWithId>;
 
   constructor() {
+    super();
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
   }
 
@@ -45,22 +50,28 @@ export class BlogsQueryRepository {
     }
 
     if (searchNameTerm) {
-      return {
-        pagesCount: Math.ceil(allBlogs.length / pageSize),
-        totalCount: allBlogs.length,
+      return this.getResult({
+        data: {
+          pagesCount: Math.ceil(allBlogs.length / pageSize),
+          totalCount: allBlogs.length,
+          pageSize,
+          page: pageNumber,
+          items: allBlogsToView,
+        },
+        status: COMMON_RESULT_STATUSES.SUCCESS,
+      });
+    }
+
+    return this.getResult({
+      data: {
+        pagesCount: Math.ceil(allBlogsCount / pageSize),
+        totalCount: allBlogsCount,
         pageSize,
         page: pageNumber,
         items: allBlogsToView,
-      };
-    }
-
-    return {
-      pagesCount: Math.ceil(allBlogsCount / pageSize),
-      totalCount: allBlogsCount,
-      pageSize,
-      page: pageNumber,
-      items: allBlogsToView,
-    };
+      },
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   async getBlogPosts({
@@ -83,10 +94,17 @@ export class BlogsQueryRepository {
     const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
     if (!found) {
-      return null;
+      return this.getResult<null>({
+        data: null,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+        errorMessage: ERROR_MSG[COMMON_RESULT_STATUSES.NOT_FOUND],
+      });
     }
 
-    return this._mapToBlogViewModel(found);
+    return this.getResult<BlogWithId>({
+      data: this._mapToBlogViewModel(found) as BlogWithId,
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   _mapToBlogViewModel(blog: WithId<BlogWithId> | null): BlogWithId | null {

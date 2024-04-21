@@ -4,6 +4,7 @@ import { blogsService } from "../src/domain/services/blogs.service";
 import { faker } from "@faker-js/faker";
 import supertest, { Response } from "supertest";
 import TestAgent from "supertest/lib/agent";
+import { Result } from "../src/common/types/common.types";
 
 export const generateFiltersOptions = (
   pageSize?: number,
@@ -23,8 +24,8 @@ export const generateFiltersOptions = (
 export const addMockBlogs = async (
   count: number,
   names?: string[]
-): Promise<(BlogWithId | null)[]> => {
-  const promises: Promise<BlogWithId | null>[] = [];
+): Promise<Result<BlogWithId | null>[]> => {
+  const promises: Promise<Result<BlogWithId | null>>[] = [];
 
   for (let i = 0; i < count; i++) {
     const blog = blogsService.addBlog(getMockBlogInput(names?.[i] ?? null));

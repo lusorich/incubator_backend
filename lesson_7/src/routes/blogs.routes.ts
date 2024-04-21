@@ -2,7 +2,11 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { checkSchema, validationResult } from "express-validator";
 import { BlogInput, BlogWithId, ErrorsMessages, Post } from "../types";
-import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
+import {
+  getFiltersFromQuery,
+  getFormattedErrors,
+  isDataInResult,
+} from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
 import { blogsService } from "../domain/services/blogs.service";
 import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
@@ -10,6 +14,7 @@ import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth } from "../auth.middleware";
 import { jwtService } from "../common/services/jwt.service";
+import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 
 export const blogsRouter = Router({});
 
@@ -26,7 +31,7 @@ blogsRouter
       searchNameTerm,
     });
 
-    res.status(HTTP_STATUS.SUCCESS).json(allBlogs);
+    res.status(HTTP_STATUS.SUCCESS).json(allBlogs.data);
   })
   .post(
     checkAuth,
@@ -45,7 +50,7 @@ blogsRouter
 
       const newBlog = await blogsService.addBlog(req.body);
 
-      return res.status(HTTP_STATUS.CREATED).json(newBlog || undefined);
+      return res.status(HTTP_STATUS.CREATED).json(newBlog.data);
     }
   )
   .delete(checkAuth, async (_req, res: Response) => {
@@ -58,13 +63,13 @@ blogsRouter
   .route(ENDPOINTS.BLOGS_ID)
   .get(async (req: Request, res: Response<BlogWithId | void>) => {
     const { id } = req.params;
-    const foundBlog = await blogsQueryRepository.getBlogById(id);
+    const result = await blogsQueryRepository.getBlogById(id);
 
-    if (!foundBlog) {
+    if (!isDataInResult(result)) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
-    return res.status(HTTP_STATUS.SUCCESS).json(foundBlog);
+    return res.status(HTTP_STATUS.SUCCESS).json(result.data);
   })
   .put(
     checkAuth,
@@ -78,12 +83,12 @@ blogsRouter
         return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
       }
 
-      const isSuccess = await blogsService.updateBlogById(
+      const updateResult = await blogsService.updateBlogById(
         req.params.id,
         req.body
       );
 
-      if (!isSuccess) {
+      if (updateResult.status === COMMON_RESULT_STATUSES.NOT_FOUND) {
         return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
@@ -92,9 +97,9 @@ blogsRouter
   )
   //TODO: возможно нет смысла сначала искать, достаточно делать удаление и проверять было ли что то удалено
   .delete(checkAuth, async (req: Request, res: Response) => {
-    const found = await blogsQueryRepository.getBlogById(req.params.id);
+    const result = await blogsQueryRepository.getBlogById(req.params.id);
 
-    if (!found) {
+    if (!isDataInResult(result)) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
@@ -111,18 +116,22 @@ blogsRouter
     );
     const blogId = req.params.id;
 
-    const posts = await blogsQueryRepository.getBlogPosts({
+    const postsResult = await blogsQueryRepository.getBlogPosts({
       pagination,
       sortBy,
       sortDirection,
       blogId,
     });
 
-    if (posts.items.length === 0) {
+    if (
+      postsResult?.data &&
+      "items" in postsResult.data &&
+      postsResult.data.items.length === 0
+    ) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
-    return res.status(HTTP_STATUS.SUCCESS).json(posts);
+    return res.status(HTTP_STATUS.SUCCESS).json(postsResult.data);
   })
   .post(
     checkAuth,
@@ -147,7 +156,7 @@ blogsRouter
 
       const blog = await blogsQueryRepository.getBlogById(blogId);
 
-      if (!blog) {
+      if (!isDataInResult(blog)) {
         return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
