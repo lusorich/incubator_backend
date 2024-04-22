@@ -263,8 +263,16 @@ authRouter
 
     const userId = jwtService.getIdFromToken(refreshToken);
     const isValid = jwtService.isValid(refreshToken);
+    const isTokenInBlacklist = await authQueryRepository.getIsTokenInBlacklist(
+      userId,
+      refreshToken
+    );
 
-    if (!isValid) {
+    if (
+      !userId ||
+      !isValid ||
+      isTokenInBlacklist.status === COMMON_RESULT_STATUSES.SUCCESS
+    ) {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
 

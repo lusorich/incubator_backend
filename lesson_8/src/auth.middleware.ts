@@ -27,6 +27,11 @@ export const checkJwtAuth = async (
   const token = req.headers.authorization.split(" ")[1];
 
   const id = jwtService.getIdFromToken(token);
+  const isValid = jwtService.isValid(token);
+
+  if (!isValid) {
+    return res.sendStatus(HTTP_STATUS.NO_AUTH);
+  }
 
   if (id) {
     try {
