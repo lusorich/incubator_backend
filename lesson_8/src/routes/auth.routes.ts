@@ -17,6 +17,9 @@ import { EmailService } from "../common/services/email.service";
 import { usersService } from "../domain/services/users.service";
 import { isAfter } from "date-fns";
 import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
+import { authCommandsRepository } from "../repositories/commands/auth.commands.repository";
+import { authQueryRepository } from "../repositories/query/auth.query.repository";
+import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 
 export const authRouter = Router({});
 
@@ -45,7 +48,7 @@ authRouter
       const refreshToken = jwtService.create(authResult._id.toString(), "20s");
 
       return res
-        .cookie("refresh_token", refreshToken, {
+        .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: true,
         })
@@ -205,11 +208,19 @@ authRouter
 authRouter
   .route(ENDPOINTS.AUTH_REFRESH_TOKEN)
   .post(async (req: Request, res: Response) => {
-    const prevRefreshToken = req.cookies.refresh_token;
+    const prevRefreshToken = req.cookies.refreshToken;
     const userId = jwtService.getIdFromToken(prevRefreshToken);
     const isValid = jwtService.isValid(prevRefreshToken);
 
-    if (!isValid) {
+    const isTokenInBlacklist = await authQueryRepository.getIsTokenInBlacklist(
+      userId,
+      prevRefreshToken
+    );
+
+    if (
+      !isValid ||
+      isTokenInBlacklist.status === COMMON_RESULT_STATUSES.SUCCESS
+    ) {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
 
@@ -226,11 +237,38 @@ authRouter
     const accessToken = jwtService.create(userId, "10s");
     const refreshToken = jwtService.create(userId, "20s");
 
+    await authService.addTokenToBlacklist(userId, prevRefreshToken);
+
     return res
-      .cookie("refresh_token", refreshToken, {
+      .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
       })
       .status(HTTP_STATUS.SUCCESS)
       .json({ accessToken });
+  });
+
+authRouter
+  .route(ENDPOINTS.AUTH_BLACKLIST)
+  .get(async (req: Request, res: Response) => {
+    const blacklist = await authQueryRepository.getBlacklist();
+
+    return res.json(blacklist);
+  });
+
+authRouter
+  .route(ENDPOINTS.AUTH_LOGOUT)
+  .post(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    const userId = jwtService.getIdFromToken(refreshToken);
+    const isValid = jwtService.isValid(refreshToken);
+
+    if (!isValid) {
+      return res.sendStatus(HTTP_STATUS.NO_AUTH);
+    }
+
+    await authCommandsRepository.addTokenToBlacklist(userId, refreshToken);
+
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

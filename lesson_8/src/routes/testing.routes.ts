@@ -4,6 +4,7 @@ import { blogsCommandsRepository } from "../repositories/commands/blogs.commands
 import { postsCommandsRepository } from "../repositories/commands/posts.commands.repository";
 import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
 import { commentsCommandsRepository } from "../repositories/commands/comments.commands.repository";
+import { authCommandsRepository } from "../repositories/commands/auth.commands.repository";
 
 export const testingRouter = Router({});
 
@@ -14,6 +15,7 @@ testingRouter
     postsCommandsRepository.clearPosts();
     usersCommandsRepository.clearUsers();
     commentsCommandsRepository.clearComments();
+    authCommandsRepository.clearBlacklist();
 
     res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

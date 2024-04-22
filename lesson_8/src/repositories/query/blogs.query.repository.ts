@@ -6,11 +6,10 @@ import {
   SortDirection,
 } from "../../constants";
 import { client } from "../../db/db";
-import { BlogView, BlogWithId, PostWithId, QueryParams } from "../../types";
+import { BlogWithId, PostWithId, QueryParams } from "../../types";
 import { postsQueryRepository } from "./posts.query.repository";
 import { ResultObject } from "../../common/helpers/result.helper";
 import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
-import { getCommonErrorMsg } from "../../helpers";
 
 export class BlogsQueryRepository extends ResultObject {
   coll: Collection<BlogWithId>;

@@ -105,3 +105,8 @@ export type PostView = {
   page: number;
   items: (PostWithId | null)[];
 };
+
+export interface Blacklist {
+  userId: string;
+  tokens: string[]
+}

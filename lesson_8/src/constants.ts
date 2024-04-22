@@ -28,6 +28,8 @@ export const enum ENDPOINTS {
   REGISTRATION = "/auth/registration",
   REGISTRATION_EMAIL_RESENDING = "/auth/registration-email-resending",
   AUTH_REFRESH_TOKEN = "/auth/refresh-token",
+  AUTH_BLACKLIST = "/auth/blacklist",
+  AUTH_LOGOUT = "/auth/logout",
 }
 
 export const enum HTTP_STATUS {
@@ -47,6 +49,7 @@ export const enum MONGO_COLLECTIONS {
   POSTS = "posts",
   USERS = "users",
   COMMENTS = "comments",
+  BLACKLIST = "blacklist",
 }
 
 export enum SortDirection {

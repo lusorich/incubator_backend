@@ -3,6 +3,7 @@ import { usersQueryRepository } from "../../repositories/query/users.query.repos
 import { cryptService } from "../../common/services/crypt.service";
 import { WithId } from "mongodb";
 import { UserDb } from "../../types";
+import { authCommandsRepository } from "../../repositories/commands/auth.commands.repository";
 //TODO: сервис не должен обращаться к квери репозиторию
 
 // единый интерфейс для AuthService, но разная зависимость для сервиса
@@ -31,6 +32,8 @@ export interface IAuthService {
     password: string;
     login: string;
   }) => Promise<WithId<UserDb> | boolean>;
+
+  addTokenToBlacklist: (userId: string, token: string) => Promise<any>;
 }
 export class AuthService implements IAuthService {
   async auth({
@@ -109,6 +112,10 @@ export class AuthService implements IAuthService {
     }
 
     return found;
+  }
+
+  async addTokenToBlacklist(userId: string, token: string) {
+    return await authCommandsRepository.addTokenToBlacklist(userId, token);
   }
 }
 
