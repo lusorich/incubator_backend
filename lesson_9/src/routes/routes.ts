@@ -6,6 +6,7 @@ import { testingRouter } from "./testing.routes";
 import { usersRouter } from "./users.routes";
 import { authRouter } from "./auth.routes";
 import { commentsRouter } from "./comments.routes";
+import { securityRouter } from "./security.routes";
 
 export default (app: Express) => {
   app.use(postsRouter);
@@ -14,4 +15,5 @@ export default (app: Express) => {
   app.use(usersRouter);
   app.use(authRouter);
   app.use(commentsRouter);
+  app.use(securityRouter);
 };

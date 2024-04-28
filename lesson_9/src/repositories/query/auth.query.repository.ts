@@ -1,22 +1,10 @@
-import { Collection, ObjectId, WithId } from "mongodb";
-import {
-  ERROR_MSG,
-  MONGO_COLLECTIONS,
-  MONGO_DB_NAME,
-  SortDirection,
-} from "../../constants";
+import { Collection } from "mongodb";
+import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
 import { client } from "../../db/db";
-import {
-  Blacklist,
-  BlogView,
-  BlogWithId,
-  PostWithId,
-  QueryParams,
-} from "../../types";
-import { postsQueryRepository } from "./posts.query.repository";
+import { Blacklist } from "../../types";
+
 import { ResultObject } from "../../common/helpers/result.helper";
 import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
-import { getCommonErrorMsg } from "../../helpers";
 
 export class AuthQueryRepository extends ResultObject {
   coll: Collection<Blacklist>;

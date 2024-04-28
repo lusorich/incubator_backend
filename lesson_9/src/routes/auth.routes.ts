@@ -7,15 +7,10 @@ import { authService } from "../domain/services/auth.service";
 import { authSchema } from "../schemas/auth.schema";
 import { checkJwtAuth } from "../auth.middleware";
 import { UserAuthView } from "../types";
-import {
-  UsersQueryRepository,
-  usersQueryRepository,
-} from "../repositories/query/users.query.repository";
+import { usersQueryRepository } from "../repositories/query/users.query.repository";
 import { jwtService } from "../common/services/jwt.service";
-import nodemailer from "nodemailer";
 import { EmailService } from "../common/services/email.service";
 import { usersService } from "../domain/services/users.service";
-import { isAfter } from "date-fns";
 import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
 import { authCommandsRepository } from "../repositories/commands/auth.commands.repository";
 import { authQueryRepository } from "../repositories/query/auth.query.repository";
@@ -250,7 +245,7 @@ authRouter
 
 authRouter
   .route(ENDPOINTS.AUTH_BLACKLIST)
-  .get(async (req: Request, res: Response) => {
+  .get(async (_req: Request, res: Response) => {
     const blacklist = await authQueryRepository.getBlacklist();
 
     return res.json(blacklist);

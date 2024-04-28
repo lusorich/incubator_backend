@@ -53,6 +53,7 @@ export const enum MONGO_COLLECTIONS {
   USERS = "users",
   COMMENTS = "comments",
   BLACKLIST = "blacklist",
+  SECURITY_DEVICES = "security_devices",
 }
 
 export enum SortDirection {

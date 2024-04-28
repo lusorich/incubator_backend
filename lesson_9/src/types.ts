@@ -110,3 +110,19 @@ export interface Blacklist {
   userId: string;
   tokens: string[]
 }
+
+export interface SecurityDevices {
+  userId: string;
+  deviceId: string;
+  iat: Date;
+  deviceName: string;
+  ip: string;
+  exp: Date;
+}
+
+export interface SecurityDeviceView {
+  ip: string;
+  title: string;
+  lastActiveDate: Date;
+  deviceId: string;
+}
