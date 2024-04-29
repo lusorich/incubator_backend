@@ -6,10 +6,14 @@ export class JwtService {
     this.provider = provider;
   }
 
-  create(id: string, expires: string = "1h") {
-    const token = this.provider.sign({ id }, SETTINGS.JWT_SECRET_KEY, {
-      expiresIn: expires,
-    });
+  create(id: string, expires: string = "1h", deviceId?: string) {
+    const token = this.provider.sign(
+      { id, deviceId },
+      SETTINGS.JWT_SECRET_KEY,
+      {
+        expiresIn: expires,
+      }
+    );
 
     return token;
   }
@@ -39,6 +43,26 @@ export class JwtService {
 
     if (decoded) {
       return decoded.id;
+    }
+
+    return null;
+  }
+
+  getDeviceIdFromToken(token: string) {
+    const decoded = this.decode(token);
+
+    if (decoded) {
+      return decoded.deviceId;
+    }
+
+    return null;
+  }
+
+  getIatFromToken(token: string) {
+    const decoded = this.decode(token);
+
+    if (decoded) {
+      return decoded.iat;
     }
 
     return null;

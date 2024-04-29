@@ -12,9 +12,10 @@ import { jwtService } from "../common/services/jwt.service";
 import { EmailService } from "../common/services/email.service";
 import { usersService } from "../domain/services/users.service";
 import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
-import { authCommandsRepository } from "../repositories/commands/auth.commands.repository";
-import { authQueryRepository } from "../repositories/query/auth.query.repository";
 import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
+import { sessionsService } from "../domain/services/sessions.service";
+import { randomUUID } from "crypto";
+import { sessionQueryRepository } from "../repositories/query/sessions.query.repository";
 
 export const authRouter = Router({});
 
@@ -39,8 +40,24 @@ authRouter
         return res.sendStatus(HTTP_STATUS.NO_AUTH);
       }
 
-      const accessToken = jwtService.create(authResult._id.toString(), "10s");
-      const refreshToken = jwtService.create(authResult._id.toString(), "20s");
+      const deviceId = randomUUID();
+      // 10s
+      const accessToken = jwtService.create(authResult._id.toString(), "1h");
+      // 20s
+      const refreshToken = jwtService.create(
+        authResult._id.toString(),
+        "2h",
+        deviceId
+      );
+
+      await sessionsService.addSession({
+        userId: authResult._id.toString(),
+        deviceId,
+        iat: jwtService.decode(refreshToken)?.iat ?? "",
+        exp: jwtService.decode(refreshToken)?.exp ?? "",
+        deviceName: req.get("User-Agent") ?? "unknown",
+        ip: req.ip ?? "",
+      });
 
       return res
         .cookie("refreshToken", refreshToken, {
@@ -205,16 +222,17 @@ authRouter
   .post(async (req: Request, res: Response) => {
     const prevRefreshToken = req.cookies.refreshToken;
     const userId = jwtService.getIdFromToken(prevRefreshToken);
+    const deviceId = jwtService.getDeviceIdFromToken(prevRefreshToken);
     const isValid = jwtService.isValid(prevRefreshToken);
-
-    const isTokenInBlacklist = await authQueryRepository.getIsTokenInBlacklist(
+    const currentSession = await sessionQueryRepository.getSession(
       userId,
-      prevRefreshToken
+      deviceId,
+      jwtService.decode(prevRefreshToken)?.iat || ""
     );
 
     if (
       !isValid ||
-      isTokenInBlacklist.status === COMMON_RESULT_STATUSES.SUCCESS
+      currentSession.status === COMMON_RESULT_STATUSES.NOT_FOUND
     ) {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
@@ -228,11 +246,18 @@ authRouter
     } else {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
+    // 10s
+    const accessToken = jwtService.create(userId, "1h");
+    // 20s
+    const refreshToken = jwtService.create(userId, "2h", deviceId);
 
-    const accessToken = jwtService.create(userId, "10s");
-    const refreshToken = jwtService.create(userId, "20s");
-
-    await authService.addTokenToBlacklist(userId, prevRefreshToken);
+    await sessionsService.updateSession({
+      userId,
+      deviceId,
+      currentIat: jwtService.decode(prevRefreshToken)?.iat ?? "",
+      newIat: jwtService.decode(refreshToken)?.iat ?? "",
+      exp: jwtService.decode(refreshToken)?.exp ?? "",
+    });
 
     return res
       .cookie("refreshToken", refreshToken, {
@@ -244,34 +269,30 @@ authRouter
   });
 
 authRouter
-  .route(ENDPOINTS.AUTH_BLACKLIST)
-  .get(async (_req: Request, res: Response) => {
-    const blacklist = await authQueryRepository.getBlacklist();
-
-    return res.json(blacklist);
-  });
-
-authRouter
   .route(ENDPOINTS.AUTH_LOGOUT)
   .post(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
     const userId = jwtService.getIdFromToken(refreshToken);
+    const deviceId = jwtService.getDeviceIdFromToken(refreshToken);
+    const iat = jwtService.getIatFromToken(refreshToken);
+
     const isValid = jwtService.isValid(refreshToken);
-    const isTokenInBlacklist = await authQueryRepository.getIsTokenInBlacklist(
+    const currentSession = await sessionQueryRepository.getSession(
       userId,
-      refreshToken
+      deviceId,
+      iat || ""
     );
 
     if (
       !userId ||
       !isValid ||
-      isTokenInBlacklist.status === COMMON_RESULT_STATUSES.SUCCESS
+      currentSession.status === COMMON_RESULT_STATUSES.NOT_FOUND
     ) {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
 
-    await authCommandsRepository.addTokenToBlacklist(userId, refreshToken);
+    await sessionsService.clearUserSessionsByDevice(userId, deviceId);
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });

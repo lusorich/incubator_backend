@@ -42,6 +42,12 @@ export const getMockBlogInput = (name?: string | null): BlogInput => ({
   websiteUrl: faker.internet.url(),
 });
 
+export const getMockRegistrationData = () => ({
+  login: faker.person.lastName(),
+  password: faker.internet.password({ length: 10 }),
+  email: faker.internet.email(),
+});
+
 export const withAuthCredentials = async (
   //@ts-ignore
   req: (typeof supertest)["SuperTestStatic"]["Test"]
