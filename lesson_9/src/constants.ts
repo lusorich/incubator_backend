@@ -28,7 +28,6 @@ export const enum ENDPOINTS {
   REGISTRATION = "/auth/registration",
   REGISTRATION_EMAIL_RESENDING = "/auth/registration-email-resending",
   AUTH_REFRESH_TOKEN = "/auth/refresh-token",
-  AUTH_BLACKLIST = "/auth/blacklist",
   AUTH_LOGOUT = "/auth/logout",
   SECURITY_DEVICES = "/security/devices",
   SECURITY_DEVICE_BY_DEVICE_ID = "/security/devices/:id",
@@ -52,8 +51,8 @@ export const enum MONGO_COLLECTIONS {
   POSTS = "posts",
   USERS = "users",
   COMMENTS = "comments",
-  BLACKLIST = "blacklist",
-  SECURITY_DEVICES = "security_devices",
+  SESSIONS = "sessions",
+  REQUESTS = "requests",
 }
 
 export enum SortDirection {

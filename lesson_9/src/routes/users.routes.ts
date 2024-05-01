@@ -5,7 +5,7 @@ import { usersQueryRepository } from "../repositories/query/users.query.reposito
 import { checkSchema, validationResult } from "express-validator";
 import { usersSchema } from "../schemas/users.schema";
 import { usersService } from "../domain/services/users.service";
-import { checkAuth } from "../auth.middleware";
+import { checkAuth } from "../common/middlewares/auth.middleware";
 
 export const usersRouter = Router({});
 

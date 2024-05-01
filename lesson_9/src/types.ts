@@ -106,23 +106,29 @@ export type PostView = {
   items: (PostWithId | null)[];
 };
 
-export interface Blacklist {
-  userId: string;
-  tokens: string[]
+export interface SecurityInfo {
+  userId: Session["userId"];
+  sessions: Session[];
 }
 
-export interface SecurityDevices {
+export interface RateRequest {
+  ip: string;
+  url: string;
+  date: Date | string;
+}
+
+export interface Session {
   userId: string;
   deviceId: string;
-  iat: Date;
+  iat: Date | number | string;
   deviceName: string;
   ip: string;
-  exp: Date;
+  exp: Date | number | string;
 }
 
-export interface SecurityDeviceView {
+export interface SessionView {
   ip: string;
   title: string;
-  lastActiveDate: Date;
+  lastActiveDate: Session["iat"];
   deviceId: string;
 }

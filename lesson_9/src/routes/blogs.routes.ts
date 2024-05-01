@@ -12,7 +12,7 @@ import { blogsService } from "../domain/services/blogs.service";
 import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
 import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
-import { checkAuth } from "../auth.middleware";
+import { checkAuth } from "../common/middlewares/auth.middleware";
 import { jwtService } from "../common/services/jwt.service";
 import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 

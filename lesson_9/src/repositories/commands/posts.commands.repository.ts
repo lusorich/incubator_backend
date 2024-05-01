@@ -44,8 +44,6 @@ export class PostsCommandsRepository {
     return true;
   }
 
-  async addCommentToPost() {}
-
   async clearPosts() {
     await this.coll.deleteMany({});
 

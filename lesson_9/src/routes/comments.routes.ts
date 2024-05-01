@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { commentsQueryRepository } from "../repositories/query/comments.query.repository";
-import { checkJwtAuth } from "../auth.middleware";
+import { checkJwtAuth } from "../common/middlewares/auth.middleware";
 import { checkSchema, validationResult } from "express-validator";
 import { postCommentContentValidator } from "../schemas/posts.schema";
 import { getFormattedErrors } from "../helpers";
