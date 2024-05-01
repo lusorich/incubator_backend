@@ -52,6 +52,7 @@ export const enum MONGO_COLLECTIONS {
   USERS = "users",
   COMMENTS = "comments",
   SESSIONS = "sessions",
+  REQUESTS = "requests",
 }
 
 export enum SortDirection {

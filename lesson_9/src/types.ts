@@ -111,6 +111,12 @@ export interface SecurityInfo {
   sessions: Session[];
 }
 
+export interface RateRequest {
+  ip: string;
+  url: string;
+  date: Date | string;
+}
+
 export interface Session {
   userId: string;
   deviceId: string;

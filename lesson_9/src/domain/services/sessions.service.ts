@@ -1,5 +1,5 @@
 import { sessionsCommandsRepository } from "../../repositories/commands/sessions.commands.repository";
-import type { Session } from "../../types";
+import type { RateRequest, Session } from "../../types";
 
 class SessionsService {
   async addSession(session: Session) {
@@ -36,6 +36,24 @@ class SessionsService {
       userId,
       deviceId
     );
+  }
+
+  async clearUserSessionsExceptCurrent(
+    userId: Session["userId"],
+    deviceId: Session["deviceId"],
+    iat: Session["iat"]
+  ) {
+    return await sessionsCommandsRepository.clearUserSessionsExceptCurrent(
+      userId,
+      deviceId,
+      iat
+    );
+  }
+
+  async clearSessions() {
+    await sessionsCommandsRepository.clearSessions();
+
+    return this;
   }
 }
 

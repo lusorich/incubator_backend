@@ -5,7 +5,11 @@ import { checkSchema, validationResult } from "express-validator";
 import { getFormattedErrors } from "../helpers";
 import { authService } from "../domain/services/auth.service";
 import { authSchema } from "../schemas/auth.schema";
-import { checkJwtAuth } from "../auth.middleware";
+import {
+  checkJwtAuth,
+  checkRefreshToken,
+  checkRequestCount,
+} from "../common/middlewares/auth.middleware";
 import { UserAuthView } from "../types";
 import { usersQueryRepository } from "../repositories/query/users.query.repository";
 import { jwtService } from "../common/services/jwt.service";
@@ -16,12 +20,14 @@ import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 import { sessionsService } from "../domain/services/sessions.service";
 import { randomUUID } from "crypto";
 import { sessionQueryRepository } from "../repositories/query/sessions.query.repository";
+import { formatISO, fromUnixTime } from "date-fns";
 
 export const authRouter = Router({});
 
 authRouter
   .route(ENDPOINTS.AUTH_LOGIN)
   .post(
+    checkRequestCount,
     checkSchema(authSchema, ["body"]),
     async (req: Request, res: Response) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
@@ -42,19 +48,22 @@ authRouter
 
       const deviceId = randomUUID();
       // 10s
-      const accessToken = jwtService.create(authResult._id.toString(), "1h");
+      const accessToken = jwtService.create(authResult._id.toString(), "10s");
       // 20s
       const refreshToken = jwtService.create(
         authResult._id.toString(),
-        "2h",
+        "20s",
         deviceId
       );
+
+      const iat = jwtService.getIatFromToken(refreshToken);
+      const exp = jwtService.getExpFromToken(refreshToken);
 
       await sessionsService.addSession({
         userId: authResult._id.toString(),
         deviceId,
-        iat: jwtService.decode(refreshToken)?.iat ?? "",
-        exp: jwtService.decode(refreshToken)?.exp ?? "",
+        iat: iat || "",
+        exp: exp || "",
         deviceName: req.get("User-Agent") ?? "unknown",
         ip: req.ip ?? "",
       });
@@ -92,6 +101,7 @@ authRouter
 authRouter
   .route(ENDPOINTS.REGISTRATION)
   .post(
+    checkRequestCount,
     checkSchema(usersSchema, ["body"]),
     async (req: Request, res: Response) => {
       const errors = validationResult(req).array({ onlyFirstError: true });
@@ -110,7 +120,9 @@ authRouter
 
       if (isUserWithUsernameExist || isUserWithEmailExist) {
         const errors: { errorsMessages: { field: string; message: string }[] } =
-          { errorsMessages: [] };
+          {
+            errorsMessages: [],
+          };
 
         if (isUserWithEmailExist) {
           errors.errorsMessages.push({
@@ -148,7 +160,7 @@ authRouter
 
 authRouter
   .route(ENDPOINTS.REGISTRATION_CONFIRMATION)
-  .post(async (req: Request, res: Response) => {
+  .post(checkRequestCount, async (req: Request, res: Response) => {
     const code = req.params?.code || req.body?.code || null;
 
     if (!code) {
@@ -176,66 +188,54 @@ authRouter
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
 
-authRouter
-  .route(ENDPOINTS.REGISTRATION_EMAIL_RESENDING)
-  .post(
-    checkSchema({ email: emailValidator }, ["body"]),
-    async (req: Request, res: Response) => {
-      const errors = validationResult(req).array({ onlyFirstError: true });
-      const found = await usersQueryRepository.findUserByEmail(req.body?.email);
+authRouter.route(ENDPOINTS.REGISTRATION_EMAIL_RESENDING).post(
+  checkRequestCount,
+  checkSchema({ email: emailValidator }, ["body"]),
 
-      if (errors.length) {
-        const formattedErrors = getFormattedErrors(errors);
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req).array({ onlyFirstError: true });
+    const found = await usersQueryRepository.findUserByEmail(req.body?.email);
 
-        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-      }
+    if (errors.length) {
+      const formattedErrors = getFormattedErrors(errors);
 
-      if (!found || found?.emailConfirmation?.isConfirmed) {
-        return res.status(HTTP_STATUS.INCORRECT).json({
-          errorsMessages: [{ message: "Wrong email", field: "email" }],
-        });
-      }
-
-      const emailService = new EmailService();
-      const emailConfirmationInfo = emailService.generateEmailConfirmation();
-      const emailTemplate = emailService.generateEmailTemplate({
-        code: emailConfirmationInfo.confirmationCode,
-      });
-
-      await usersCommandsRepository.updateEmailConfirmation(
-        found._id,
-        emailConfirmationInfo
-      );
-
-      await emailService.sendEmail({
-        from: "eeugern@mail.ru",
-        to: req.body.email,
-        html: emailTemplate,
-      });
-
-      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+      return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
     }
-  );
+
+    if (!found || found?.emailConfirmation?.isConfirmed) {
+      return res.status(HTTP_STATUS.INCORRECT).json({
+        errorsMessages: [{ message: "Wrong email", field: "email" }],
+      });
+    }
+
+    const emailService = new EmailService();
+    const emailConfirmationInfo = emailService.generateEmailConfirmation();
+    const emailTemplate = emailService.generateEmailTemplate({
+      code: emailConfirmationInfo.confirmationCode,
+    });
+
+    await usersCommandsRepository.updateEmailConfirmation(
+      found._id,
+      emailConfirmationInfo
+    );
+
+    await emailService.sendEmail({
+      from: "eeugern@mail.ru",
+      to: req.body.email,
+      html: emailTemplate,
+    });
+
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+  }
+);
 
 authRouter
   .route(ENDPOINTS.AUTH_REFRESH_TOKEN)
-  .post(async (req: Request, res: Response) => {
+  .post(checkRefreshToken, async (req: Request, res: Response) => {
     const prevRefreshToken = req.cookies.refreshToken;
+
     const userId = jwtService.getIdFromToken(prevRefreshToken);
     const deviceId = jwtService.getDeviceIdFromToken(prevRefreshToken);
-    const isValid = jwtService.isValid(prevRefreshToken);
-    const currentSession = await sessionQueryRepository.getSession(
-      userId,
-      deviceId,
-      jwtService.decode(prevRefreshToken)?.iat || ""
-    );
-
-    if (
-      !isValid ||
-      currentSession.status === COMMON_RESULT_STATUSES.NOT_FOUND
-    ) {
-      return res.sendStatus(HTTP_STATUS.NO_AUTH);
-    }
 
     if (userId) {
       try {
@@ -247,16 +247,16 @@ authRouter
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
     // 10s
-    const accessToken = jwtService.create(userId, "1h");
+    const accessToken = jwtService.create(userId, "10s");
     // 20s
-    const refreshToken = jwtService.create(userId, "2h", deviceId);
+    const refreshToken = jwtService.create(userId, "20s", deviceId);
 
     await sessionsService.updateSession({
       userId,
       deviceId,
-      currentIat: jwtService.decode(prevRefreshToken)?.iat ?? "",
-      newIat: jwtService.decode(refreshToken)?.iat ?? "",
-      exp: jwtService.decode(refreshToken)?.exp ?? "",
+      currentIat: jwtService.getIatFromToken(prevRefreshToken) ?? "",
+      newIat: jwtService.getIatFromToken(refreshToken) ?? "",
+      exp: jwtService.getExpFromToken(refreshToken) ?? "",
     });
 
     return res
@@ -270,27 +270,11 @@ authRouter
 
 authRouter
   .route(ENDPOINTS.AUTH_LOGOUT)
-  .post(async (req: Request, res: Response) => {
+  .post(checkRefreshToken, async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
     const userId = jwtService.getIdFromToken(refreshToken);
     const deviceId = jwtService.getDeviceIdFromToken(refreshToken);
-    const iat = jwtService.getIatFromToken(refreshToken);
-
-    const isValid = jwtService.isValid(refreshToken);
-    const currentSession = await sessionQueryRepository.getSession(
-      userId,
-      deviceId,
-      iat || ""
-    );
-
-    if (
-      !userId ||
-      !isValid ||
-      currentSession.status === COMMON_RESULT_STATUSES.NOT_FOUND
-    ) {
-      return res.sendStatus(HTTP_STATUS.NO_AUTH);
-    }
 
     await sessionsService.clearUserSessionsByDevice(userId, deviceId);
 

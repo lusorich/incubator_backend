@@ -1,5 +1,5 @@
 import { Collection } from "mongodb";
-import type { SecurityInfo, Session } from "../../types";
+import type { RateRequest, SecurityInfo, Session } from "../../types";
 import { client } from "../../db/db";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
 import { ResultObject } from "../../common/helpers/result.helper";
@@ -69,23 +69,28 @@ class SessionsCommandsRepository extends ResultObject {
     userId: Session["userId"],
     deviceId: Session["deviceId"]
   ) {
-    await this.coll.updateMany(
+    return await this.coll.updateMany(
       { userId },
       { $pull: { sessions: { deviceId } } }
     );
   }
-  //TODO
   async clearUserSessionsExceptCurrent(
     userId: Session["userId"],
     deviceId: Session["deviceId"],
     iat: Session["iat"]
   ) {
-    await this.coll.updateMany(
+    return await this.coll.updateMany(
       { userId },
       {
-        $pull: { sessions: { deviceId, iat } },
+        $pull: { sessions: { iat: { $ne: iat } } },
       }
     );
+  }
+
+  async clearSessions() {
+    await this.coll.deleteMany({});
+
+    return this;
   }
 }
 

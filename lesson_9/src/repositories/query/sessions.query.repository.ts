@@ -2,8 +2,9 @@ import { Collection, WithId } from "mongodb";
 import { ResultObject } from "../../common/helpers/result.helper";
 import { client } from "../../db/db";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
-import { SecurityInfo, Session, SessionView } from "../../types";
+import { RateRequest, SecurityInfo, Session, SessionView } from "../../types";
 import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
+import { isEqual } from "date-fns";
 
 export class SessionsQueryRepository extends ResultObject {
   coll: Collection<SecurityInfo>;
@@ -44,8 +45,37 @@ export class SessionsQueryRepository extends ResultObject {
       });
     }
 
-    return this.getResult<SessionView[]>({
-      data: this._mapToSessionViewModel(securityInfo?.sessions),
+    const equalTimeSessions = securityInfo?.sessions?.filter((session) =>
+      isEqual(session?.iat, iat)
+    );
+
+    if (!equalTimeSessions?.length) {
+      return this.getResult({
+        data: null,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+      });
+    }
+
+    return this.getResult({
+      data: null,
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
+  }
+
+  async getSessionByDeviceId(deviceId: Session["deviceId"]) {
+    const securityInfo = await this.coll.findOne({
+      "sessions.deviceId": deviceId,
+    });
+
+    if (!securityInfo?.sessions.length) {
+      return this.getResult({
+        data: null,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+      });
+    }
+
+    return this.getResult<SecurityInfo>({
+      data: securityInfo,
       status: COMMON_RESULT_STATUSES.SUCCESS,
     });
   }
