@@ -11,7 +11,7 @@ const loginValidator = {
   },
 };
 
-const passwordValidator = {
+export const passwordValidator = {
   customSanitizer: trimSanitizer,
   isString: true,
   isLength: { options: { min: 6, max: 20 } },

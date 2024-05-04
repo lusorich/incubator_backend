@@ -116,6 +116,18 @@ export class UsersQueryRepository {
     return found;
   }
 
+  async findUserByRecoveryCode(recoveryCode: string) {
+    const found = await this.coll.findOne({
+      "emailPasswordRecovery.recoveryCode": recoveryCode,
+    });
+
+    if (!found) {
+      return null;
+    }
+
+    return found;
+  }
+
   _mapToUserViewModel(user: WithId<UserDb> | null): UserViewWithId | null {
     if (!user) {
       return null;

@@ -1,6 +1,10 @@
 import { Router, type Response, type Request } from "express";
 import { ENDPOINTS, HTTP_STATUS, SETTINGS } from "../constants";
-import { emailValidator, usersSchema } from "../schemas/users.schema";
+import {
+  emailValidator,
+  passwordValidator,
+  usersSchema,
+} from "../schemas/users.schema";
 import { checkSchema, validationResult } from "express-validator";
 import { getFormattedErrors } from "../helpers";
 import { authService } from "../domain/services/auth.service";
@@ -21,6 +25,7 @@ import { sessionsService } from "../domain/services/sessions.service";
 import { randomUUID } from "crypto";
 import { sessionQueryRepository } from "../repositories/query/sessions.query.repository";
 import { formatISO, fromUnixTime } from "date-fns";
+import { ObjectId } from "mongodb";
 
 export const authRouter = Router({});
 
@@ -296,7 +301,8 @@ authRouter
       }
 
       const emailService = new EmailService();
-      const emailConfirmationInfo = emailService.generatePasswordRecoveryConfirmation();
+      const emailConfirmationInfo =
+        emailService.generatePasswordRecoveryConfirmation();
       const emailTemplate = emailService.generateRecoveryPasswordEmail({
         recoveryCode: emailConfirmationInfo.recoveryCode,
       });
@@ -310,11 +316,55 @@ authRouter
         );
       }
 
-      await emailService.sendEmail({
-        from: "eeugern@mail.ru",
-        to: req.body.email,
-        html: emailTemplate,
-      });
+      try {
+        await emailService.sendEmail({
+          from: "eeugern@mail.ru",
+          to: req.body.email,
+          html: emailTemplate,
+        });
+      } catch (e) {
+        console.error("e");
+      }
+
+      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+    }
+  );
+
+authRouter
+  .route(ENDPOINTS.AUTH_NEW_PASSWORD)
+  .post(
+    checkRequestCount,
+    checkSchema({ newPassword: passwordValidator }, ["body"]),
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req).array({ onlyFirstError: true });
+      const recoveryCode = req.body?.recoveryCode || null;
+      const newPassword = req.body.newPassword || null;
+
+      if (errors.length) {
+        const formattedErrors = getFormattedErrors(errors);
+
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+      }
+
+      const found = await usersQueryRepository.findUserByRecoveryCode(
+        recoveryCode
+      );
+
+      if (!found) {
+        return res.status(HTTP_STATUS.INCORRECT).json({
+          errorsMessages: [
+            { message: "Wrong recovery code", field: "recoveryCode" },
+          ],
+        });
+      }
+
+      // if (found.emailConfirmation?.isConfirmed) {
+      //   return res.status(HTTP_STATUS.INCORRECT).json({
+      //     errorsMessages: [{ message: "Wrong code", field: "code" }],
+      //   })
+      // }
+
+      await usersService.updateUserPassword(found, newPassword);
 
       return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }

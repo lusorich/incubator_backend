@@ -32,6 +32,7 @@ export const enum ENDPOINTS {
   SECURITY_DEVICES = "/security/devices",
   SECURITY_DEVICE_BY_DEVICE_ID = "/security/devices/:id",
   AUTH_PASSWORD_RECOVERY = "/auth/password-recovery",
+  AUTH_NEW_PASSWORD = "/auth/new-password"
 }
 
 export const enum HTTP_STATUS {

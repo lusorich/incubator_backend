@@ -15,6 +15,7 @@ export interface IUsersCommandsRepository {
   addUser: (newUser: UserDb) => Promise<UserViewWithId | null>;
   deleteUserById: (id: UserDb["id"]) => Promise<boolean>;
   clearUsers: () => Promise<this>;
+  updateUserPassword: (id: ObjectId, hash: string) => Promise<boolean>;
 }
 
 export class UsersCommandsRepository {
@@ -97,6 +98,23 @@ export class UsersCommandsRepository {
       {
         $set: {
           emailPasswordRecovery: recoveryInfo,
+        },
+      }
+    );
+
+    if (!found.matchedCount) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async updateUserPassword(id: ObjectId, hash: string) {
+    let found = await this.coll.updateOne(
+      { _id: id },
+      {
+        $set: {
+          hash,
         },
       }
     );
