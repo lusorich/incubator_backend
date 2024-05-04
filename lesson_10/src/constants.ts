@@ -31,6 +31,7 @@ export const enum ENDPOINTS {
   AUTH_LOGOUT = "/auth/logout",
   SECURITY_DEVICES = "/security/devices",
   SECURITY_DEVICE_BY_DEVICE_ID = "/security/devices/:id",
+  AUTH_PASSWORD_RECOVERY = "/auth/password-recovery",
 }
 
 export const enum HTTP_STATUS {

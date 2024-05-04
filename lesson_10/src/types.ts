@@ -9,6 +9,7 @@ export interface BlogInput {
 export interface UserDb extends UserViewWithId {
   hash: string;
   emailConfirmation?: UserEmailConfirmation;
+  emailRecoveryPassword?: UserEmailRecoveryPassword;
 }
 
 export interface UserViewWithId extends UserView {
@@ -24,6 +25,12 @@ export interface UserEmailConfirmation {
   confirmationCode: string | null;
   expire: Date | null;
   isConfirmed: boolean;
+}
+
+export interface UserEmailRecoveryPassword {
+  recoveryCode: string | null;
+  expire: Date | null;
+  isUsed: boolean;
 }
 
 export interface CommentatorInfo {

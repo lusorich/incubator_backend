@@ -3,7 +3,7 @@ import { EMAIL_TRANSPORT_SETTINGS } from "../types/email.types";
 import { DEFAULT_TRANSPORT_SETTINGS } from "../constants/email.constants";
 import { randomUUID } from "crypto";
 import { add } from "date-fns";
-import { UserEmailConfirmation } from "../../types";
+import { UserEmailConfirmation, UserEmailRecoveryPassword } from "../../types";
 
 export class EmailService {
   private mailer;
@@ -24,15 +24,36 @@ export class EmailService {
     isConfirmed: false,
   });
 
+  generatePasswordRecoveryConfirmation = (): UserEmailRecoveryPassword => ({
+    recoveryCode: randomUUID(),
+    expire: add(new Date(), { days: 3 }),
+    isUsed: false,
+  });
+
   generateEmailTemplate = ({
     link = "localhost:3003/auth/registration-confirmation",
     code,
+    title = "Thank for your registration",
   }: {
     link?: string;
+    title?: string;
     code: string | null;
-  }) => `<h1>Thank for your registration</h1>
- <p>To finish registration please follow the link below:
-     <a href='http://${link}?code=${code}'>complete registration</a>
+  }) =>
+    `<h1>${title}</h1>
+ <p>To finish please follow the link below:
+     <a href='http://${link}?code=${code}'>complete action</a>
+ </p>`;
+
+  generateRecoveryPasswordEmail = ({
+    link = "localhost:3003/auth/password-recovery",
+    recoveryCode,
+  }: {
+    link?: string;
+    recoveryCode: string | null;
+  }) =>
+    `<h1>Recovery password</h1>
+ <p>To finish please follow the link below:
+     <a href='http://${link}?recoveryCode=${recoveryCode}'>complete recovery</a>
  </p>`;
 
   async sendEmail({

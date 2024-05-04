@@ -280,3 +280,42 @@ authRouter
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
+
+authRouter
+  .route(ENDPOINTS.AUTH_PASSWORD_RECOVERY)
+  .post(
+    checkRequestCount,
+    checkSchema({ email: emailValidator }, ["body"]),
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req).array({ onlyFirstError: true });
+
+      if (errors.length) {
+        const formattedErrors = getFormattedErrors(errors);
+
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+      }
+
+      const emailService = new EmailService();
+      const emailConfirmationInfo = emailService.generatePasswordRecoveryConfirmation();
+      const emailTemplate = emailService.generateRecoveryPasswordEmail({
+        recoveryCode: emailConfirmationInfo.recoveryCode,
+      });
+
+      const found = await usersQueryRepository.findUserByEmail(req.body?.email);
+
+      if (found) {
+        await usersCommandsRepository.updateEmailRecoveryPasswordConfirmation(
+          found._id,
+          emailConfirmationInfo
+        );
+      }
+
+      await emailService.sendEmail({
+        from: "eeugern@mail.ru",
+        to: req.body.email,
+        html: emailTemplate,
+      });
+
+      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+    }
+  );

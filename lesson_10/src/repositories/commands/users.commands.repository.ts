@@ -4,7 +4,12 @@ import { client } from "../../db/db";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
 import { postsQueryRepository } from "../query/posts.query.repository";
 import { usersQueryRepository } from "../query/users.query.repository";
-import { UserDb, UserEmailConfirmation, UserViewWithId } from "../../types";
+import {
+  UserDb,
+  UserEmailConfirmation,
+  UserEmailRecoveryPassword,
+  UserViewWithId,
+} from "../../types";
 
 export interface IUsersCommandsRepository {
   addUser: (newUser: UserDb) => Promise<UserViewWithId | null>;
@@ -72,6 +77,26 @@ export class UsersCommandsRepository {
       {
         $set: {
           emailConfirmation,
+        },
+      }
+    );
+
+    if (!found.matchedCount) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async updateEmailRecoveryPasswordConfirmation(
+    id: ObjectId,
+    recoveryInfo: UserEmailRecoveryPassword
+  ) {
+    let found = await this.coll.updateOne(
+      { _id: id },
+      {
+        $set: {
+          emailPasswordRecovery: recoveryInfo,
         },
       }
     );
