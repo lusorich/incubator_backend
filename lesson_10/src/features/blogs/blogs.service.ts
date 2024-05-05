@@ -1,8 +1,8 @@
-import { BlogInput, BlogWithId } from "../../types";
+import { BlogInput, BlogWithId } from "./domain/blog.entity";
 import {
   IBblogsCommandsRepository,
   blogsCommandsRepository,
-} from "../../repositories/commands/blogs.commands.repository";
+} from "./repositories/blogs.commands.repository";
 
 export class BlogsService {
   blogsCommandsRepository: IBblogsCommandsRepository;
@@ -16,7 +16,6 @@ export class BlogsService {
       ...blog,
       isMembership: false,
       createdAt: new Date(),
-      id: String(Math.round(Math.random() * 1000)),
     };
 
     return await this.blogsCommandsRepository.addBlog(newBlog);

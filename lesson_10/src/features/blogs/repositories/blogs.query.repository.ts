@@ -4,19 +4,20 @@ import {
   MONGO_COLLECTIONS,
   MONGO_DB_NAME,
   SortDirection,
-} from "../../constants";
-import { client } from "../../db/db";
-import { BlogWithId, PostWithId, QueryParams } from "../../types";
-import { postsQueryRepository } from "./posts.query.repository";
-import { ResultObject } from "../../common/helpers/result.helper";
-import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
+} from "../../../constants";
+import { client } from "../../../db/db";
+import { PostWithId, QueryParams } from "../../../types";
+import { postsQueryRepository } from "../../../repositories/query/posts.query.repository";
+import { ResultObject } from "../../../common/helpers/result.helper";
+import { COMMON_RESULT_STATUSES } from "../../../common/types/common.types";
+import { BlogModel, BlogWithId } from "../domain/blog.entity";
 
 export class BlogsQueryRepository extends ResultObject {
-  coll: Collection<BlogWithId>;
+  model: typeof BlogModel;
 
   constructor() {
     super();
-    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
+    this.model = BlogModel;
   }
 
   async getAllBlogs({
@@ -27,10 +28,10 @@ export class BlogsQueryRepository extends ResultObject {
   }: QueryParams) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
-    const allBlogsWithoutSorting = await this.coll.find().toArray();
+    const allBlogsWithoutSorting = await this.model.find();
     const allBlogsCount = allBlogsWithoutSorting.length;
 
-    const allBlogs = await this.coll
+    const allBlogs = await this.model
       .find({
         name: {
           $regex: searchNameTerm || /./,
@@ -39,8 +40,7 @@ export class BlogsQueryRepository extends ResultObject {
       })
       .limit(pageSize)
       .skip((pageNumber - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 })
-      .toArray();
+      .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 });
 
     let allBlogsToView: (BlogWithId | null)[] = [];
 
@@ -90,7 +90,7 @@ export class BlogsQueryRepository extends ResultObject {
   }
 
   async getBlogById(id: BlogWithId["id"]) {
-    const found = await this.coll.findOne({ _id: new ObjectId(id) });
+    const found = await this.model.findOne({ _id: id });
 
     if (!found) {
       return this.getResult<null>({

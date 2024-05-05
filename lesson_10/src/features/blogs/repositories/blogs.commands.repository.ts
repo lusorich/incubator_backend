@@ -1,13 +1,18 @@
 import { Collection, ObjectId, WithId } from "mongodb";
-import { ERROR_MSG, MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
-import { client } from "../../db/db";
-import { BlogInput, BlogWithId } from "../../types";
-import { blogsQueryRepository } from "../query/blogs.query.repository";
-import { ResultObject } from "../../common/helpers/result.helper";
+import {
+  ERROR_MSG,
+  MONGO_COLLECTIONS,
+  MONGO_DB_NAME,
+} from "../../../constants";
+import { client } from "../../../db/db";
+
+import { ResultObject } from "../../../common/helpers/result.helper";
 import {
   COMMON_RESULT_STATUSES,
   Result,
-} from "../../common/types/common.types";
+} from "../../../common/types/common.types";
+import { BlogInput, BlogWithId } from "../domain/blog.entity";
+import { blogsQueryRepository } from "./blogs.query.repository";
 
 export interface IBblogsCommandsRepository {
   addBlog: (newBlob: BlogWithId) => Promise<Result<BlogWithId>>;
@@ -42,10 +47,7 @@ export class BlogsCommandsRepository
   }
 
   async updateBlogById(id: BlogWithId["id"], props: Partial<BlogInput>) {
-    let found = await this.coll.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { ...props } }
-    );
+    let found = await this.coll.updateOne({ id }, { $set: { ...props } });
 
     if (!found.matchedCount) {
       return this.getResult({
@@ -62,7 +64,7 @@ export class BlogsCommandsRepository
   }
 
   async deleteBlogById(id: BlogWithId["id"]) {
-    const found = await this.coll.deleteOne({ _id: new ObjectId(id) });
+    const found = await this.coll.deleteOne({ id });
 
     if (!found.deletedCount) {
       return this.getResult({

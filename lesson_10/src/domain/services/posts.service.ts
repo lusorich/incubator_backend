@@ -1,6 +1,6 @@
 import { Post, PostWithId, UserViewWithId } from "../../types";
 import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
-import { blogsQueryRepository } from "../../repositories/query/blogs.query.repository";
+import { blogsQueryRepository } from "../../features/blogs/repositories/blogs.query.repository";
 
 export class PostsService {
   async addPost(post: Post) {

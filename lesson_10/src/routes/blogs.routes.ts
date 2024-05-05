@@ -1,20 +1,21 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { checkSchema, validationResult } from "express-validator";
-import { BlogInput, BlogWithId, ErrorsMessages, Post } from "../types";
+import { ErrorsMessages, Post } from "../types";
 import {
   getFiltersFromQuery,
   getFormattedErrors,
   isDataInResult,
 } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
-import { blogsService } from "../domain/services/blogs.service";
-import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
+import { blogsService } from "../features/blogs/blogs.service";
+import { blogsQueryRepository } from "../features/blogs/repositories/blogs.query.repository";
 import { postsSchema } from "../schemas/posts.schema";
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth } from "../common/middlewares/auth.middleware";
 import { jwtService } from "../common/services/jwt.service";
 import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
+import { BlogInput, BlogWithId } from "../features/blogs/domain/blog.entity";
 
 export const blogsRouter = Router({});
 
@@ -63,6 +64,7 @@ blogsRouter
   .route(ENDPOINTS.BLOGS_ID)
   .get(async (req: Request, res: Response<BlogWithId | void>) => {
     const { id } = req.params;
+
     const result = await blogsQueryRepository.getBlogById(id);
 
     if (!isDataInResult(result)) {

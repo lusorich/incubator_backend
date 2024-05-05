@@ -1,6 +1,6 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
-import { blogsCommandsRepository } from "../repositories/commands/blogs.commands.repository";
+import { blogsCommandsRepository } from "../features/blogs/repositories/blogs.commands.repository";
 import { postsCommandsRepository } from "../repositories/commands/posts.commands.repository";
 import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
 import { commentsCommandsRepository } from "../repositories/commands/comments.commands.repository";

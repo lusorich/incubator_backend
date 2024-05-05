@@ -11,7 +11,7 @@ import {
 
 import { postsAddCommentSchema, postsSchema } from "../schemas/posts.schema";
 
-import { blogsQueryRepository } from "../repositories/query/blogs.query.repository";
+import { blogsQueryRepository } from "../features/blogs/repositories/blogs.query.repository";
 import { postsQueryRepository } from "../repositories/query/posts.query.repository";
 import { postsService } from "../domain/services/posts.service";
 import { checkAuth, checkJwtAuth } from "../common/middlewares/auth.middleware";

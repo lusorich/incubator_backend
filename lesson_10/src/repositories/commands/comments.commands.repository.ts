@@ -1,8 +1,7 @@
 import { Collection, ObjectId, WithId } from "mongodb";
 import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
 import { client } from "../../db/db";
-import { BlogInput, BlogWithId, CommentDb, CommentView } from "../../types";
-import { blogsQueryRepository } from "../query/blogs.query.repository";
+import { CommentDb, CommentView } from "../../types";
 import { commentsQueryRepository } from "../query/comments.query.repository";
 
 export class CommentsCommandsRepository {

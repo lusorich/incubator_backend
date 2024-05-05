@@ -6,7 +6,7 @@ import {
   UserViewWithId,
 } from "../../types";
 import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
-import { blogsQueryRepository } from "../../repositories/query/blogs.query.repository";
+import { blogsQueryRepository } from "../../features/blogs/repositories/blogs.query.repository";
 import { commentsCommandsRepository } from "../../repositories/commands/comments.commands.repository";
 
 export class CommentsService {

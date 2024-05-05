@@ -1,13 +1,14 @@
 import { MongoClient } from "mongodb";
 import { SETTINGS } from "../constants";
+import mongoose from "mongoose";
 
 export const client = new MongoClient(SETTINGS.MONGO_URL);
 
+const mongoUrl = SETTINGS.MONGO_URL + SETTINGS.DB_NAME;
 export const runDb = async () => {
   try {
-    await client.connect();
-    await client.db(SETTINGS.DB_NAME).command({ ping: 1 });
+    await mongoose.connect(mongoUrl);
   } catch (e) {
-    client.close();
+    await mongoose.disconnect();
   }
 };
