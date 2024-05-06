@@ -16,6 +16,12 @@ export interface BlogWithId extends BlogInput {
 type BlogModel = Model<BlogWithId>;
 
 const blogSchema = new mongoose.Schema<BlogWithId>({
+  createdAt: {
+    type: Date,
+  },
+  isMembership: {
+    type: Boolean,
+  },
   name: {
     type: String,
     required: true,

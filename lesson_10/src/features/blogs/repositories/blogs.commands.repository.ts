@@ -11,7 +11,7 @@ import {
   COMMON_RESULT_STATUSES,
   Result,
 } from "../../../common/types/common.types";
-import { BlogInput, BlogWithId } from "../domain/blog.entity";
+import { BlogInput, BlogModel, BlogWithId } from "../domain/blog.entity";
 import { blogsQueryRepository } from "./blogs.query.repository";
 
 export interface IBblogsCommandsRepository {
@@ -28,26 +28,26 @@ export class BlogsCommandsRepository
   extends ResultObject
   implements IBblogsCommandsRepository
 {
-  coll: Collection<BlogWithId>;
+  model: typeof BlogModel;
 
   constructor() {
     super();
-    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.BLOGS);
+    this.model = BlogModel;
   }
 
   async addBlog(newBlog: BlogWithId) {
-    await this.coll.insertOne(newBlog);
+    const result = await this.model.create(newBlog);
 
     return this.getResult<BlogWithId>({
       status: COMMON_RESULT_STATUSES.SUCCESS,
       data: blogsQueryRepository._mapToBlogViewModel(
-        newBlog as WithId<BlogWithId>
+        result as WithId<BlogWithId>
       ) as BlogWithId,
     });
   }
 
   async updateBlogById(id: BlogWithId["id"], props: Partial<BlogInput>) {
-    let found = await this.coll.updateOne({ id }, { $set: { ...props } });
+    let found = await this.model.updateOne({ _id: id }, { $set: { ...props } });
 
     if (!found.matchedCount) {
       return this.getResult({
@@ -64,7 +64,7 @@ export class BlogsCommandsRepository
   }
 
   async deleteBlogById(id: BlogWithId["id"]) {
-    const found = await this.coll.deleteOne({ id });
+    const found = await this.model.deleteOne({ _id: id });
 
     if (!found.deletedCount) {
       return this.getResult({
@@ -81,7 +81,7 @@ export class BlogsCommandsRepository
   }
 
   async clearBlogs() {
-    await this.coll.deleteMany({});
+    await this.model.deleteMany({});
 
     return this;
   }
