@@ -1,20 +1,12 @@
 import { SortDirection } from "./constants";
 import { BlogWithId } from "./features/blogs/domain/blog.entity";
 import { PostWithId } from "./features/posts/domain/post.entity";
+import { UserView, UserViewWithId } from "./features/users/domain/user.entity";
 
 export interface UserDb extends UserViewWithId {
   hash: string;
   emailConfirmation?: UserEmailConfirmation;
   emailRecoveryPassword?: UserEmailRecoveryPassword;
-}
-
-export interface UserViewWithId extends UserView {
-  id: string;
-}
-export interface UserView {
-  login: string;
-  email: string;
-  createdAt: Date;
 }
 
 export interface UserEmailConfirmation {
@@ -74,11 +66,7 @@ export interface SecurityInfo {
   sessions: Session[];
 }
 
-export interface RateRequest {
-  ip: string;
-  url: string;
-  date: Date | string;
-}
+
 
 export interface Session {
   userId: string;

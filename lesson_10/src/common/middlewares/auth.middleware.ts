@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { HTTP_STATUS } from "../../constants";
 import { jwtService } from "../services/jwt.service";
-import { usersQueryRepository } from "../../repositories/query/users.query.repository";
-import { requestsService } from "../../domain/services/requests.service";
-import { requestsQueryRepository } from "../../repositories/query/requests.query.repository";
+import { usersQueryRepository } from "../../features/users/repositories/users.query.repository";
+import { requestsService } from "../../features/requests/application/requests.service";
+import { requestsQueryRepository } from "../../features/requests/repositories/requests.query.repository";
 import { formatISO, parseISO } from "date-fns";
 import { sessionQueryRepository } from "../../repositories/query/sessions.query.repository";
 import { COMMON_RESULT_STATUSES } from "../types/common.types";

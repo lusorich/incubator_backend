@@ -1,15 +1,12 @@
-import { Collection, ObjectId, WithId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 
-import { client } from "../../db/db";
-import { MONGO_COLLECTIONS, MONGO_DB_NAME } from "../../constants";
-import { postsQueryRepository } from "../../features/posts/repositories/posts.query.repository";
-import { usersQueryRepository } from "../query/users.query.repository";
 import {
   UserDb,
   UserEmailConfirmation,
   UserEmailRecoveryPassword,
-  UserViewWithId,
-} from "../../types";
+} from "../../../types";
+import { UserModel, UserViewWithId } from "../domain/user.entity";
+import { usersQueryRepository } from "./users.query.repository";
 
 export interface IUsersCommandsRepository {
   addUser: (newUser: UserDb) => Promise<UserViewWithId | null>;
@@ -19,20 +16,20 @@ export interface IUsersCommandsRepository {
 }
 
 export class UsersCommandsRepository {
-  coll: Collection<UserDb>;
+  model: typeof UserModel;
 
   constructor() {
-    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.USERS);
+    this.model = UserModel;
   }
 
   async addUser(user: UserDb) {
-    await this.coll.insertOne(user);
+    const result = await this.model.create(user);
 
-    return usersQueryRepository._mapToUserViewModel(user as WithId<UserDb>);
+    return usersQueryRepository._mapToUserViewModel(result as WithId<UserDb>);
   }
 
   async deleteUserById(id: UserDb["id"]) {
-    const found = await this.coll.deleteOne({ _id: new ObjectId(id) });
+    const found = await this.model.deleteOne({ _id: id });
 
     if (!found.deletedCount) {
       return false;
@@ -42,14 +39,14 @@ export class UsersCommandsRepository {
   }
 
   async clearUsers() {
-    await this.coll.deleteMany({});
+    await this.model.deleteMany({});
 
     return this;
   }
 
   //TODO: Maybe in service
   async setUserIsConfirmed(id: ObjectId) {
-    let found = await this.coll.updateOne(
+    let found = await this.model.updateOne(
       { _id: id },
       {
         $set: {
@@ -73,7 +70,7 @@ export class UsersCommandsRepository {
     id: ObjectId,
     emailConfirmation: UserEmailConfirmation
   ) {
-    let found = await this.coll.updateOne(
+    let found = await this.model.updateOne(
       { _id: id },
       {
         $set: {
@@ -93,7 +90,7 @@ export class UsersCommandsRepository {
     id: ObjectId,
     recoveryInfo: UserEmailRecoveryPassword
   ) {
-    let found = await this.coll.updateOne(
+    let found = await this.model.updateOne(
       { _id: id },
       {
         $set: {
@@ -110,7 +107,7 @@ export class UsersCommandsRepository {
   }
 
   async updateUserPassword(id: ObjectId, hash: string) {
-    let found = await this.coll.updateOne(
+    let found = await this.model.updateOne(
       { _id: id },
       {
         $set: {

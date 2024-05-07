@@ -15,11 +15,11 @@ import {
   checkRequestCount,
 } from "../common/middlewares/auth.middleware";
 import { UserAuthView } from "../types";
-import { usersQueryRepository } from "../repositories/query/users.query.repository";
+import { usersQueryRepository } from "../features/users/repositories/users.query.repository";
 import { jwtService } from "../common/services/jwt.service";
 import { EmailService } from "../common/services/email.service";
-import { usersService } from "../domain/services/users.service";
-import { usersCommandsRepository } from "../repositories/commands/users.commands.repository";
+import { usersService } from "../features/users/application/users.service";
+import { usersCommandsRepository } from "../features/users/repositories/users.commands.repository";
 import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 import { sessionsService } from "../domain/services/sessions.service";
 import { randomUUID } from "crypto";

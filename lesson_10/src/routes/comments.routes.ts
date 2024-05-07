@@ -5,7 +5,7 @@ import { checkJwtAuth } from "../common/middlewares/auth.middleware";
 import { checkSchema, validationResult } from "express-validator";
 import { postCommentContentValidator } from "../schemas/posts.schema";
 import { getFormattedErrors } from "../helpers";
-import { usersQueryRepository } from "../repositories/query/users.query.repository";
+import { usersQueryRepository } from "../features/users/repositories/users.query.repository";
 import { commentsService } from "../domain/services/comments.service";
 
 export const commentsRouter = Router({});

@@ -1,5 +1,5 @@
 import * as bcrypt from "bcrypt";
-import { usersQueryRepository } from "../../repositories/query/users.query.repository";
+import { usersQueryRepository } from "../../features/users/repositories/users.query.repository";
 import { cryptService } from "../../common/services/crypt.service";
 import { WithId } from "mongodb";
 import { UserDb } from "../../types";

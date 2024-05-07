@@ -1,10 +1,10 @@
 import { Router, type Response, type Request } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { getFiltersFromQuery, getFormattedErrors } from "../helpers";
-import { usersQueryRepository } from "../repositories/query/users.query.repository";
+import { usersQueryRepository } from "../features/users/repositories/users.query.repository";
 import { checkSchema, validationResult } from "express-validator";
 import { usersSchema } from "../schemas/users.schema";
-import { usersService } from "../domain/services/users.service";
+import { usersService } from "../features/users/application/users.service";
 import { checkAuth } from "../common/middlewares/auth.middleware";
 
 export const usersRouter = Router({});

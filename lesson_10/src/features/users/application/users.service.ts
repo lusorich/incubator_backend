@@ -1,10 +1,11 @@
 import {
   IUsersCommandsRepository,
   usersCommandsRepository,
-} from "../../repositories/commands/users.commands.repository";
-import { UserDb, UserEmailConfirmation, UserViewWithId } from "../../types";
-import { cryptService } from "../../common/services/crypt.service";
+} from "../repositories/users.commands.repository";
+import { UserDb, UserEmailConfirmation } from "../../../types";
+import { cryptService } from "../../../common/services/crypt.service";
 import { WithId } from "mongodb";
+import { UserViewWithId } from "../domain/user.entity";
 
 export class UsersService {
   usersCommandsRepository: IUsersCommandsRepository;
@@ -29,7 +30,6 @@ export class UsersService {
       hash: userHash,
       createdAt: new Date(),
       emailConfirmation: emailConfirmationInfo,
-      id: String(Math.round(Math.random() * 1000)),
     };
 
     return await this.usersCommandsRepository.addUser(newUser);
@@ -42,7 +42,10 @@ export class UsersService {
       salt,
     });
 
-    return await this.usersCommandsRepository.updateUserPassword(user._id, userHash);
+    return await this.usersCommandsRepository.updateUserPassword(
+      user._id,
+      userHash
+    );
   }
 
   async deleteUserById(id: UserViewWithId["id"]) {

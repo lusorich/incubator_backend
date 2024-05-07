@@ -3,10 +3,10 @@ import {
   MONGO_COLLECTIONS,
   MONGO_DB_NAME,
   SortDirection,
-} from "../../constants";
-import { client } from "../../db/db";
-import { QueryParams, UserDb, UserViewWithId } from "../../types";
-import { usersCommandsRepository } from "../commands/users.commands.repository";
+} from "../../../constants";
+import { client } from "../../../db/db";
+import { QueryParams, UserDb } from "../../../types";
+import { UserViewWithId } from "../domain/user.entity";
 
 export class UsersQueryRepository {
   coll: Collection<UserDb>;

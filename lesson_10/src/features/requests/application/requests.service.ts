@@ -1,6 +1,5 @@
-import { requestsCommandsRepository } from "../../repositories/commands/requests.commands.repository";
-import { sessionsCommandsRepository } from "../../repositories/commands/sessions.commands.repository";
-import type { RateRequest, Session } from "../../types";
+import { RateRequest } from "../domain/request.entity";
+import { requestsCommandsRepository } from "../repositories/requests.commands.repository";
 
 class RequestsService {
   async addRequest(
