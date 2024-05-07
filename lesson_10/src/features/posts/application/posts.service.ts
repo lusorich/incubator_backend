@@ -1,6 +1,6 @@
-import { Post, PostWithId, UserViewWithId } from "../../types";
-import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
-import { blogsQueryRepository } from "../../features/blogs/repositories/blogs.query.repository";
+import { postsCommandsRepository } from "../repositories/posts.commands.repository";
+import { blogsQueryRepository } from "../../blogs/repositories/blogs.query.repository";
+import { Post, PostWithId } from "../domain/post.entity";
 
 export class PostsService {
   async addPost(post: Post) {
@@ -8,7 +8,6 @@ export class PostsService {
 
     const newPost: PostWithId = {
       ...post,
-      id: String(Math.round(Math.random() * 1000)),
       blogName: parentBlog?.data?.name || "",
       createdAt: new Date(),
     };

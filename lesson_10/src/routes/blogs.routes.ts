@@ -8,10 +8,10 @@ import {
   isDataInResult,
 } from "../helpers";
 import { blogsSchema } from "../schemas/blogs.schema";
-import { blogsService } from "../features/blogs/blogs.service";
+import { blogsService } from "../features/blogs/application/blogs.service";
 import { blogsQueryRepository } from "../features/blogs/repositories/blogs.query.repository";
 import { postsSchema } from "../schemas/posts.schema";
-import { postsService } from "../domain/services/posts.service";
+import { postsService } from "../features/posts/application/posts.service";
 import { checkAuth } from "../common/middlewares/auth.middleware";
 import { jwtService } from "../common/services/jwt.service";
 import { COMMON_RESULT_STATUSES } from "../common/types/common.types";

@@ -1,8 +1,8 @@
-import { BlogInput, BlogWithId } from "./domain/blog.entity";
+import { BlogInput, BlogWithId } from "../domain/blog.entity";
 import {
   IBblogsCommandsRepository,
   blogsCommandsRepository,
-} from "./repositories/blogs.commands.repository";
+} from "../repositories/blogs.commands.repository";
 
 export class BlogsService {
   blogsCommandsRepository: IBblogsCommandsRepository;

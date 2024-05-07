@@ -2,7 +2,7 @@ import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 
 import { checkSchema, validationResult } from "express-validator";
-import { ErrorsMessages, Post, PostView, PostWithId } from "../types";
+import { ErrorsMessages } from "../types";
 import {
   getFiltersFromQuery,
   getFormattedErrors,
@@ -12,13 +12,14 @@ import {
 import { postsAddCommentSchema, postsSchema } from "../schemas/posts.schema";
 
 import { blogsQueryRepository } from "../features/blogs/repositories/blogs.query.repository";
-import { postsQueryRepository } from "../repositories/query/posts.query.repository";
-import { postsService } from "../domain/services/posts.service";
+import { postsQueryRepository } from "../features/posts/repositories/posts.query.repository";
+import { postsService } from "../features/posts/application/posts.service";
 import { checkAuth, checkJwtAuth } from "../common/middlewares/auth.middleware";
 import { usersQueryRepository } from "../repositories/query/users.query.repository";
 import { commentsService } from "../domain/services/comments.service";
 import { commentsQueryRepository } from "../repositories/query/comments.query.repository";
 import { COMMON_RESULT_STATUSES, Result } from "../common/types/common.types";
+import { Post, PostWithId } from "../features/posts/domain/post.entity";
 
 export const postsRouter = Router({});
 

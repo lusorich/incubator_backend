@@ -1,26 +1,17 @@
-import { Collection, ObjectId, WithId } from "mongodb";
-import { BlogWithId, PostView, PostWithId, QueryParams } from "../../types";
-import { client } from "../../db/db";
-import {
-  ERROR_MSG,
-  MONGO_COLLECTIONS,
-  MONGO_DB_NAME,
-  SortDirection,
-} from "../../constants";
-import { ResultObject } from "../../common/helpers/result.helper";
-import { COMMON_RESULT_STATUSES } from "../../common/types/common.types";
-import { getCommonErrorMsg } from "../../helpers";
+import { WithId } from "mongodb";
+import { QueryParams } from "../../../types";
+
+import { ERROR_MSG, SortDirection } from "../../../constants";
+import { ResultObject } from "../../../common/helpers/result.helper";
+import { COMMON_RESULT_STATUSES } from "../../../common/types/common.types";
+import { PostModel, PostWithId } from "../domain/post.entity";
 
 export class PostsQueryRepository extends ResultObject {
-  coll: Collection<PostWithId>;
-  blogsColl: Collection<BlogWithId>;
+  model: typeof PostModel;
 
   constructor() {
     super();
-    this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.POSTS);
-    this.blogsColl = client
-      .db(MONGO_DB_NAME)
-      .collection(MONGO_COLLECTIONS.BLOGS);
+    this.model = PostModel;
   }
 
   async getAllPosts({
@@ -31,18 +22,16 @@ export class PostsQueryRepository extends ResultObject {
   }: QueryParams & { blogId?: PostWithId["blogId"] }) {
     const { pageSize = 10, pageNumber = 1 } = pagination;
 
-    const allPostsWithoutSorting = await this.coll
-      .find({
-        blogId: {
-          $regex: blogId || /./,
-          $options: "i",
-        },
-      })
-      .toArray();
+    const allPostsWithoutSorting = await this.model.find({
+      blogId: {
+        $regex: blogId || /./,
+        $options: "i",
+      },
+    });
 
     const allPostsCount = allPostsWithoutSorting.length;
 
-    const allPosts = await this.coll
+    const allPosts = await this.model
       .find({
         blogId: {
           $regex: blogId || /./,
@@ -51,8 +40,7 @@ export class PostsQueryRepository extends ResultObject {
       })
       .limit(pageSize)
       .skip((pageNumber - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 })
-      .toArray();
+      .sort({ [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 });
 
     let allPostsToView: (PostWithId | null)[] = [];
 
@@ -73,7 +61,7 @@ export class PostsQueryRepository extends ResultObject {
   }
 
   async getPostById(id: PostWithId["id"]) {
-    const found = await this.coll.findOne({ _id: new ObjectId(id) });
+    const found = await this.model.findOne({ _id: id });
 
     return this.getResult({
       data: this._mapToPostViewModel(found),

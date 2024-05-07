@@ -1,5 +1,6 @@
 import { SortDirection } from "./constants";
 import { BlogWithId } from "./features/blogs/domain/blog.entity";
+import { PostWithId } from "./features/posts/domain/post.entity";
 
 export interface UserDb extends UserViewWithId {
   hash: string;
@@ -45,19 +46,6 @@ export interface CommentDb extends CommentView {
 
 export type UserAuthView = Omit<UserView, "createdAt"> & { userId: string };
 
-export interface Post {
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-}
-
-export interface PostWithId extends Post {
-  id: string;
-  createdAt: Date;
-  blogName: string;
-}
-
 export type FieldError = {
   message: string;
   field: string;
@@ -80,14 +68,6 @@ export interface QueryParams {
   searchLoginTerm?: string | null;
   searchEmailTerm?: string | null;
 }
-
-export type PostView = {
-  pagesCount: number;
-  totalCount: number;
-  pageSize: number;
-  page: number;
-  items: (PostWithId | null)[];
-};
 
 export interface SecurityInfo {
   userId: Session["userId"];

@@ -12,7 +12,7 @@ import {
   PostWithId,
   QueryParams,
 } from "../../types";
-import { postsQueryRepository } from "./posts.query.repository";
+import { postsQueryRepository } from "../../features/posts/repositories/posts.query.repository";
 
 export class CommentsQueryRepository {
   coll: Collection<CommentDb>;

@@ -5,7 +5,7 @@ import {
   PostWithId,
   UserViewWithId,
 } from "../../types";
-import { postsCommandsRepository } from "../../repositories/commands/posts.commands.repository";
+import { postsCommandsRepository } from "../../features/posts/repositories/posts.commands.repository";
 import { blogsQueryRepository } from "../../features/blogs/repositories/blogs.query.repository";
 import { commentsCommandsRepository } from "../../repositories/commands/comments.commands.repository";
 

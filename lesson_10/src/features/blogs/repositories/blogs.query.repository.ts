@@ -6,11 +6,12 @@ import {
   SortDirection,
 } from "../../../constants";
 import { client } from "../../../db/db";
-import { PostWithId, QueryParams } from "../../../types";
-import { postsQueryRepository } from "../../../repositories/query/posts.query.repository";
+import {  QueryParams } from "../../../types";
+import { postsQueryRepository } from "../../posts/repositories/posts.query.repository";
 import { ResultObject } from "../../../common/helpers/result.helper";
 import { COMMON_RESULT_STATUSES } from "../../../common/types/common.types";
 import { BlogModel, BlogWithId } from "../domain/blog.entity";
+import { PostWithId } from "../../posts/domain/post.entity";
 
 export class BlogsQueryRepository extends ResultObject {
   model: typeof BlogModel;
