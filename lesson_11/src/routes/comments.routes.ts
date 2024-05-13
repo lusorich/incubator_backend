@@ -3,10 +3,15 @@ import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { commentsQueryRepository } from "../repositories/query/comments.query.repository";
 import { checkJwtAuth } from "../common/middlewares/auth.middleware";
 import { checkSchema, validationResult } from "express-validator";
-import { postCommentContentValidator } from "../schemas/posts.schema";
+import {
+  likeStatusValidator,
+  postCommentContentValidator,
+} from "../schemas/posts.schema";
 import { getFormattedErrors } from "../helpers";
 import { usersQueryRepository } from "../features/users/repositories/users.query.repository";
 import { commentsService } from "../domain/services/comments.service";
+import { jwtService } from "../common/services/jwt.service";
+import { likesService } from "../features/likes/application/likes.service";
 
 export const commentsRouter = Router({});
 
@@ -71,3 +76,23 @@ commentsRouter
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   });
+
+commentsRouter
+  .route(ENDPOINTS.COMMENTS_LIKE_STATUS)
+  .put(
+    checkJwtAuth,
+    checkSchema({ likeStatus: likeStatusValidator }, ["body"]),
+    async (req: Request, res: Response) => {
+      const { userId } = req;
+      const parentId = req.params.id;
+      const status = req.body.likeStatus;
+
+      const result = await likesService.updateLike({
+        userId: userId || "",
+        parentId,
+        status,
+      });
+
+      return res.sendStatus(HTTP_STATUS.NO_CONTENT)
+    }
+  );

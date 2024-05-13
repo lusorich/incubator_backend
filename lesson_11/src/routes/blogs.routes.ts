@@ -1,7 +1,7 @@
 import { type Response, type Request, Router } from "express";
 import { ENDPOINTS, HTTP_STATUS } from "../constants";
 import { checkSchema, validationResult } from "express-validator";
-import { ErrorsMessages, Post } from "../types";
+import { ErrorsMessages } from "../types";
 import {
   getFiltersFromQuery,
   getFormattedErrors,
@@ -16,6 +16,7 @@ import { checkAuth } from "../common/middlewares/auth.middleware";
 import { jwtService } from "../common/services/jwt.service";
 import { COMMON_RESULT_STATUSES } from "../common/types/common.types";
 import { BlogInput, BlogWithId } from "../features/blogs/domain/blog.entity";
+import { Post } from "../features/posts/domain/post.entity";
 
 export const blogsRouter = Router({});
 

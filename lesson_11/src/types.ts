@@ -1,5 +1,6 @@
 import { SortDirection } from "./constants";
 import { BlogWithId } from "./features/blogs/domain/blog.entity";
+import { LIKE_STATUS } from "./features/likes/domain/like.entity";
 import { PostWithId } from "./features/posts/domain/post.entity";
 import { UserView, UserViewWithId } from "./features/users/domain/user.entity";
 
@@ -25,10 +26,16 @@ export interface CommentatorInfo {
   userId: string;
   userLogin: string;
 }
+export interface CommentLikesInfo {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: LIKE_STATUS;
+}
 export interface CommentView {
   content: string;
   id: string;
   commentatorInfo: CommentatorInfo;
+  likesInfo: CommentLikesInfo;
   createdAt: Date;
 }
 
@@ -65,8 +72,6 @@ export interface SecurityInfo {
   userId: Session["userId"];
   sessions: Session[];
 }
-
-
 
 export interface Session {
   userId: string;

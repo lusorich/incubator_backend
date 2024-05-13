@@ -7,6 +7,12 @@ export const titleValidator = {
   errorMessage: getCommonErrorMsg("title"),
 };
 
+export const likeStatusValidator = {
+  isString: true,
+  isLength: { options: { min: 1, max: 10000 } },
+  errorMessage: getCommonErrorMsg("likeStatus")
+}
+
 export const shortDescriptionValidator = {
   customSanitizer: trimSanitizer,
   isString: true,

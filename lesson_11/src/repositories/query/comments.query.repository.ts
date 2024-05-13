@@ -5,14 +5,10 @@ import {
   SortDirection,
 } from "../../constants";
 import { client } from "../../db/db";
-import {
-  BlogWithId,
-  CommentDb,
-  CommentView,
-  PostWithId,
-  QueryParams,
-} from "../../types";
+import { CommentDb, CommentView, QueryParams } from "../../types";
 import { postsQueryRepository } from "../../features/posts/repositories/posts.query.repository";
+import { PostWithId } from "../../features/posts/domain/post.entity";
+import { BlogWithId } from "../../features/blogs/domain/blog.entity";
 
 export class CommentsQueryRepository {
   coll: Collection<CommentDb>;
@@ -80,6 +76,7 @@ export class CommentsQueryRepository {
       id: comment._id.toString(),
       content: comment.content,
       commentatorInfo: comment.commentatorInfo,
+      likesInfo: comment?.likesInfo,
       createdAt: comment.createdAt,
     };
   }

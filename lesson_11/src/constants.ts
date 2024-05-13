@@ -24,6 +24,7 @@ export const enum ENDPOINTS {
   AUTH_ME = "/auth/me",
   POSTS_ID_COMMENTS = "/posts/:id/comments",
   COMMENTS_ID = "/comments/:id",
+  COMMENTS_LIKE_STATUS = "/comments/:id/like-status",
   REGISTRATION_CONFIRMATION = "/auth/registration-confirmation",
   REGISTRATION = "/auth/registration",
   REGISTRATION_EMAIL_RESENDING = "/auth/registration-email-resending",
@@ -32,7 +33,7 @@ export const enum ENDPOINTS {
   SECURITY_DEVICES = "/security/devices",
   SECURITY_DEVICE_BY_DEVICE_ID = "/security/devices/:id",
   AUTH_PASSWORD_RECOVERY = "/auth/password-recovery",
-  AUTH_NEW_PASSWORD = "/auth/new-password"
+  AUTH_NEW_PASSWORD = "/auth/new-password",
 }
 
 export const enum HTTP_STATUS {
