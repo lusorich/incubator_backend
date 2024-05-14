@@ -12,20 +12,7 @@ export class LikesService {
       status,
     });
 
-    // const updatedCommentLikesInfoRes =
-    //   await commentsService.updateCommentById(parentId, {
-    //     likesInfo: {
-    //       myStatus:
-    //     }
-    //   });
-
-    await this.likesCommandsRepository.updateLike({
-      parentId,
-      userId,
-      status,
-    });
-
-    console.log("updatedRes", updatedLikeRes);
+    await commentsService.recalculateLikes(parentId, userId);
   }
 }
 

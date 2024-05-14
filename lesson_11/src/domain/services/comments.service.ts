@@ -2,7 +2,7 @@ import { CommentDb, CommentView } from "../../types";
 import { commentsCommandsRepository } from "../../repositories/commands/comments.commands.repository";
 import { UserViewWithId } from "../../features/users/domain/user.entity";
 import { PostWithId } from "../../features/posts/domain/post.entity";
-import { LIKE_STATUS } from "../../features/likes/domain/like.entity";
+import { LIKE_STATUS, LikeDb } from "../../features/likes/domain/like.entity";
 
 export class CommentsService {
   async updateCommentById(
@@ -54,7 +54,9 @@ export class CommentsService {
   }
   //TODO: получить по commentId все лайки, отфильтровать по статусу
   // при проходе сравнить userId и проставить myStatus
-  async recalculateLikes(commentId: CommentDb["id"]) {}
+  async recalculateLikes(commentId: CommentDb["id"], userId: LikeDb["userId"]) {
+    return await commentsCommandsRepository.recalculateLikes(commentId, userId);
+  }
 
   async clearComments() {
     await commentsCommandsRepository.clearComments();
