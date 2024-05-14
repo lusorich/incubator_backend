@@ -9,11 +9,13 @@ import { CommentDb, CommentView, QueryParams } from "../../types";
 import { postsQueryRepository } from "../../features/posts/repositories/posts.query.repository";
 import { PostWithId } from "../../features/posts/domain/post.entity";
 import { BlogWithId } from "../../features/blogs/domain/blog.entity";
+import { ResultObject } from "../../common/helpers/result.helper";
 
-export class CommentsQueryRepository {
+export class CommentsQueryRepository extends ResultObject {
   coll: Collection<CommentDb>;
 
   constructor() {
+    super();
     this.coll = client.db(MONGO_DB_NAME).collection(MONGO_COLLECTIONS.COMMENTS);
   }
 

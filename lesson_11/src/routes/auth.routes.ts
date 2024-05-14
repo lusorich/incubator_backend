@@ -53,11 +53,11 @@ authRouter
 
       const deviceId = randomUUID();
       // 10s
-      const accessToken = jwtService.create(authResult._id.toString(), "10m");
+      const accessToken = jwtService.create(authResult._id.toString(), "1h");
       // 20s
       const refreshToken = jwtService.create(
         authResult._id.toString(),
-        "20m",
+        "2h",
         deviceId
       );
 
@@ -252,9 +252,9 @@ authRouter
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }
     // 10s
-    const accessToken = jwtService.create(userId, "10m");
+    const accessToken = jwtService.create(userId, "1h");
     // 20s
-    const refreshToken = jwtService.create(userId, "20m", deviceId);
+    const refreshToken = jwtService.create(userId, "2h", deviceId);
 
     await sessionsService.updateSession({
       userId,

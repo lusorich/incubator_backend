@@ -87,12 +87,18 @@ commentsRouter
       const parentId = req.params.id;
       const status = req.body.likeStatus;
 
+      const comment = await commentsQueryRepository.getCommentById(parentId);
+
+      if (!comment) {
+        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
+      }
+
       const result = await likesService.updateLike({
         userId: userId || "",
         parentId,
         status,
       });
 
-      return res.sendStatus(HTTP_STATUS.NO_CONTENT)
+      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
     }
   );

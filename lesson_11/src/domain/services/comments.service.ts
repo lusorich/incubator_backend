@@ -52,6 +52,9 @@ export class CommentsService {
 
     return commentsCommandsRepository.addComment(comment);
   }
+  //TODO: получить по commentId все лайки, отфильтровать по статусу
+  // при проходе сравнить userId и проставить myStatus
+  async recalculateLikes(commentId: CommentDb["id"]) {}
 
   async clearComments() {
     await commentsCommandsRepository.clearComments();

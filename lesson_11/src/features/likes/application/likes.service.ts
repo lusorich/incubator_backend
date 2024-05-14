@@ -19,7 +19,7 @@ export class LikesService {
     //     }
     //   });
 
-    this.likesCommandsRepository.updateLike({
+    await this.likesCommandsRepository.updateLike({
       parentId,
       userId,
       status,
