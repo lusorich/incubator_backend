@@ -12,6 +12,7 @@ import { usersQueryRepository } from "../features/users/repositories/users.query
 import { commentsService } from "../domain/services/comments.service";
 import { jwtService } from "../common/services/jwt.service";
 import { likesService } from "../features/likes/application/likes.service";
+import { LikesQueryRepository } from "../features/likes/repositories/likes.query.repository";
 
 export const commentsRouter = Router({});
 
@@ -19,8 +20,38 @@ commentsRouter
   .route(ENDPOINTS.COMMENTS_ID)
   .get(async (req: Request, res: Response) => {
     const commentId = req.params.id;
+    const token = req.headers.authorization?.split(" ")[1];
 
-    const comment = await commentsQueryRepository.getCommentById(commentId);
+    const id = jwtService.getIdFromToken(token || "");
+    const isValid = jwtService.isValid(token || "");
+    let like;
+
+    if (id && isValid) {
+      try {
+        const user = await usersQueryRepository.getUserById(id);
+
+        if (!user || !user.id) {
+          return res.sendStatus(HTTP_STATUS.NO_AUTH);
+        }
+
+        req.userId = user.id;
+
+        like = await new LikesQueryRepository().getLikesByParentAndUserId(
+          commentId,
+          isValid ? user.id : ""
+        );
+      } catch (e) {
+        like = await new LikesQueryRepository().getLikesByParentAndUserId(
+          commentId,
+          ""
+        );
+      }
+    }
+
+    const comment = await commentsQueryRepository.getCommentById(
+      commentId,
+      like
+    );
 
     if (!comment) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
@@ -83,7 +114,16 @@ commentsRouter
     checkJwtAuth,
     checkSchema({ likeStatus: likeStatusValidator }, ["body"]),
     async (req: Request, res: Response) => {
+      const errors = validationResult(req).array({ onlyFirstError: true });
+
+      if (errors.length) {
+        const formattedErrors = getFormattedErrors(errors);
+
+        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+      }
+
       const { userId } = req;
+
       const parentId = req.params.id;
       const status = req.body.likeStatus;
 
@@ -93,7 +133,7 @@ commentsRouter
         return res.sendStatus(HTTP_STATUS.NOT_FOUND);
       }
 
-      const result = await likesService.updateLike({
+      await likesService.updateLike({
         userId: userId || "",
         parentId,
         status,

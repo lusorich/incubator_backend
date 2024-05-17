@@ -41,7 +41,11 @@ export const checkJwtAuth = async (
     try {
       const user = await usersQueryRepository.getUserById(id);
 
-      req.userId = user ? user.id : null;
+      if (!user || !user.id) {
+        return res.sendStatus(HTTP_STATUS.NO_AUTH);
+      }
+
+      req.userId = user.id;
     } catch (e) {
       return res.sendStatus(HTTP_STATUS.NO_AUTH);
     }

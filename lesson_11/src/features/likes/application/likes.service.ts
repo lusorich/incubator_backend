@@ -6,7 +6,7 @@ export class LikesService {
   constructor(private likesCommandsRepository: LikesCommandsRepository) {}
 
   async updateLike({ parentId, userId, status }: LikeDb) {
-    const updatedLikeRes = await this.likesCommandsRepository.updateLike({
+     await this.likesCommandsRepository.updateLike({
       parentId,
       userId,
       status,

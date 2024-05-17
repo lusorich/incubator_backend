@@ -8,15 +8,16 @@ export class LikesCommandsRepository extends ResultObject {
   }
 
   async updateLike({ parentId, userId, status }: LikeDb) {
+    const ff = await this.model.findOne({ parentId, userId });
     const found = await this.model.updateOne(
       {
         parentId,
         userId,
       },
       {
-        parentId,
-        userId,
-        status,
+        $set: {
+          status,
+        },
       },
       { upsert: true }
     );

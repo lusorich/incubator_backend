@@ -12,4 +12,13 @@ export class LikesQueryRepository extends ResultObject {
 
     return result;
   }
+
+  async getLikesByParentAndUserId(
+    parentId: LikeDb["parentId"],
+    userId: LikeDb["userId"]
+  ) {
+    const result = await this.model.findOne({ parentId, userId });
+
+    return result;
+  }
 }

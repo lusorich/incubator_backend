@@ -65,7 +65,7 @@ export class CommentsCommandsRepository {
       (like) => like.parentId === commentId && like.userId === userId
     );
 
-    const res = await this.coll.updateOne(
+     await this.coll.updateOne(
       { _id: new ObjectId(commentId) },
       {
         $set: {

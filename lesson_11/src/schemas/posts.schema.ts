@@ -1,3 +1,4 @@
+import { LIKE_STATUS } from "../features/likes/domain/like.entity";
 import { trimSanitizer, getCommonErrorMsg } from "../helpers";
 
 export const titleValidator = {
@@ -10,8 +11,11 @@ export const titleValidator = {
 export const likeStatusValidator = {
   isString: true,
   isLength: { options: { min: 1, max: 10000 } },
-  errorMessage: getCommonErrorMsg("likeStatus")
-}
+  errorMessage: getCommonErrorMsg("likeStatus"),
+  isIn: {
+    options: [[LIKE_STATUS.DISLIKE, LIKE_STATUS.LIKE, LIKE_STATUS.NONE]],
+  },
+};
 
 export const shortDescriptionValidator = {
   customSanitizer: trimSanitizer,

@@ -20,6 +20,7 @@ import { commentsService } from "../domain/services/comments.service";
 import { commentsQueryRepository } from "../repositories/query/comments.query.repository";
 import { COMMON_RESULT_STATUSES, Result } from "../common/types/common.types";
 import { Post, PostWithId } from "../features/posts/domain/post.entity";
+import { jwtService } from "../common/services/jwt.service";
 
 export const postsRouter = Router({});
 
@@ -201,17 +202,48 @@ postsRouter
     const { pagination, sortDirection, sortBy } = getFiltersFromQuery(
       req.query
     );
-
     const postId = req.params.id;
+    const token = req.headers.authorization?.split(" ")[1];
 
-    const comments = await commentsQueryRepository.getCommentsByPostId({
-      pagination,
-      sortDirection,
-      sortBy,
-      postId,
-    });
+    const id = jwtService.getIdFromToken(token || "");
+    const isValid = jwtService.isValid(token || "");
+    let comments;
 
-    if (!comments.items.length) {
+    if (id && isValid) {
+      try {
+        const user = await usersQueryRepository.getUserById(id);
+
+        if (!user || !user.id) {
+          return res.sendStatus(HTTP_STATUS.NO_AUTH);
+        }
+
+        comments = await commentsQueryRepository.getCommentsByPostId({
+          pagination,
+          sortDirection,
+          sortBy,
+          postId,
+          userId: user.id,
+        });
+      } catch (e) {
+        comments = await commentsQueryRepository.getCommentsByPostId({
+          pagination,
+          sortDirection,
+          sortBy,
+          postId,
+          userId: "",
+        });
+      }
+    } else {
+      comments = await commentsQueryRepository.getCommentsByPostId({
+        pagination,
+        sortDirection,
+        sortBy,
+        postId,
+        userId: "",
+      });
+    }
+
+    if (!comments?.items.length) {
       return res.sendStatus(HTTP_STATUS.NOT_FOUND);
     }
 
