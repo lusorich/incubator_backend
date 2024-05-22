@@ -23,9 +23,12 @@ const userSchema = new mongoose.Schema<UserDb>({
     minlength: 3,
     maxlength: 10,
   },
+  createdAt: {
+    type: Date,
+  },
   hash: {
-    type: String
-  }
+    type: String,
+  },
 });
 
 export const UserModel = model<UserDb, UserModel>("User", userSchema);
