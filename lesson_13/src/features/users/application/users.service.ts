@@ -26,13 +26,6 @@ export class UsersService {
       hash: userHash,
     });
 
-    const newUser: UserDb = {
-      login: user.login,
-      email: user.email,
-      hash: userHash,
-      createdAt: new Date(),
-    };
-
     return await this.usersCommandsRepository.addUser(newUser);
   }
 

@@ -1,13 +1,16 @@
-import { Collection, ObjectId, WithId } from "mongodb";
+import { Collection, ObjectId, WithId } from 'mongodb';
 import {
   MONGO_COLLECTIONS,
   MONGO_DB_NAME,
   SortDirection,
-} from "../../../constants";
-import { client } from "../../../db/db";
-import { QueryParams, UserDb } from "../../../types";
-import { UserViewWithId } from "../domain/user.entity";
+} from '../../../constants';
+import { client } from '../../../db/db';
+import { QueryParams } from '../../../types';
+import { Container, injectable } from 'inversify';
+import { UserDb } from '../domain/user.entity';
+import 'reflect-metadata';
 
+@injectable()
 export class UsersQueryRepository {
   coll: Collection<UserDb>;
 
@@ -33,13 +36,13 @@ export class UsersQueryRepository {
           {
             login: {
               $regex: searchLoginTerm || /./,
-              $options: "i",
+              $options: 'i',
             },
           },
           {
             email: {
               $regex: searchEmailTerm || /./,
-              $options: "i",
+              $options: 'i',
             },
           },
         ],
@@ -74,7 +77,7 @@ export class UsersQueryRepository {
     };
   }
 
-  async getUserById(id: UserViewWithId["id"]) {
+  async getUserById(id: UserViewWithId['id']) {
     const found = await this.coll.findOne({ _id: new ObjectId(id) });
 
     if (!found) {
@@ -84,7 +87,7 @@ export class UsersQueryRepository {
     return this._mapToUserViewModel(found);
   }
 
-  async findUserByEmail(email: UserViewWithId["email"]) {
+  async findUserByEmail(email: UserViewWithId['email']) {
     const found = await this.coll.findOne({ email: email });
 
     if (!found) {
@@ -94,32 +97,8 @@ export class UsersQueryRepository {
     return found;
   }
 
-  async findUserByLogin(login: UserViewWithId["login"]) {
+  async findUserByLogin(login: UserViewWithId['login']) {
     const found = await this.coll.findOne({ login: login });
-
-    if (!found) {
-      return null;
-    }
-
-    return found;
-  }
-
-  async findUserByConfirmationCode(code: string) {
-    const found = await this.coll.findOne({
-      "emailConfirmation.confirmationCode": code,
-    });
-
-    if (!found) {
-      return null;
-    }
-
-    return found;
-  }
-
-  async findUserByRecoveryCode(recoveryCode: string) {
-    const found = await this.coll.findOne({
-      "emailPasswordRecovery.recoveryCode": recoveryCode,
-    });
 
     if (!found) {
       return null;
