@@ -19,8 +19,8 @@ export interface UserDb extends UserView {
 
 export type UserMakeInstanceProps = Omit<UserDb, 'createdAt' | 'id'>;
 
-interface UserModel extends Model<UserDb> {
-  makeInstance: ({ email, login, hash }: UserMakeInstanceProps) => void;
+export interface IUserModel extends Model<UserDb> {
+  makeInstance: ({ email, login, hash }: UserMakeInstanceProps) => UserDocument;
 }
 
 const userSchema = new mongoose.Schema<UserDb>({
@@ -44,12 +44,21 @@ const userSchema = new mongoose.Schema<UserDb>({
 
 userSchema.static(
   'makeInstance',
-  ({ email, login, hash }: UserModel['makeInstance']['arguments']) => {
-    const user = new UserModel({ email, login, hash, createdAt: new Date() });
+  ({
+    email,
+    login,
+    hash,
+  }: IUserModel['makeInstance']['arguments']): UserDocument => {
+    const user = new UserModel({
+      email,
+      login,
+      hash,
+      createdAt: new Date(),
+    });
 
     return user;
   },
 );
 
-export const UserModel = model<UserDb, UserModel>('User', userSchema);
+export const UserModel = model<UserDb, IUserModel>('User', userSchema);
 export type UserDocument = mongoose.HydratedDocument<UserDb>;

@@ -1,14 +1,21 @@
+import { validationResult } from 'express-validator';
 import { HTTP_STATUS } from '../../../constants';
-import { getFiltersFromQuery } from '../../../helpers';
+import { getFiltersFromQuery, getFormattedErrors } from '../../../helpers';
 import { UsersQueryRepository } from '../repositories/users.query.repository';
 import { injectable } from 'inversify';
+import { UsersService } from '../application/users.service';
 
 @injectable()
 export class UsersController {
   private usersQueryRepository: UsersQueryRepository;
+  private usersService: UsersService;
 
-  constructor(usersQueryRepository: UsersQueryRepository) {
+  constructor(
+    usersQueryRepository: UsersQueryRepository,
+    usersService: UsersService,
+  ) {
     this.usersQueryRepository = usersQueryRepository;
+    this.usersService = usersService;
   }
 
   async getUsers(req, res) {
@@ -29,5 +36,19 @@ export class UsersController {
     });
 
     res.status(HTTP_STATUS.SUCCESS).json(users);
+  }
+
+  async addUser(req, res) {
+    const errors = validationResult(req).array({ onlyFirstError: true });
+
+    if (errors.length) {
+      const formattedErrors = getFormattedErrors(errors);
+
+      return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+    }
+
+    const newUser = await this.usersService.addUser(req.body);
+
+    return res.status(HTTP_STATUS.CREATED).json(newUser || undefined);
   }
 }

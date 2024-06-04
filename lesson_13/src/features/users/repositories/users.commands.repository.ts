@@ -2,14 +2,14 @@ import { ObjectId, WithId } from 'mongodb';
 
 import {
   UserDb,
-  UserEmailConfirmation,
-  UserEmailRecoveryPassword,
-} from '../../../types';
-import { UserModel, UserViewWithId } from '../domain/user.entity';
+  UserDocument,
+  UserModel,
+  UserView,
+} from '../domain/user.entity';
 import { usersQueryRepository } from './users.query.repository';
 
 export interface IUsersCommandsRepository {
-  addUser: (newUser: UserDb) => Promise<UserViewWithId | null>;
+  save: (user: UserDocument) => Promise<UserView | null>;
   deleteUserById: (id: UserDb['id']) => Promise<boolean>;
   clearUsers: () => Promise<this>;
 }
@@ -19,12 +19,6 @@ export class UsersCommandsRepository {
 
   constructor() {
     this.model = UserModel;
-  }
-
-  async addUser(user: UserDb) {
-    const result = await this.model.create(user);
-
-    return usersQueryRepository._mapToUserViewModel(result as WithId<UserDb>);
   }
 
   async deleteUserById(id: UserDb['id']) {
@@ -41,6 +35,12 @@ export class UsersCommandsRepository {
     await this.model.deleteMany({});
 
     return this;
+  }
+
+  async save(user: UserDocument) {
+    const res = await user.save();
+
+    return usersQueryRepository._mapToUserViewModel(res);
   }
 }
 

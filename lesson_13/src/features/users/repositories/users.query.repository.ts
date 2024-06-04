@@ -6,7 +6,7 @@ import {
 } from '../../../constants';
 import { client } from '../../../db/db';
 import { QueryParams } from '../../../types';
-import { Container, injectable } from 'inversify';
+import { injectable } from 'inversify';
 import { UserDb } from '../domain/user.entity';
 import 'reflect-metadata';
 

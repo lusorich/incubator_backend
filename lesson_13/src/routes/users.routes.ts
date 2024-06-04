@@ -17,19 +17,7 @@ usersRouter
   .get(usersController.getUsers.bind(usersController))
   .post(
     checkSchema(usersSchema, ['body']),
-    async (req: Request, res: Response) => {
-      const errors = validationResult(req).array({ onlyFirstError: true });
-
-      if (errors.length) {
-        const formattedErrors = getFormattedErrors(errors);
-
-        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-      }
-
-      const newUser = await usersService.addUser(req.body);
-
-      return res.status(HTTP_STATUS.CREATED).json(newUser || undefined);
-    },
+    usersController.addUser.bind(usersController),
   );
 
 usersRouter
