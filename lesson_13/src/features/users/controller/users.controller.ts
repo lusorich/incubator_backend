@@ -51,4 +51,16 @@ export class UsersController {
 
     return res.status(HTTP_STATUS.CREATED).json(newUser || undefined);
   }
+
+  async deleteUser(req, res) {
+    const found = await this.usersQueryRepository.getUserById(req.params.id);
+
+    if (!found) {
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
+    }
+
+    await this.usersService.deleteUserById(req.params.id);
+
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+  }
 }

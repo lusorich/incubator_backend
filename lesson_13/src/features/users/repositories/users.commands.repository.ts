@@ -7,28 +7,36 @@ import {
   UserView,
 } from '../domain/user.entity';
 import { usersQueryRepository } from './users.query.repository';
+import { ResultObject } from '../../../common/helpers/result.helper';
+import { COMMON_RESULT_STATUSES } from '../../../common/types/common.types';
+import { ERROR_MSG, ErrorsMsg } from '../../../constants';
+import { injectable } from 'inversify';
+import 'reflect-metadata';
 
-export interface IUsersCommandsRepository {
-  save: (user: UserDocument) => Promise<UserView | null>;
-  deleteUserById: (id: UserDb['id']) => Promise<boolean>;
-  clearUsers: () => Promise<this>;
-}
-
-export class UsersCommandsRepository {
+@injectable()
+export class UsersCommandsRepository extends ResultObject {
   model: typeof UserModel;
 
   constructor() {
+    super();
     this.model = UserModel;
   }
 
-  async deleteUserById(id: UserDb['id']) {
+  async deleteUserById(id: UserView['id']) {
     const found = await this.model.deleteOne({ _id: id });
 
     if (!found.deletedCount) {
-      return false;
+      return this.getResult<boolean>({
+        data: false,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+        errorMessage: ERROR_MSG[COMMON_RESULT_STATUSES.NOT_FOUND],
+      });
     }
 
-    return true;
+    return this.getResult<boolean>({
+      data: true,
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   async clearUsers() {

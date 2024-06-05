@@ -1,18 +1,19 @@
 import {
   IUsersCommandsRepository,
+  UsersCommandsRepository,
   usersCommandsRepository,
 } from '../repositories/users.commands.repository';
 
 import { cryptService } from '../../../common/services/crypt.service';
-import { UserInput, UserModel } from '../domain/user.entity';
+import { UserInput, UserModel, UserView } from '../domain/user.entity';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 
 @injectable()
 export class UsersService {
-  usersCommandsRepository: IUsersCommandsRepository;
+  private usersCommandsRepository: UsersCommandsRepository;
 
-  constructor() {
+  constructor(usersCommandsRepository: UsersCommandsRepository) {
     this.usersCommandsRepository = usersCommandsRepository;
   }
 
@@ -32,11 +33,9 @@ export class UsersService {
     return await this.usersCommandsRepository.save(newUser);
   }
 
-  async deleteUserById(id: UserViewWithId['id']) {
+  async deleteUserById(id: UserView['id']) {
     return await this.usersCommandsRepository.deleteUserById(id);
   }
 
   async clearUsers() {}
 }
-
-export const usersService = new UsersService();

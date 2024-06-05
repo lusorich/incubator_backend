@@ -22,14 +22,4 @@ usersRouter
 
 usersRouter
   .route(ENDPOINTS.USERS_ID)
-  .delete(async (req: Request, res: Response) => {
-    const found = await usersQueryRepository.getUserById(req.params.id);
-
-    if (!found) {
-      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-    }
-
-    await usersService.deleteUserById(req.params.id);
-
-    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
-  });
+  .delete(usersController.deleteUser.bind(usersController));
