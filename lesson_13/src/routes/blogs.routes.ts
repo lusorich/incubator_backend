@@ -27,22 +27,7 @@ blogsRouter
   .get(blogsController.getBlogs.bind(blogsController))
   .post(
     checkSchema(blogsSchema, ['body']),
-    async (
-      req: Request<Partial<BlogInput>>,
-      res: Response<BlogInput | ErrorsMessages>,
-    ) => {
-      const errors = validationResult(req).array({ onlyFirstError: true });
-
-      if (errors.length) {
-        const formattedErrors = getFormattedErrors(errors);
-
-        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-      }
-
-      const newBlog = await blogsService.addBlog(req.body);
-
-      return res.status(HTTP_STATUS.CREATED).json(newBlog.data);
-    },
+    blogsController.addBlog.bind(blogsController),
   )
   .delete(async (_req, res: Response) => {
     await blogsService.clearBlogs();

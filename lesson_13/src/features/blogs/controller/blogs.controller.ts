@@ -1,14 +1,26 @@
+import { validationResult } from 'express-validator';
 import { HTTP_STATUS } from '../../../constants';
-import { getFiltersFromQuery, isDataInResult } from '../../../helpers';
+import {
+  getFiltersFromQuery,
+  getFormattedErrors,
+  isDataInResult,
+} from '../../../helpers';
+import { BlogsCommandsRepository } from '../repositories/blogs.commands.repository';
 import { BlogsQueryRepository } from '../repositories/blogs.query.repository';
 import { injectable } from 'inversify';
+import { BlogsService } from '../application/blogs.service';
 
 @injectable()
 export class BlogsController {
   private blogsQueryRepository: BlogsQueryRepository;
+  private blogsService: BlogsService;
 
-  constructor(blogsQueryRepository: BlogsQueryRepository) {
+  constructor(
+    blogsQueryRepository: BlogsQueryRepository,
+    blogsService: BlogsService,
+  ) {
     this.blogsQueryRepository = blogsQueryRepository;
+    this.blogsService = blogsService;
   }
 
   async getBlogs(req, res) {
@@ -35,5 +47,19 @@ export class BlogsController {
     }
 
     return res.status(HTTP_STATUS.SUCCESS).json(result.data);
+  }
+
+  async addBlog(req, res) {
+    const errors = validationResult(req).array({ onlyFirstError: true });
+
+    if (errors.length) {
+      const formattedErrors = getFormattedErrors(errors);
+
+      return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+    }
+
+    const newBlog = await this.blogsService.addBlog(req.body);
+
+    return res.status(HTTP_STATUS.CREATED).json(newBlog.data);
   }
 }

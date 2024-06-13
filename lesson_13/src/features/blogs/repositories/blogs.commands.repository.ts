@@ -7,7 +7,8 @@ import {
   Result,
 } from '../../../common/types/common.types';
 import { BlogInput, BlogModel, BlogWithId } from '../domain/blog.entity';
-import { blogsQueryRepository } from './blogs.query.repository';
+import { injectable } from 'inversify';
+import { BlogsQueryRepository } from './blogs.query.repository';
 
 export interface IBblogsCommandsRepository {
   addBlog: (newBlob: BlogWithId) => Promise<Result<BlogWithId>>;
@@ -19,15 +20,18 @@ export interface IBblogsCommandsRepository {
   clearBlogs: () => Promise<this>;
 }
 
+@injectable()
 export class BlogsCommandsRepository
   extends ResultObject
   implements IBblogsCommandsRepository
 {
   model: typeof BlogModel;
+  private blogsQueryRepository: BlogsQueryRepository;
 
-  constructor() {
+  constructor(blogsQueryRepository: BlogsQueryRepository) {
     super();
     this.model = BlogModel;
+    this.blogsQueryRepository = blogsQueryRepository;
   }
 
   async addBlog(newBlog: BlogWithId) {
@@ -35,7 +39,7 @@ export class BlogsCommandsRepository
 
     return this.getResult<BlogWithId>({
       status: COMMON_RESULT_STATUSES.SUCCESS,
-      data: blogsQueryRepository._mapToBlogViewModel(
+      data: this.blogsQueryRepository._mapToBlogViewModel(
         result as WithId<BlogWithId>,
       ) as BlogWithId,
     });
