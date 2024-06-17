@@ -20,17 +20,8 @@ export const enum ENDPOINTS {
   TESTING = '/testing/all-data',
   USERS = '/users',
   USERS_ID = '/users/:id',
-  AUTH_LOGIN = '/auth/login',
-  AUTH_ME = '/auth/me',
   POSTS_ID_COMMENTS = '/posts/:id/comments',
   COMMENTS_ID = '/comments/:id',
-  REGISTRATION_CONFIRMATION = '/auth/registration-confirmation',
-  REGISTRATION = '/auth/registration',
-  REGISTRATION_EMAIL_RESENDING = '/auth/registration-email-resending',
-  AUTH_REFRESH_TOKEN = '/auth/refresh-token',
-  AUTH_LOGOUT = '/auth/logout',
-  AUTH_PASSWORD_RECOVERY = '/auth/password-recovery',
-  AUTH_NEW_PASSWORD = '/auth/new-password',
 }
 
 export const enum HTTP_STATUS {

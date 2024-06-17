@@ -1,9 +1,6 @@
-import nodemailer from "nodemailer";
-import { EMAIL_TRANSPORT_SETTINGS } from "../types/email.types";
-import { DEFAULT_TRANSPORT_SETTINGS } from "../constants/email.constants";
-import { randomUUID } from "crypto";
-import { add } from "date-fns";
-import { UserEmailConfirmation, UserEmailRecoveryPassword } from "../../types";
+import nodemailer from 'nodemailer';
+import { EMAIL_TRANSPORT_SETTINGS } from '../types/email.types';
+import { DEFAULT_TRANSPORT_SETTINGS } from '../constants/email.constants';
 
 export class EmailService {
   private mailer;
@@ -11,29 +8,17 @@ export class EmailService {
 
   constructor(
     mailer = nodemailer,
-    settings: EMAIL_TRANSPORT_SETTINGS = DEFAULT_TRANSPORT_SETTINGS
+    settings: EMAIL_TRANSPORT_SETTINGS = DEFAULT_TRANSPORT_SETTINGS,
   ) {
     this.mailer = mailer;
 
     this.transport = this.mailer.createTransport(settings);
   }
 
-  generateEmailConfirmation = (): UserEmailConfirmation => ({
-    confirmationCode: randomUUID(),
-    expire: add(new Date(), { days: 3 }),
-    isConfirmed: false,
-  });
-
-  generatePasswordRecoveryConfirmation = (): UserEmailRecoveryPassword => ({
-    recoveryCode: randomUUID(),
-    expire: add(new Date(), { days: 3 }),
-    isUsed: false,
-  });
-
   generateEmailTemplate = ({
-    link = "localhost:3003/auth/registration-confirmation",
+    link = 'localhost:3003/auth/registration-confirmation',
     code,
-    title = "Thank for your registration",
+    title = 'Thank for your registration',
   }: {
     link?: string;
     title?: string;
@@ -45,7 +30,7 @@ export class EmailService {
  </p>`;
 
   generateRecoveryPasswordEmail = ({
-    link = "localhost:3003/auth/password-recovery",
+    link = 'localhost:3003/auth/password-recovery',
     recoveryCode,
   }: {
     link?: string;
@@ -59,8 +44,8 @@ export class EmailService {
   async sendEmail({
     to,
     from,
-    subject = "Hello",
-    text = "Hi",
+    subject = 'Hello',
+    text = 'Hi',
     html,
   }: {
     to: string;

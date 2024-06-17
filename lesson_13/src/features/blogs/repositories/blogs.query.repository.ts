@@ -6,7 +6,9 @@ import { ResultObject } from '../../../common/helpers/result.helper';
 import { COMMON_RESULT_STATUSES } from '../../../common/types/common.types';
 import { BlogModel, BlogWithId } from '../domain/blog.entity';
 import { PostWithId } from '../../posts/domain/post.entity';
+import { injectable } from 'inversify';
 
+@injectable()
 export class BlogsQueryRepository extends ResultObject {
   model: typeof BlogModel;
 
@@ -116,5 +118,3 @@ export class BlogsQueryRepository extends ResultObject {
     };
   }
 }
-
-export const blogsQueryRepository = new BlogsQueryRepository();

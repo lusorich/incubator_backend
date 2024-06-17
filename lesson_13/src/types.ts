@@ -1,26 +1,6 @@
-import { SortDirection } from "./constants";
-import { BlogWithId } from "./features/blogs/domain/blog.entity";
-import { LIKE_STATUS } from "./features/likes/domain/like.entity";
-import { PostWithId } from "./features/posts/domain/post.entity";
-import { UserView, UserViewWithId } from "./features/users/domain/user.entity";
-
-export interface UserDb extends UserViewWithId {
-  hash: string;
-  emailConfirmation?: UserEmailConfirmation;
-  emailRecoveryPassword?: UserEmailRecoveryPassword;
-}
-
-export interface UserEmailConfirmation {
-  confirmationCode: string | null;
-  expire: Date | null;
-  isConfirmed: boolean;
-}
-
-export interface UserEmailRecoveryPassword {
-  recoveryCode: string | null;
-  expire: Date | null;
-  isUsed: boolean;
-}
+import { SortDirection } from './constants';
+import { LIKE_STATUS } from './features/likes/domain/like.entity';
+import { PostWithId } from './features/posts/domain/post.entity';
 
 export interface CommentatorInfo {
   userId: string;
@@ -40,10 +20,8 @@ export interface CommentView {
 }
 
 export interface CommentDb extends CommentView {
-  postId: PostWithId["id"];
+  postId: PostWithId['id'];
 }
-
-export type UserAuthView = Omit<UserView, "createdAt"> & { userId: string };
 
 export type FieldError = {
   message: string;
@@ -62,29 +40,8 @@ export type Pagination = {
 export interface QueryParams {
   pagination: Pagination;
   sortDirection: SortDirection;
-  sortBy: string | keyof BlogWithId | keyof PostWithId;
+  sortBy: string;
   searchNameTerm?: string | null;
   searchLoginTerm?: string | null;
   searchEmailTerm?: string | null;
-}
-
-export interface SecurityInfo {
-  userId: Session["userId"];
-  sessions: Session[];
-}
-
-export interface Session {
-  userId: string;
-  deviceId: string;
-  iat: Date | number | string;
-  deviceName: string;
-  ip: string;
-  exp: Date | number | string;
-}
-
-export interface SessionView {
-  ip: string;
-  title: string;
-  lastActiveDate: Session["iat"];
-  deviceId: string;
 }

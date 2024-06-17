@@ -12,45 +12,20 @@ import { blogsService } from '../features/blogs/application/blogs.service';
 import { blogsQueryRepository } from '../features/blogs/repositories/blogs.query.repository';
 import { postsSchema } from '../schemas/posts.schema';
 import { postsService } from '../features/posts/application/posts.service';
-import { COMMON_RESULT_STATUSES } from '../common/types/common.types';
-import { BlogInput, BlogWithId } from '../features/blogs/domain/blog.entity';
 import { Post } from '../features/posts/domain/post.entity';
+import { container } from '../common/helpers/inversify.container';
+import { BlogsController } from '../features/blogs/controller/blogs.controller';
 
 export const blogsRouter = Router({});
 
+const blogsController = container.resolve(BlogsController);
+
 blogsRouter
   .route(ENDPOINTS.BLOGS)
-  .get(async (req: Request, res: Response) => {
-    const { pagination, sortDirection, sortBy, searchNameTerm } =
-      getFiltersFromQuery(req.query);
-
-    const allBlogs = await blogsQueryRepository.getAllBlogs({
-      pagination,
-      sortDirection,
-      sortBy,
-      searchNameTerm,
-    });
-
-    res.status(HTTP_STATUS.SUCCESS).json(allBlogs.data);
-  })
+  .get(blogsController.getBlogs.bind(blogsController))
   .post(
     checkSchema(blogsSchema, ['body']),
-    async (
-      req: Request<Partial<BlogInput>>,
-      res: Response<BlogInput | ErrorsMessages>,
-    ) => {
-      const errors = validationResult(req).array({ onlyFirstError: true });
-
-      if (errors.length) {
-        const formattedErrors = getFormattedErrors(errors);
-
-        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-      }
-
-      const newBlog = await blogsService.addBlog(req.body);
-
-      return res.status(HTTP_STATUS.CREATED).json(newBlog.data);
-    },
+    blogsController.addBlog.bind(blogsController),
   )
   .delete(async (_req, res: Response) => {
     await blogsService.clearBlogs();
@@ -60,52 +35,12 @@ blogsRouter
 
 blogsRouter
   .route(ENDPOINTS.BLOGS_ID)
-  .get(async (req: Request, res: Response<BlogWithId | void>) => {
-    const { id } = req.params;
-
-    const result = await blogsQueryRepository.getBlogById(id);
-
-    if (!isDataInResult(result)) {
-      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-    }
-
-    return res.status(HTTP_STATUS.SUCCESS).json(result.data);
-  })
+  .get(blogsController.getBlogById.bind(blogsController))
   .put(
     checkSchema(blogsSchema, ['body']),
-    async (req: Request, res: Response<ErrorsMessages>) => {
-      const errors = validationResult(req).array({ onlyFirstError: true });
-
-      if (errors.length) {
-        const formattedErrors = getFormattedErrors(errors);
-
-        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-      }
-
-      const updateResult = await blogsService.updateBlogById(
-        req.params.id,
-        req.body,
-      );
-
-      if (updateResult.status === COMMON_RESULT_STATUSES.NOT_FOUND) {
-        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-      }
-
-      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
-    },
+    blogsController.updateBlogById.bind(blogsController),
   )
-  //TODO: возможно нет смысла сначала искать, достаточно делать удаление и проверять было ли что то удалено
-  .delete( async (req: Request, res: Response) => {
-    const result = await blogsQueryRepository.getBlogById(req.params.id);
-
-    if (!isDataInResult(result)) {
-      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-    }
-
-    await blogsService.deleteBlogById(req.params.id);
-
-    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
-  });
+  .delete(blogsController.deleteBlogById.bind(blogsController));
 
 blogsRouter
   .route(ENDPOINTS.POSTS_BY_BLOG_ID)

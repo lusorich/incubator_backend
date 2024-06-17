@@ -1,13 +1,12 @@
-import { BlogInput, BlogWithId } from "../domain/blog.entity";
-import {
-  IBblogsCommandsRepository,
-  blogsCommandsRepository,
-} from "../repositories/blogs.commands.repository";
+import { BlogInput, BlogWithId } from '../domain/blog.entity';
+import { BlogsCommandsRepository } from '../repositories/blogs.commands.repository';
+import { injectable } from 'inversify';
 
+@injectable()
 export class BlogsService {
-  blogsCommandsRepository: IBblogsCommandsRepository;
+  private blogsCommandsRepository: BlogsCommandsRepository;
 
-  constructor() {
+  constructor(blogsCommandsRepository: BlogsCommandsRepository) {
     this.blogsCommandsRepository = blogsCommandsRepository;
   }
 
@@ -21,11 +20,11 @@ export class BlogsService {
     return await this.blogsCommandsRepository.addBlog(newBlog);
   }
 
-  async updateBlogById(id: BlogWithId["id"], props: Partial<BlogInput>) {
+  async updateBlogById(id: BlogWithId['id'], props: Partial<BlogInput>) {
     return await this.blogsCommandsRepository.updateBlogById(id, props);
   }
 
-  async deleteBlogById(id: BlogWithId["id"]) {
+  async deleteBlogById(id: BlogWithId['id']) {
     return await this.blogsCommandsRepository.deleteBlogById(id);
   }
 
@@ -35,5 +34,3 @@ export class BlogsService {
     return this;
   }
 }
-
-export const blogsService = new BlogsService();

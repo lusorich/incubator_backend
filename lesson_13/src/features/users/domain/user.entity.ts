@@ -1,16 +1,27 @@
-import mongoose, { Model, model } from "mongoose";
-import { UserDb } from "../../../types";
+import mongoose, { Model, model } from 'mongoose';
 
-export interface UserViewWithId extends UserView {
-  id?: string;
+export interface UserInput {
+  login: string;
+  password: string;
+  email: string;
 }
+
 export interface UserView {
+  id: string;
+  createdAt: Date;
   login: string;
   email: string;
-  createdAt: Date;
 }
 
-type UserModel = Model<UserDb>;
+export interface UserDb extends UserView {
+  hash: string;
+}
+
+export type UserMakeInstanceProps = Omit<UserDb, 'createdAt' | 'id'>;
+
+export interface IUserModel extends Model<UserDb> {
+  makeInstance: ({ email, login, hash }: UserMakeInstanceProps) => UserDocument;
+}
 
 const userSchema = new mongoose.Schema<UserDb>({
   email: {
@@ -31,5 +42,23 @@ const userSchema = new mongoose.Schema<UserDb>({
   },
 });
 
-export const UserModel = model<UserDb, UserModel>("User", userSchema);
+userSchema.static(
+  'makeInstance',
+  ({
+    email,
+    login,
+    hash,
+  }: IUserModel['makeInstance']['arguments']): UserDocument => {
+    const user = new UserModel({
+      email,
+      login,
+      hash,
+      createdAt: new Date(),
+    });
+
+    return user;
+  },
+);
+
+export const UserModel = model<UserDb, IUserModel>('User', userSchema);
 export type UserDocument = mongoose.HydratedDocument<UserDb>;

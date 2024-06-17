@@ -1,41 +1,42 @@
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId, WithId } from 'mongodb';
 
 import {
   UserDb,
-  UserEmailConfirmation,
-  UserEmailRecoveryPassword,
-} from "../../../types";
-import { UserModel, UserViewWithId } from "../domain/user.entity";
-import { usersQueryRepository } from "./users.query.repository";
+  UserDocument,
+  UserModel,
+  UserView,
+} from '../domain/user.entity';
+import { usersQueryRepository } from './users.query.repository';
+import { ResultObject } from '../../../common/helpers/result.helper';
+import { COMMON_RESULT_STATUSES } from '../../../common/types/common.types';
+import { ERROR_MSG, ErrorsMsg } from '../../../constants';
+import { injectable } from 'inversify';
+import 'reflect-metadata';
 
-export interface IUsersCommandsRepository {
-  addUser: (newUser: UserDb) => Promise<UserViewWithId | null>;
-  deleteUserById: (id: UserDb["id"]) => Promise<boolean>;
-  clearUsers: () => Promise<this>;
-  updateUserPassword: (id: ObjectId, hash: string) => Promise<boolean>;
-}
-
-export class UsersCommandsRepository {
+@injectable()
+export class UsersCommandsRepository extends ResultObject {
   model: typeof UserModel;
 
   constructor() {
+    super();
     this.model = UserModel;
   }
 
-  async addUser(user: UserDb) {
-    const result = await this.model.create(user);
-
-    return usersQueryRepository._mapToUserViewModel(result as WithId<UserDb>);
-  }
-
-  async deleteUserById(id: UserDb["id"]) {
+  async deleteUserById(id: UserView['id']) {
     const found = await this.model.deleteOne({ _id: id });
 
     if (!found.deletedCount) {
-      return false;
+      return this.getResult<boolean>({
+        data: false,
+        status: COMMON_RESULT_STATUSES.NOT_FOUND,
+        errorMessage: ERROR_MSG[COMMON_RESULT_STATUSES.NOT_FOUND],
+      });
     }
 
-    return true;
+    return this.getResult<boolean>({
+      data: true,
+      status: COMMON_RESULT_STATUSES.SUCCESS,
+    });
   }
 
   async clearUsers() {
@@ -44,83 +45,10 @@ export class UsersCommandsRepository {
     return this;
   }
 
-  //TODO: Maybe in service
-  async setUserIsConfirmed(id: ObjectId) {
-    let found = await this.model.updateOne(
-      { _id: id },
-      {
-        $set: {
-          emailConfirmation: {
-            isConfirmed: true,
-            confirmationCode: null,
-            expire: null,
-          },
-        },
-      }
-    );
+  async save(user: UserDocument) {
+    const res = await user.save();
 
-    if (!found.matchedCount) {
-      return false;
-    }
-
-    return true;
-  }
-
-  async updateEmailConfirmation(
-    id: ObjectId,
-    emailConfirmation: UserEmailConfirmation
-  ) {
-    let found = await this.model.updateOne(
-      { _id: id },
-      {
-        $set: {
-          emailConfirmation,
-        },
-      }
-    );
-
-    if (!found.matchedCount) {
-      return false;
-    }
-
-    return true;
-  }
-
-  async updateEmailRecoveryPasswordConfirmation(
-    id: ObjectId,
-    recoveryInfo: UserEmailRecoveryPassword
-  ) {
-    let found = await this.model.updateOne(
-      { _id: id },
-      {
-        $set: {
-          emailPasswordRecovery: recoveryInfo,
-        },
-      }
-    );
-
-    if (!found.matchedCount) {
-      return false;
-    }
-
-    return true;
-  }
-
-  async updateUserPassword(id: ObjectId, hash: string) {
-    let found = await this.model.updateOne(
-      { _id: id },
-      {
-        $set: {
-          hash,
-        },
-      }
-    );
-
-    if (!found.matchedCount) {
-      return false;
-    }
-
-    return true;
+    return usersQueryRepository._mapToUserViewModel(res);
   }
 }
 

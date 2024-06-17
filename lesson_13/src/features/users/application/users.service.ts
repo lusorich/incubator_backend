@@ -1,58 +1,41 @@
 import {
   IUsersCommandsRepository,
+  UsersCommandsRepository,
   usersCommandsRepository,
-} from "../repositories/users.commands.repository";
-import { UserDb, UserEmailConfirmation } from "../../../types";
-import { cryptService } from "../../../common/services/crypt.service";
-import { WithId } from "mongodb";
-import { UserViewWithId } from "../domain/user.entity";
+} from '../repositories/users.commands.repository';
 
+import { cryptService } from '../../../common/services/crypt.service';
+import { UserInput, UserModel, UserView } from '../domain/user.entity';
+import { injectable } from 'inversify';
+import 'reflect-metadata';
+
+@injectable()
 export class UsersService {
-  usersCommandsRepository: IUsersCommandsRepository;
+  private usersCommandsRepository: UsersCommandsRepository;
 
-  constructor() {
+  constructor(usersCommandsRepository: UsersCommandsRepository) {
     this.usersCommandsRepository = usersCommandsRepository;
   }
 
-  async addUser(
-    user: Omit<UserDb & { password: string }, "id">,
-    emailConfirmationInfo?: UserEmailConfirmation
-  ) {
+  async addUser(user: UserInput) {
     const salt = await cryptService.getSalt();
     const userHash = await cryptService.getHash({
-      password: user.password || "",
+      password: user.password || '',
       salt,
     });
 
-    const newUser: UserDb = {
+    const newUser = UserModel.makeInstance({
       login: user.login,
       email: user.email,
       hash: userHash,
-      createdAt: new Date(),
-      emailConfirmation: emailConfirmationInfo,
-    };
-
-    return await this.usersCommandsRepository.addUser(newUser);
-  }
-
-  async updateUserPassword(user: WithId<UserDb>, newPassword: string) {
-    const salt = await cryptService.getSalt();
-    const userHash = await cryptService.getHash({
-      password: newPassword || "",
-      salt,
     });
 
-    return await this.usersCommandsRepository.updateUserPassword(
-      user._id,
-      userHash
-    );
+    return await this.usersCommandsRepository.save(newUser);
   }
 
-  async deleteUserById(id: UserViewWithId["id"]) {
+  async deleteUserById(id: UserView['id']) {
     return await this.usersCommandsRepository.deleteUserById(id);
   }
 
   async clearUsers() {}
 }
-
-export const usersService = new UsersService();
