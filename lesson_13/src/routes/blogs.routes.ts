@@ -12,8 +12,6 @@ import { blogsService } from '../features/blogs/application/blogs.service';
 import { blogsQueryRepository } from '../features/blogs/repositories/blogs.query.repository';
 import { postsSchema } from '../schemas/posts.schema';
 import { postsService } from '../features/posts/application/posts.service';
-import { COMMON_RESULT_STATUSES } from '../common/types/common.types';
-import { BlogInput, BlogWithId } from '../features/blogs/domain/blog.entity';
 import { Post } from '../features/posts/domain/post.entity';
 import { container } from '../common/helpers/inversify.container';
 import { BlogsController } from '../features/blogs/controller/blogs.controller';
@@ -40,39 +38,9 @@ blogsRouter
   .get(blogsController.getBlogById.bind(blogsController))
   .put(
     checkSchema(blogsSchema, ['body']),
-    async (req: Request, res: Response<ErrorsMessages>) => {
-      const errors = validationResult(req).array({ onlyFirstError: true });
-
-      if (errors.length) {
-        const formattedErrors = getFormattedErrors(errors);
-
-        return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-      }
-
-      const updateResult = await blogsService.updateBlogById(
-        req.params.id,
-        req.body,
-      );
-
-      if (updateResult.status === COMMON_RESULT_STATUSES.NOT_FOUND) {
-        return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-      }
-
-      return res.sendStatus(HTTP_STATUS.NO_CONTENT);
-    },
+    blogsController.updateBlogById.bind(blogsController),
   )
-  //TODO: возможно нет смысла сначала искать, достаточно делать удаление и проверять было ли что то удалено
-  .delete(async (req: Request, res: Response) => {
-    const result = await blogsQueryRepository.getBlogById(req.params.id);
-
-    if (!isDataInResult(result)) {
-      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-    }
-
-    await blogsService.deleteBlogById(req.params.id);
-
-    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
-  });
+  .delete(blogsController.deleteBlogById.bind(blogsController));
 
 blogsRouter
   .route(ENDPOINTS.POSTS_BY_BLOG_ID)

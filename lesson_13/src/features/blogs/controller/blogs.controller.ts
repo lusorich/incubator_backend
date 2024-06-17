@@ -9,6 +9,7 @@ import { BlogsCommandsRepository } from '../repositories/blogs.commands.reposito
 import { BlogsQueryRepository } from '../repositories/blogs.query.repository';
 import { injectable } from 'inversify';
 import { BlogsService } from '../application/blogs.service';
+import { COMMON_RESULT_STATUSES } from '../../../common/types/common.types';
 
 @injectable()
 export class BlogsController {
@@ -23,7 +24,7 @@ export class BlogsController {
     this.blogsService = blogsService;
   }
 
-  async getBlogs(req, res) {
+  async getBlogs(req: Request, res: Response) {
     const { pagination, sortDirection, sortBy, searchNameTerm } =
       getFiltersFromQuery(req.query);
 
@@ -61,5 +62,36 @@ export class BlogsController {
     const newBlog = await this.blogsService.addBlog(req.body);
 
     return res.status(HTTP_STATUS.CREATED).json(newBlog.data);
+  }
+
+  async updateBlogById(req, res) {
+    const errors = validationResult(req).array({ onlyFirstError: true });
+
+    if (errors.length) {
+      const formattedErrors = getFormattedErrors(errors);
+
+      return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
+    }
+
+    const updateResult = await this.blogsService.updateBlogById(
+      req.params.id,
+      req.body,
+    );
+
+    if (updateResult.status === COMMON_RESULT_STATUSES.NOT_FOUND) {
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
+    }
+
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+  }
+
+  async deleteBlogById(req, res) {
+    const result = await this.blogsService.deleteBlogById(req.params.id);
+
+    if (result.status === COMMON_RESULT_STATUSES.NOT_FOUND) {
+      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
+    }
+
+    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   }
 }
