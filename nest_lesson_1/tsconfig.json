@@ -1,18 +1,21 @@
 {
-  "files": ["index.d.ts"],
   "compilerOptions": {
-    "target": "es2016",
     "module": "commonjs",
-    "outDir": "./dist",
-    "strict": true,
-    "noImplicitReturns": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
+    "declaration": true,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts"]
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
 }

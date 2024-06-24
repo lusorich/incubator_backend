@@ -1,66 +1,66 @@
-import { validationResult } from 'express-validator';
-import { HTTP_STATUS } from '../../../constants';
-import { getFiltersFromQuery, getFormattedErrors } from '../../../helpers';
-import { UsersQueryRepository } from '../repositories/users.query.repository';
-import { injectable } from 'inversify';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from '../application/users.service';
+import { UsersQueryRepository } from '../repositories/users.repository.query';
+import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
 
-@injectable()
+@Controller('users')
 export class UsersController {
-  private usersQueryRepository: UsersQueryRepository;
-  private usersService: UsersService;
-
+  usersService: UsersService;
   constructor(
-    usersQueryRepository: UsersQueryRepository,
     usersService: UsersService,
+
+    private readonly usersQueryRepository: UsersQueryRepository,
   ) {
-    this.usersQueryRepository = usersQueryRepository;
     this.usersService = usersService;
   }
 
-  async getUsers(req, res) {
-    const {
-      sortBy,
-      sortDirection,
-      pagination,
-      searchEmailTerm,
-      searchLoginTerm,
-    } = getFiltersFromQuery(req.query);
-
-    const users = await this.usersQueryRepository.getAllUsers({
-      pagination,
-      sortDirection,
-      sortBy,
-      searchEmailTerm,
-      searchLoginTerm,
+  @Get()
+  async getUsers(
+    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
+    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
+    sortDirection: string,
+    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
+    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Query('searchEmailTerm') searchEmailTerm: string,
+    @Query('searchLoginTerm') searchLoginTerm: string,
+  ) {
+    const result = await this.usersQueryRepository.getUsers({
+      paginationParams: {
+        sortBy,
+        sortDirection,
+        pageSize,
+        pageNumber,
+        searchEmailTerm,
+        searchLoginTerm,
+      },
     });
 
-    res.status(HTTP_STATUS.SUCCESS).json(users);
+    return result;
   }
 
-  async addUser(req, res) {
-    const errors = validationResult(req).array({ onlyFirstError: true });
+  @Post()
+  @HttpCode(200)
+  async createUser(@Body() inputModel: any) {
+    const result = await this.usersService.create(
+      inputModel.login,
+      inputModel.email,
+    );
 
-    if (errors.length) {
-      const formattedErrors = getFormattedErrors(errors);
-
-      return res.status(HTTP_STATUS.INCORRECT).json(formattedErrors);
-    }
-
-    const newUser = await this.usersService.addUser(req.body);
-
-    return res.status(HTTP_STATUS.CREATED).json(newUser || undefined);
+    return this.usersQueryRepository.getById(result);
   }
 
-  async deleteUser(req, res) {
-    const found = await this.usersQueryRepository.getUserById(req.params.id);
-
-    if (!found) {
-      return res.sendStatus(HTTP_STATUS.NOT_FOUND);
-    }
-
-    await this.usersService.deleteUserById(req.params.id);
-
-    return res.sendStatus(HTTP_STATUS.NO_CONTENT);
+  @Delete(':id')
+  async deleteUser(@Param('id') id: number) {
+    return await this.usersService.delete(id);
   }
 }

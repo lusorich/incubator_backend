@@ -1,41 +1,19 @@
-import {
-  IUsersCommandsRepository,
-  UsersCommandsRepository,
-  usersCommandsRepository,
-} from '../repositories/users.commands.repository';
+import { Injectable } from '@nestjs/common';
+import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 
-import { cryptService } from '../../../common/services/crypt.service';
-import { UserInput, UserModel, UserView } from '../domain/user.entity';
-import { injectable } from 'inversify';
-import 'reflect-metadata';
-
-@injectable()
+@Injectable()
 export class UsersService {
-  private usersCommandsRepository: UsersCommandsRepository;
+  constructor(private usersCommandsRepository: UsersCommandsRepository) {}
 
-  constructor(usersCommandsRepository: UsersCommandsRepository) {
-    this.usersCommandsRepository = usersCommandsRepository;
+  async create(login: string, email: string) {
+    const result = await this.usersCommandsRepository.create(login, email);
+
+    return result.id;
   }
 
-  async addUser(user: UserInput) {
-    const salt = await cryptService.getSalt();
-    const userHash = await cryptService.getHash({
-      password: user.password || '',
-      salt,
-    });
+  async delete(id: number) {
+    const result = await this.usersCommandsRepository.delete(id);
 
-    const newUser = UserModel.makeInstance({
-      login: user.login,
-      email: user.email,
-      hash: userHash,
-    });
-
-    return await this.usersCommandsRepository.save(newUser);
+    return result;
   }
-
-  async deleteUserById(id: UserView['id']) {
-    return await this.usersCommandsRepository.deleteUserById(id);
-  }
-
-  async clearUsers() {}
 }
