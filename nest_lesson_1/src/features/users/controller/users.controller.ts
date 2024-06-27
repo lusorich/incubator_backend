@@ -5,6 +5,8 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -60,7 +62,12 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(201)
   async deleteUser(@Param('id') id: number) {
-    return await this.usersService.delete(id);
+    const result = await this.usersService.delete(id);
+
+    if (result.deletedCount < 1) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
   }
 }

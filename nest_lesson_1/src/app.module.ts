@@ -7,6 +7,9 @@ import { User, UserSchema } from './features/users/domain/user.entity';
 import { UsersService } from './features/users/application/users.service';
 import { UsersQueryRepository } from './features/users/repositories/users.repository.query';
 import { UsersCommandsRepository } from './features/users/repositories/users.repository.commands';
+import { BlogsQueryRepository } from './features/blogs/repositories/blogs.repository.query';
+import { BlogsController } from './features/blogs/controller/blogs.controller';
+import { Blog, BlogSchema } from './features/blogs/domain/blog.entity';
 
 @Module({
   imports: [
@@ -16,14 +19,17 @@ import { UsersCommandsRepository } from './features/users/repositories/users.rep
         name: User.name,
         schema: UserSchema,
       },
+      { name: Blog.name, schema: BlogSchema },
     ]),
   ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController, UsersController, BlogsController],
   providers: [
     AppService,
     UsersService,
     UsersQueryRepository,
     UsersCommandsRepository,
+
+    BlogsQueryRepository,
   ],
 })
 export class AppModule {}
