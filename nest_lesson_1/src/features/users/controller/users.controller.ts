@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
-import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
+import { SORT_DIRECTION } from 'src/common/types';
 
 @Controller('users')
 export class UsersController {
@@ -51,7 +51,7 @@ export class UsersController {
   }
 
   @Post()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: any) {
     const result = await this.usersService.create(
       inputModel.login,
@@ -62,7 +62,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @HttpCode(201)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: number) {
     const result = await this.usersService.delete(id);
 

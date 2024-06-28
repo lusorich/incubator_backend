@@ -35,7 +35,8 @@ export class BlogsQueryRepository {
   }
 
   async getById(id: string) {
-    //const blog = await this.BlogModel.findById(id);
-    //return userOutputModelMapper(user);
+    const blog = await this.BlogModel.findById(id);
+
+    return blog;
   }
 }

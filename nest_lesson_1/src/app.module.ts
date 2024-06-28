@@ -10,6 +10,8 @@ import { UsersCommandsRepository } from './features/users/repositories/users.rep
 import { BlogsQueryRepository } from './features/blogs/repositories/blogs.repository.query';
 import { BlogsController } from './features/blogs/controller/blogs.controller';
 import { Blog, BlogSchema } from './features/blogs/domain/blog.entity';
+import { BlogsCommandsRepository } from './features/blogs/repositories/blogs.repository.commands';
+import { BlogsService } from './features/blogs/application/blogs.service';
 
 @Module({
   imports: [
@@ -29,7 +31,9 @@ import { Blog, BlogSchema } from './features/blogs/domain/blog.entity';
     UsersQueryRepository,
     UsersCommandsRepository,
 
+    BlogsService,
     BlogsQueryRepository,
+    BlogsCommandsRepository,
   ],
 })
 export class AppModule {}
