@@ -5,8 +5,8 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -67,7 +67,7 @@ export class UsersController {
     const result = await this.usersService.delete(id);
 
     if (result.deletedCount < 1) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('User not found');
     }
   }
 }

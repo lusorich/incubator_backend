@@ -16,6 +16,10 @@ export class BlogsCommandsRepository {
     return this.save(blog);
   }
 
+  async update({ newData, id }) {
+    return this.BlogModel.updateOne({ _id: id }, { ...newData });
+  }
+
   async save(blog: BlogDocument) {
     return blog.save();
   }

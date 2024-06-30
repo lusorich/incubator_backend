@@ -7,6 +7,10 @@ import {
   Query,
   HttpCode,
   Body,
+  Param,
+  NotFoundException,
+  Delete,
+  Put,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
@@ -49,5 +53,38 @@ export class BlogsController {
     });
 
     return this.blogsQueryRepository.getById(result);
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateBlog(@Param('id') id: string, @Body() inputModel: any) {
+    const blog = await this.blogsQueryRepository.getById(id);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    await this.blogsService.update({ newData: inputModel, id });
+  }
+
+  @Get(':id')
+  async getBlogById(@Param('id') id: string) {
+    const blog = await this.blogsQueryRepository.getById(id);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    return blog;
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param('id') id: number) {
+    const result = await this.blogsService.delete(id);
+
+    if (result.deletedCount < 1) {
+      throw new NotFoundException('Blog not found');
+    }
   }
 }
