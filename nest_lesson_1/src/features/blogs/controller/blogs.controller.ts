@@ -15,12 +15,14 @@ import {
 import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
+import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly blogsService: BlogsService,
+    private readonly postsQueryRepository: PostsQueryRepository,
   ) {}
 
   @Get()
@@ -86,5 +88,33 @@ export class BlogsController {
     if (result.deletedCount < 1) {
       throw new NotFoundException('Blog not found');
     }
+  }
+
+  @Get(':id/posts')
+  async getPostsByBlog(
+    @Param('id') id: string,
+    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
+    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
+    sortDirection: string,
+    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
+    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+  ) {
+    const blog = await this.blogsQueryRepository.getById(id);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    const result = await this.postsQueryRepository.getPostsByBlog({
+      paginationParams: {
+        sortBy,
+        sortDirection,
+        pageSize,
+        pageNumber,
+      },
+      blogId: id,
+    });
+
+    return result;
   }
 }

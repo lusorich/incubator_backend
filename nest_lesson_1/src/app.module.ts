@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersController } from './features/users/controller/users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './features/users/domain/user.entity';
@@ -12,6 +10,11 @@ import { BlogsController } from './features/blogs/controller/blogs.controller';
 import { Blog, BlogSchema } from './features/blogs/domain/blog.entity';
 import { BlogsCommandsRepository } from './features/blogs/repositories/blogs.repository.commands';
 import { BlogsService } from './features/blogs/application/blogs.service';
+import { PostsService } from './features/posts/application/posts.service';
+import { PostsQueryRepository } from './features/posts/repositories/posts.repository.query';
+import { PostsCommandsRepository } from './features/posts/repositories/posts.repository.commands';
+import { PostsController } from './features/posts/controller/posts.controller';
+import { Post, PostSchema } from './features/posts/domain/post.entity';
 
 @Module({
   imports: [
@@ -22,11 +25,11 @@ import { BlogsService } from './features/blogs/application/blogs.service';
         schema: UserSchema,
       },
       { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema },
     ]),
   ],
-  controllers: [AppController, UsersController, BlogsController],
+  controllers: [UsersController, BlogsController, PostsController],
   providers: [
-    AppService,
     UsersService,
     UsersQueryRepository,
     UsersCommandsRepository,
@@ -34,6 +37,10 @@ import { BlogsService } from './features/blogs/application/blogs.service';
     BlogsService,
     BlogsQueryRepository,
     BlogsCommandsRepository,
+
+    PostsService,
+    PostsQueryRepository,
+    PostsCommandsRepository,
   ],
 })
 export class AppModule {}

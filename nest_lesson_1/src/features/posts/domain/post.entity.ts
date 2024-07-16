@@ -13,7 +13,7 @@ export class Post {
   content: string;
 
   @Prop()
-  blogId: boolean;
+  blogId: string;
 
   @Prop()
   blogName: string;
