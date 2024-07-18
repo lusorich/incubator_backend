@@ -16,4 +16,8 @@ export class UsersService {
 
     return result;
   }
+
+  async deleteAll() {
+    return await this.usersCommandsRepository.deleteAll();
+  }
 }

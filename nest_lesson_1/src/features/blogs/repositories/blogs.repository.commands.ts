@@ -27,4 +27,8 @@ export class BlogsCommandsRepository {
   async delete(id: number) {
     return this.BlogModel.deleteOne({ _id: id });
   }
+
+  async deleteAll() {
+    return this.BlogModel.deleteMany({});
+  }
 }

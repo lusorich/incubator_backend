@@ -29,4 +29,8 @@ export class PostsCommandsRepository {
   async delete(id: number) {
     return this.PostModel.deleteOne({ _id: id });
   }
+
+  async deleteAll() {
+    return this.PostModel.deleteMany({});
+  }
 }

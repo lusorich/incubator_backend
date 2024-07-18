@@ -15,6 +15,7 @@ import { PostsQueryRepository } from './features/posts/repositories/posts.reposi
 import { PostsCommandsRepository } from './features/posts/repositories/posts.repository.commands';
 import { PostsController } from './features/posts/controller/posts.controller';
 import { Post, PostSchema } from './features/posts/domain/post.entity';
+import { TestingController } from './features/testing/controller/testing.controller';
 
 @Module({
   imports: [
@@ -28,7 +29,12 @@ import { Post, PostSchema } from './features/posts/domain/post.entity';
       { name: Post.name, schema: PostSchema },
     ]),
   ],
-  controllers: [UsersController, BlogsController, PostsController],
+  controllers: [
+    UsersController,
+    BlogsController,
+    PostsController,
+    TestingController,
+  ],
   providers: [
     UsersService,
     UsersQueryRepository,

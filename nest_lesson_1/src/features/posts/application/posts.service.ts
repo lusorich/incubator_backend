@@ -26,4 +26,8 @@ export class PostsService {
 
     return result;
   }
+
+  async deleteAll() {
+    return await this.postsCommandsRepository.deleteAll();
+  }
 }

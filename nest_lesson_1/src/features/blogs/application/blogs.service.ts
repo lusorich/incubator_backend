@@ -24,4 +24,8 @@ export class BlogsService {
 
     return result;
   }
+
+  async deleteAll() {
+    return await this.blogsCommandsRepository.deleteAll();
+  }
 }

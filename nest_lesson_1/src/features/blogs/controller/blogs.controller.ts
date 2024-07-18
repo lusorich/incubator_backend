@@ -16,6 +16,7 @@ import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
 import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
+import { PostsService } from 'src/features/posts/application/posts.service';
 
 @Controller('blogs')
 export class BlogsController {
@@ -23,6 +24,7 @@ export class BlogsController {
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly blogsService: BlogsService,
     private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly postsService: PostsService,
   ) {}
 
   @Get()
@@ -116,5 +118,27 @@ export class BlogsController {
     });
 
     return result;
+  }
+
+  @Post(':id/posts')
+  @HttpCode(HttpStatus.CREATED)
+  async createPostByBlog(@Param('id') id: string, @Body() inputModel: any) {
+    const { title, shortDescription, content } = inputModel;
+
+    const blog = await this.blogsQueryRepository.getById(id);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    const post = await this.postsService.create({
+      title,
+      shortDescription,
+      content,
+      blogId: blog.id,
+      blogName: blog.name,
+    });
+
+    return await this.postsQueryRepository.getById(post);
   }
 }

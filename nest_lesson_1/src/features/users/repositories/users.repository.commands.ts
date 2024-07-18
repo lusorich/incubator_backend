@@ -19,4 +19,8 @@ export class UsersCommandsRepository {
   async delete(id: number) {
     return this.UserModel.deleteOne({ _id: id });
   }
+
+  async deleteAll() {
+    return this.UserModel.deleteMany({});
+  }
 }
