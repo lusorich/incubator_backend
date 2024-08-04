@@ -12,5 +12,12 @@ export const postOutputModelMapper = (post?: PostDocument | null) => {
     blogId: post.blogId,
     blogName: post.blogName,
     createdAt: post.createdAt,
+    extendedLikesInfo: {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: 'None',
+      newestLikes: [],
+      ...(post?.extendedLikesInfo || {}),
+    },
   };
 };

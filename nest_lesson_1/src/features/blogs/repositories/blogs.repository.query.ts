@@ -11,25 +11,42 @@ export class BlogsQueryRepository {
 
   async getBlogs({
     paginationParams = {},
+    searchNameTerm = null,
   }: {
     paginationParams?: PaginationParams;
+    searchNameTerm?: string;
   }) {
     const { sortBy, sortDirection, pageNumber, pageSize } = paginationParams;
 
     const blogs = await this.BlogModel.find({});
 
     const filteredBlogs = (
-      await this.BlogModel.find({})
+      await this.BlogModel.find({
+        name: {
+          $regex: searchNameTerm || /./,
+          $options: 'i',
+        },
+      })
         .limit(pageSize)
         .skip((pageNumber - 1) * pageSize)
         .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
     ).map(blogOutputModelMapper);
 
+    if (searchNameTerm) {
+      return {
+        pagesCount: Math.ceil(filteredBlogs.length / pageSize),
+        totalCount: filteredBlogs.length,
+        pageSize: Number(pageSize),
+        page: Number(pageNumber),
+        items: filteredBlogs,
+      };
+    }
+
     return {
       pagesCount: Math.ceil(blogs.length / pageSize),
       totalCount: blogs.length,
-      pageSize,
-      page: pageNumber,
+      pageSize: Number(pageSize),
+      page: Number(pageNumber),
       items: filteredBlogs,
     };
   }

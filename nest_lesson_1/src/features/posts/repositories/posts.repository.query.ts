@@ -28,8 +28,8 @@ export class PostsQueryRepository {
     return {
       pagesCount: Math.ceil(posts.length / pageSize),
       totalCount: posts.length,
-      pageSize,
-      page: pageNumber,
+      pageSize: Number(pageSize),
+      page: Number(pageNumber),
       items: filteredBlogs,
     };
   }
@@ -51,16 +51,18 @@ export class PostsQueryRepository {
 
     const posts = await this.PostModel.find({ blogId });
 
-    const filteredPosts = await this.PostModel.find({ blogId })
-      .limit(pageSize)
-      .skip((pageNumber - 1) * pageSize)
-      .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 });
+    const filteredPosts = (
+      await this.PostModel.find({ blogId })
+        .limit(pageSize)
+        .skip((pageNumber - 1) * pageSize)
+        .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
+    ).map(postOutputModelMapper);
 
     return {
       pagesCount: Math.ceil(posts.length / pageSize),
       totalCount: posts.length,
-      pageSize,
-      page: pageNumber,
+      pageSize: Number(pageSize),
+      page: Number(pageNumber),
       items: filteredPosts,
     };
   }

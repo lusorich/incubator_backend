@@ -21,6 +21,9 @@ export class Post {
   @Prop()
   createdAt: Date;
 
+  @Prop({ type: Object, required: false })
+  extendedLikesInfo: Record<any, any>;
+
   static createPost({ title, shortDescription, content, blogId, blogName }) {
     const post = new this();
 
@@ -30,6 +33,12 @@ export class Post {
     post.blogId = blogId;
     post.blogName = blogName;
     post.createdAt = new Date();
+    post.extendedLikesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: 'None',
+      newestLikes: [],
+    };
 
     return post;
   }

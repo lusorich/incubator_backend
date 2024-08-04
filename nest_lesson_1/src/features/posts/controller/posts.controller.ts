@@ -47,8 +47,13 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: any) {
+  async createPost(@Body() inputModel: any) {
+    console.log(inputModel);
     const blog = await this.blogsQueryRepository.getById(inputModel.blogId);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
 
     const result = await this.postsService.create({
       title: inputModel.title,
@@ -86,7 +91,7 @@ export class PostsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: number) {
+  async deletePost(@Param('id') id: number) {
     const result = await this.postsService.delete(id);
 
     if (result.deletedCount < 1) {

@@ -42,16 +42,16 @@ export class UsersQueryRepository {
         pagesCount: Math.ceil(filteredUsers.length / pageSize),
 
         totalCount: filteredUsers.length,
-        pageSize,
-        page: pageNumber,
+        pageSize: Number(pageSize),
+        page: Number(pageNumber),
         items: filteredUsers,
       };
     } else {
       return {
         pagesCount: Math.ceil(users.length / pageSize),
         totalCount: users.length,
-        pageSize,
-        page: pageNumber,
+        pageSize: Number(pageSize),
+        page: Number(pageNumber),
         items: filteredUsers,
       };
     }

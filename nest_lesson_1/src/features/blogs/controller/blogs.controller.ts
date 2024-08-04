@@ -34,6 +34,7 @@ export class BlogsController {
     sortDirection: string,
     @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Query('searchNameTerm', new DefaultValuePipe(null)) searchNameTerm: string,
   ) {
     const result = await this.blogsQueryRepository.getBlogs({
       paginationParams: {
@@ -42,6 +43,7 @@ export class BlogsController {
         pageSize,
         pageNumber,
       },
+      searchNameTerm,
     });
 
     return result;
