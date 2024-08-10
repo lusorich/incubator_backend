@@ -1,4 +1,5 @@
 import {
+  ArgumentMetadata,
   Body,
   Controller,
   DefaultValuePipe,
@@ -8,12 +9,29 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  PipeTransform,
   Post,
   Query,
+  UsePipes,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
+import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+
+class CreateUserInputDto {
+  @IsNotEmpty()
+  @Length(3, 10)
+  @Matches(/^[a-zA-Z0-9_-]*$/)
+  login: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @Length(6, 20)
+  password: string;
+}
 
 @Controller('users')
 export class UsersController {
@@ -52,10 +70,10 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() inputModel: any) {
+  async createUser(@Body() userInput: CreateUserInputDto) {
     const result = await this.usersService.create(
-      inputModel.login,
-      inputModel.email,
+      userInput.login,
+      userInput.email,
     );
 
     return this.usersQueryRepository.getById(result);
