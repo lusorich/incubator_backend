@@ -1,5 +1,4 @@
 import {
-  ArgumentMetadata,
   Body,
   Controller,
   DefaultValuePipe,
@@ -9,10 +8,8 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
-  PipeTransform,
   Post,
   Query,
-  UsePipes,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
