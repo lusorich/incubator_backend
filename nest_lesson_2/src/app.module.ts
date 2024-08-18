@@ -16,10 +16,15 @@ import { PostsCommandsRepository } from './features/posts/repositories/posts.rep
 import { PostsController } from './features/posts/controller/posts.controller';
 import { Post, PostSchema } from './features/posts/domain/post.entity';
 import { TestingController } from './features/testing/controller/testing.controller';
+import { appSettings } from './settings/appSettings';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017'),
+    MongooseModule.forRoot(
+      appSettings.env.isTesting()
+        ? appSettings.api.MONGO_CONNECTION_URI_FOR_TESTS
+        : appSettings.api.MONGO_CONNECTION_URI,
+    ),
     MongooseModule.forFeature([
       {
         name: User.name,
