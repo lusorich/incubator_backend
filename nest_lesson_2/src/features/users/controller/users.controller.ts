@@ -10,11 +10,13 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { AuthGuard } from 'src/common/auth.guard';
 
 class CreateUserInputDto {
   @IsNotEmpty()
@@ -41,6 +43,7 @@ export class UsersController {
     this.usersService = usersService;
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   async getUsers(
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
