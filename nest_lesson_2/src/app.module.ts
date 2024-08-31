@@ -17,6 +17,7 @@ import { PostsController } from './features/posts/controller/posts.controller';
 import { Post, PostSchema } from './features/posts/domain/post.entity';
 import { TestingController } from './features/testing/controller/testing.controller';
 import { appSettings } from './settings/appSettings';
+import { AuthController } from './features/auth/controller/auth.controller';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { appSettings } from './settings/appSettings';
     BlogsController,
     PostsController,
     TestingController,
+    AuthController,
   ],
   providers: [
     UsersService,
