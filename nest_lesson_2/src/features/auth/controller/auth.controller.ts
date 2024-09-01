@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 
@@ -28,6 +28,7 @@ export class AuthController {
   }
 
   @Post('registration')
+  @HttpCode(HttpStatus.OK)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
     return null;
   }
