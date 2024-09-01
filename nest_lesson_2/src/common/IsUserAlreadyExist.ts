@@ -1,17 +1,28 @@
 import {
   registerDecorator,
+  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
+import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
 export class IsUserAlreadyExistConstraint
   implements ValidatorConstraintInterface
 {
-  validate(arg: string) {
-    console.log('we are in validate', arg);
-    return false;
+  constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
+
+  async validate(arg: string, options: ValidationArguments) {
+    const property = options.property;
+
+    const user = await this.UsersQueryRepository.getByProperty(property, arg);
+
+    if (user) {
+      return false;
+    }
+
+    return true;
   }
 }
 

@@ -1,21 +1,6 @@
-import {
-  Body,
-  Controller,
-  Injectable,
-  PipeTransform,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
-
-@Injectable()
-export class EmailValidationPipe implements PipeTransform {
-  transform(value: string) {
-    console.log('value', value);
-
-    return value;
-  }
-}
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -39,15 +24,11 @@ export class AuthController {
 
   @Post('login')
   async userLogin() {
-    console.log('try to login');
-
     return null;
   }
 
   @Post('registration')
   async userRegistration(@Body() userInput: RegistrationInputDto) {
-    console.log('try to registration');
-
     return null;
   }
 }

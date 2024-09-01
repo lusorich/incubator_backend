@@ -18,6 +18,7 @@ import { Post, PostSchema } from './features/posts/domain/post.entity';
 import { TestingController } from './features/testing/controller/testing.controller';
 import { appSettings } from './settings/appSettings';
 import { AuthController } from './features/auth/controller/auth.controller';
+import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AuthController } from './features/auth/controller/auth.controller';
     PostsService,
     PostsQueryRepository,
     PostsCommandsRepository,
+    IsUserAlreadyExistConstraint,
   ],
 })
 export class AppModule {}
