@@ -12,12 +12,16 @@ export class User {
   @Prop()
   createdAt: Date;
 
+  @Prop()
+  isConfirmed?: boolean;
+
   static createUser(login: string, email: string) {
     const user = new this();
 
     user.login = login;
     user.email = email;
     user.createdAt = new Date();
+    user.isConfirmed = false;
 
     return user;
   }

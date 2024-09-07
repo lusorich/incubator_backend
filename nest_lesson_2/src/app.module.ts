@@ -19,6 +19,8 @@ import { TestingController } from './features/testing/controller/testing.control
 import { appSettings } from './settings/appSettings';
 import { AuthController } from './features/auth/controller/auth.controller';
 import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
+import { AuthService } from './features/auth/application/auth.service';
+import { AuthCommandsRepository } from './features/auth/repositories/auth.repository.commands';
 
 @Module({
   imports: [
@@ -55,7 +57,11 @@ import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
     PostsService,
     PostsQueryRepository,
     PostsCommandsRepository,
+
     IsUserAlreadyExistConstraint,
+
+    AuthService,
+    AuthCommandsRepository,
   ],
 })
 export class AppModule {}

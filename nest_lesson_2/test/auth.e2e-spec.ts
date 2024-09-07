@@ -29,7 +29,16 @@ describe('Auth tests', () => {
     return request(httpServer)
       .post('/auth/registration')
       .send(userMock)
-      .expect(HttpStatus.OK);
+      .expect(HttpStatus.NO_CONTENT);
+  });
+
+  test('After registration user should exist in /users', async () => {
+    const response = await request(httpServer).get('/users');
+    const users = response.body.items;
+
+    const found = users.find((user) => user.login === userMock.login);
+
+    expect(found).toBeDefined();
   });
 
   test('If email exist should return 400', () => {
@@ -44,10 +53,13 @@ describe('Auth tests', () => {
   });
 
   test('If login exist should return 400', () => {
-    return request(httpServer).post('/auth/registration').send({
-      login: userMock.login,
-      email: faker.internet.email(),
-      password: userMock.password,
-    });
+    return request(httpServer)
+      .post('/auth/registration')
+      .send({
+        login: userMock.login,
+        email: faker.internet.email(),
+        password: userMock.password,
+      })
+      .expect(HttpStatus.BAD_REQUEST);
   });
 });

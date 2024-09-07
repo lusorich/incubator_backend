@@ -1,6 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
+import { AuthService } from '../application/auth.service';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -20,7 +21,7 @@ class RegistrationInputDto {
 
 @Controller('auth')
 export class AuthController {
-  constructor() {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   async userLogin() {
@@ -28,8 +29,8 @@ export class AuthController {
   }
 
   @Post('registration')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
-    return null;
+    return await this.authService.registration(userInput);
   }
 }
