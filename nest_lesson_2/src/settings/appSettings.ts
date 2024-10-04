@@ -44,6 +44,10 @@ class APISettings {
   public readonly MONGO_CONNECTION_URI: string;
   public readonly MONGO_CONNECTION_URI_FOR_TESTS: string;
 
+  // Mail
+  public readonly MAIL_USER: string;
+  public readonly MAIL_PASSWORD: string;
+
   constructor(private readonly envVariables: EnvironmentVariable) {
     // Application
     this.APP_PORT = this.getNumberOrDefault(
@@ -60,6 +64,10 @@ class APISettings {
     this.MONGO_CONNECTION_URI_FOR_TESTS =
       envVariables.MONGO_CONNECTION_URI_FOR_TESTS ??
       'mongodb://localhost:27017';
+
+    // Mail
+    this.MAIL_USER = envVariables.MAIL_USER;
+    this.MAIL_PASSWORD = envVariables.MAIL_PASSWORD;
   }
 
   private getNumberOrDefault(value: any, defaultValue: number): number {

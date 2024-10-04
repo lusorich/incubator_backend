@@ -21,6 +21,7 @@ import { AuthController } from './features/auth/controller/auth.controller';
 import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
 import { AuthService } from './features/auth/application/auth.service';
 import { AuthCommandsRepository } from './features/auth/repositories/auth.repository.commands';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -29,6 +30,15 @@ import { AuthCommandsRepository } from './features/auth/repositories/auth.reposi
         ? appSettings.api.MONGO_CONNECTION_URI_FOR_TESTS
         : appSettings.api.MONGO_CONNECTION_URI,
     ),
+    MailerModule.forRoot({
+      transport: {
+        service: 'Mail.ru',
+        auth: {
+          user: appSettings.api.MAIL_USER,
+          pass: appSettings.api.MAIL_PASSWORD,
+        },
+      },
+    }),
     MongooseModule.forFeature([
       {
         name: User.name,
