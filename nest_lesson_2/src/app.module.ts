@@ -22,6 +22,7 @@ import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
 import { AuthService } from './features/auth/application/auth.service';
 import { AuthCommandsRepository } from './features/auth/repositories/auth.repository.commands';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailService } from './features/mail/application/mail.service';
 
 @Module({
   imports: [
@@ -72,6 +73,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 
     AuthService,
     AuthCommandsRepository,
+
+    EmailService,
   ],
 })
 export class AppModule {}

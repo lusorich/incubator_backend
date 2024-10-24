@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { AuthService } from '../application/auth.service';
+import { EmailService } from 'src/features/mail/application/mail.service';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -21,7 +22,10 @@ class RegistrationInputDto {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @Post('login')
   async userLogin() {
@@ -31,6 +35,7 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
+    console.log(this.emailService.generateUserEmailConfirmation());
     return await this.authService.registration(userInput);
   }
 }
