@@ -6,8 +6,12 @@ import { User, UserDocument, UserModelType } from '../domain/user.entity';
 export class UsersCommandsRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async create(login: string, email: string) {
-    const user: UserDocument = this.UserModel.createUser(login, email);
+  async create(login: string, email: string, emailConfirmation) {
+    const user: UserDocument = this.UserModel.createUser(
+      login,
+      email,
+      emailConfirmation,
+    );
 
     return this.save(user);
   }

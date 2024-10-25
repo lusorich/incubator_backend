@@ -2,10 +2,11 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
+import { appSettings } from 'src/settings/appSettings';
 
 @Injectable()
 export class EmailService {
-  constructor(mailerService: MailerService) {}
+  constructor(private mailerService: MailerService) {}
 
   generateUserEmailConfirmation = () => ({
     confirmationCode: randomUUID(),
@@ -33,4 +34,26 @@ export class EmailService {
  <p>To finish please follow the link below:
      <a href='http://${link}?recoveryCode=${recoveryCode}'>complete recovery</a>
  </p>`;
+
+  sendEmail = async ({
+    to,
+    from,
+    subject = 'hello',
+    text = 'hi',
+    html,
+  }: {
+    to: string;
+    from: string;
+    subject?: string;
+    text?: string;
+    html: string;
+  }) => {
+    return await this.mailerService.sendMail({
+      to,
+      from,
+      subject,
+      text,
+      html,
+    });
+  };
 }

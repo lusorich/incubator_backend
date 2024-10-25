@@ -35,7 +35,21 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
-    console.log(this.emailService.generateUserEmailConfirmation());
-    return await this.authService.registration(userInput);
+    const emailConfirmation = this.emailService.generateUserEmailConfirmation();
+    const emailTemplate =
+      this.emailService.generateRegistrationConfirmationEmail({
+        code: emailConfirmation.confirmationCode,
+      });
+
+    await this.emailService.sendEmail({
+      from: 'eeugern@mail.ru',
+      to: userInput.email,
+      html: emailTemplate,
+    });
+
+    return await this.authService.registration({
+      ...userInput,
+      emailConfirmation,
+    });
   }
 }

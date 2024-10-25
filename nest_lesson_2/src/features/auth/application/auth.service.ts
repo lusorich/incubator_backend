@@ -6,6 +6,7 @@ export class AuthService {
   constructor(
     private readonly authCommandsRepository: AuthCommandsRepository,
   ) {}
+
   async registration(userRegistrationInputModel) {
     return this.authCommandsRepository.registration(userRegistrationInputModel);
   }

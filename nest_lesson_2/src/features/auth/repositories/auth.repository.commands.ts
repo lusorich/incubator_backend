@@ -9,6 +9,7 @@ export class AuthCommandsRepository {
     return this.UsersService.create(
       registrationUserInputModel.login,
       registrationUserInputModel.email,
+      registrationUserInputModel.emailConfirmation,
     );
   }
 }

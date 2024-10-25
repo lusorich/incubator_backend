@@ -74,6 +74,7 @@ export class UsersController {
     const result = await this.usersService.create(
       userInput.login,
       userInput.email,
+      undefined,
     );
 
     return this.usersQueryRepository.getById(result);

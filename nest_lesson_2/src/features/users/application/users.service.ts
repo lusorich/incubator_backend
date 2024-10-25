@@ -5,8 +5,12 @@ import { UsersCommandsRepository } from '../repositories/users.repository.comman
 export class UsersService {
   constructor(private usersCommandsRepository: UsersCommandsRepository) {}
 
-  async create(login: string, email: string) {
-    const result = await this.usersCommandsRepository.create(login, email);
+  async create(login: string, email: string, emailConfirmation) {
+    const result = await this.usersCommandsRepository.create(
+      login,
+      email,
+      emailConfirmation,
+    );
 
     return result.id;
   }
