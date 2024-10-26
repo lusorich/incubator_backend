@@ -2,7 +2,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
-import { appSettings } from 'src/settings/appSettings';
 
 @Injectable()
 export class EmailService {
@@ -49,7 +48,7 @@ export class EmailService {
     html: string;
   }) => {
     return await this.mailerService.sendMail({
-      to,
+      to: to,
       from,
       subject,
       text,

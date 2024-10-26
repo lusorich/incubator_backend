@@ -33,9 +33,7 @@ import { EmailService } from './features/mail/application/mail.service';
     ),
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.mail.ru',
-        port: 465,
-        secure: true,
+        service: 'Mail.ru',
         // service: 'Mail.ru',
         auth: {
           user: appSettings.api.MAIL_USER,
