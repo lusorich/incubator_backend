@@ -3,6 +3,10 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { AuthService } from '../application/auth.service';
 import { EmailService } from 'src/features/mail/application/mail.service';
+import {
+  IsConfirmationCodeActive,
+  IsConfirmationCodeActiveConstraint,
+} from 'src/common/IsConfirmationCodeActive';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -18,6 +22,12 @@ class RegistrationInputDto {
   @IsNotEmpty()
   @Length(6, 20)
   password: string;
+}
+
+class RegistrationConfirmationInputDto {
+  @IsNotEmpty()
+  @IsConfirmationCodeActive({ message: 'code has already been activated' })
+  code: string;
 }
 
 @Controller('auth')
@@ -38,7 +48,7 @@ export class AuthController {
     const emailConfirmation = this.emailService.generateUserEmailConfirmation();
     const emailTemplate =
       this.emailService.generateRegistrationConfirmationEmail({
-        code: emailConfirmation.confirmationCode,
+        code: emailConfirmation.code,
       });
 
     await this.emailService.sendEmail({
@@ -52,4 +62,10 @@ export class AuthController {
       emailConfirmation,
     });
   }
+
+  @Post('registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistationConfirmation(
+    @Body() userInput: RegistrationConfirmationInputDto,
+  ) {}
 }

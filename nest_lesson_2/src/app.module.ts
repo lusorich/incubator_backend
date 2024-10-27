@@ -23,6 +23,7 @@ import { AuthService } from './features/auth/application/auth.service';
 import { AuthCommandsRepository } from './features/auth/repositories/auth.repository.commands';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './features/mail/application/mail.service';
+import { IsConfirmationCodeActiveConstraint } from './common/IsConfirmationCodeActive';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { EmailService } from './features/mail/application/mail.service';
     PostsCommandsRepository,
 
     IsUserAlreadyExistConstraint,
+    IsConfirmationCodeActiveConstraint,
 
     AuthService,
     AuthCommandsRepository,

@@ -4,7 +4,7 @@ import { HydratedDocument, Model } from 'mongoose';
 @Schema()
 class EmailConfirmation {
   @Prop()
-  confirmationCode: string;
+  code: string;
 
   @Prop()
   expire: Date;

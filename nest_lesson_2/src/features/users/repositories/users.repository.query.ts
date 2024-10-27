@@ -66,6 +66,6 @@ export class UsersQueryRepository {
   async getByProperty(property: string, value: string) {
     const user = await this.UserModel.findOne({ [property]: value });
 
-    return userOutputModelMapper(user);
+    return user;
   }
 }

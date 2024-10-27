@@ -8,7 +8,7 @@ export class EmailService {
   constructor(private mailerService: MailerService) {}
 
   generateUserEmailConfirmation = () => ({
-    confirmationCode: randomUUID(),
+    code: randomUUID(),
     expire: add(new Date(), { days: 3 }),
     isConfirmed: false,
   });
