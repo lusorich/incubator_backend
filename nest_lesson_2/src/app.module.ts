@@ -24,6 +24,7 @@ import { AuthCommandsRepository } from './features/auth/repositories/auth.reposi
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './features/mail/application/mail.service';
 import { IsConfirmationCodeActiveConstraint } from './common/IsConfirmationCodeActive';
+import { IsUserByConfirmationCodeExistConstraint } from './common/IsUserByConfirmationCodeExist';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { IsConfirmationCodeActiveConstraint } from './common/IsConfirmationCodeA
 
     IsUserAlreadyExistConstraint,
     IsConfirmationCodeActiveConstraint,
+    IsUserByConfirmationCodeExistConstraint,
 
     AuthService,
     AuthCommandsRepository,

@@ -5,11 +5,10 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { isAfter } from 'date-fns';
 import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsConfirmationCodeActiveConstraint
+export class IsUserByConfirmationCodeExistConstraint
   implements ValidatorConstraintInterface
 {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
@@ -20,11 +19,7 @@ export class IsConfirmationCodeActiveConstraint
       arg,
     );
 
-    if (user && isAfter(new Date(), user.emailConfirmation.expire)) {
-      return false;
-    }
-
-    if (user && user.emailConfirmation.isConfirmed) {
+    if (!user) {
       return false;
     }
 
@@ -32,7 +27,7 @@ export class IsConfirmationCodeActiveConstraint
   }
 }
 
-export function IsConfirmationCodeActive(
+export function IsUserByConfirmationCodeExist(
   validationOptions?: ValidationOptions,
 ) {
   return function (object: Record<any, any>, propertyName: string) {
@@ -41,7 +36,7 @@ export function IsConfirmationCodeActive(
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsConfirmationCodeActiveConstraint,
+      validator: IsUserByConfirmationCodeExistConstraint,
     });
   };
 }

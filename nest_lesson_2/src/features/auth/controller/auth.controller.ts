@@ -3,10 +3,8 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { AuthService } from '../application/auth.service';
 import { EmailService } from 'src/features/mail/application/mail.service';
-import {
-  IsConfirmationCodeActive,
-  IsConfirmationCodeActiveConstraint,
-} from 'src/common/IsConfirmationCodeActive';
+import { IsConfirmationCodeActive } from 'src/common/IsConfirmationCodeActive';
+import { IsUserByConfirmationCodeExist } from 'src/common/IsUserByConfirmationCodeExist';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -26,7 +24,10 @@ class RegistrationInputDto {
 
 class RegistrationConfirmationInputDto {
   @IsNotEmpty()
-  @IsConfirmationCodeActive({ message: 'code has already been activated' })
+  @IsUserByConfirmationCodeExist({ message: 'user dont exist' })
+  @IsConfirmationCodeActive({
+    message: 'code has already been activated or expired',
+  })
   code: string;
 }
 
