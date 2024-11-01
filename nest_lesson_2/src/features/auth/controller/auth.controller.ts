@@ -1,20 +1,23 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
-import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { AuthService } from '../application/auth.service';
 import { EmailService } from 'src/features/mail/application/mail.service';
 import { IsConfirmationCodeActive } from 'src/common/IsConfirmationCodeActive';
 import { IsUserByConfirmationCodeExist } from 'src/common/IsUserByConfirmationCodeExist';
+import { UsersService } from 'src/features/users/application/users.service';
+import { IsEmailNotConfirmed } from 'src/common/IsEmailNotConfirmed';
+import { IsUserNotExist } from 'src/common/IsUserNotExist';
+import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 
 class RegistrationInputDto {
   @IsNotEmpty()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)
-  @IsUserAlreadyExist({ message: 'login already exist' })
+  @IsUserNotExist({ message: 'login already exist' })
   login: string;
 
   @IsEmail()
-  @IsUserAlreadyExist({ message: 'email already exist' })
+  @IsUserNotExist({ message: 'email already exist' })
   email: string;
 
   @IsNotEmpty()
@@ -31,11 +34,19 @@ class RegistrationConfirmationInputDto {
   code: string;
 }
 
+class RegistrationEmailResendingInputDto {
+  @IsNotEmpty()
+  @IsUserAlreadyExist({ message: 'user dont exist' })
+  @IsEmailNotConfirmed({ message: 'email already confirmed' })
+  email: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
+    private readonly userService: UsersService,
   ) {}
 
   @Post('login')
@@ -68,5 +79,28 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistationConfirmation(
     @Body() userInput: RegistrationConfirmationInputDto,
-  ) {}
+  ) {
+    const user = await this.userService.getByProperty(
+      'emailConfirmation.code',
+      userInput.code,
+    );
+
+    return await this.userService.updateUserIsConfirmed(user, true);
+  }
+
+  @Post('registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistrationEmailResending(
+    @Body() userInput: RegistrationEmailResendingInputDto,
+  ) {
+    const user = await this.userService.getByProperty('email', userInput.email);
+
+    const emailConfirmation = this.emailService.generateUserEmailConfirmation();
+    const emailTemplate =
+      this.emailService.generateRegistrationConfirmationEmail({
+        code: emailConfirmation.code,
+      });
+
+    await this.userService.updateUserEmailConfirmation(user, emailConfirmation);
+  }
 }

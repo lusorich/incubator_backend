@@ -8,9 +8,7 @@ import {
 import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsUserAlreadyExistConstraint
-  implements ValidatorConstraintInterface
-{
+export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
 
   async validate(arg: string, options: ValidationArguments) {
@@ -18,7 +16,7 @@ export class IsUserAlreadyExistConstraint
 
     const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
-    if (!user) {
+    if (user) {
       return false;
     }
 
@@ -26,14 +24,14 @@ export class IsUserAlreadyExistConstraint
   }
 }
 
-export function IsUserAlreadyExist(validationOptions?: ValidationOptions) {
+export function IsUserNotExist(validationOptions?: ValidationOptions) {
   return function (object: Record<any, any>, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserAlreadyExistConstraint,
+      validator: IsUserNotExistConstraint,
     });
   };
 }

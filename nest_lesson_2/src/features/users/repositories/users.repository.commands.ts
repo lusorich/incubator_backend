@@ -20,6 +20,22 @@ export class UsersCommandsRepository {
     return user.save();
   }
 
+  async updateUserIsConfirmed(user, isConfirmed) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      {
+        $set: { 'emailConfirmation.isConfirmed': isConfirmed },
+      },
+    );
+  }
+
+  async updateUserEmailConfirmation(user, emailConfirmation) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      { $set: { emailConfirmation } },
+    );
+  }
+
   async delete(id: number) {
     return this.UserModel.deleteOne({ _id: id });
   }

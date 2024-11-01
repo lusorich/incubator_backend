@@ -18,13 +18,15 @@ import { Post, PostSchema } from './features/posts/domain/post.entity';
 import { TestingController } from './features/testing/controller/testing.controller';
 import { appSettings } from './settings/appSettings';
 import { AuthController } from './features/auth/controller/auth.controller';
-import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
 import { AuthService } from './features/auth/application/auth.service';
 import { AuthCommandsRepository } from './features/auth/repositories/auth.repository.commands';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './features/mail/application/mail.service';
 import { IsConfirmationCodeActiveConstraint } from './common/IsConfirmationCodeActive';
 import { IsUserByConfirmationCodeExistConstraint } from './common/IsUserByConfirmationCodeExist';
+import { IsEmailNotConfirmedConstraint } from './common/IsEmailNotConfirmed';
+import { IsUserNotExistConstraint } from './common/IsUserNotExist';
+import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
 
 @Module({
   imports: [
@@ -72,9 +74,11 @@ import { IsUserByConfirmationCodeExistConstraint } from './common/IsUserByConfir
     PostsQueryRepository,
     PostsCommandsRepository,
 
-    IsUserAlreadyExistConstraint,
+    IsUserNotExistConstraint,
     IsConfirmationCodeActiveConstraint,
     IsUserByConfirmationCodeExistConstraint,
+    IsEmailNotConfirmedConstraint,
+    IsUserAlreadyExistConstraint,
 
     AuthService,
     AuthCommandsRepository,
