@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthService } from '../application/auth.service';
 import { EmailService } from 'src/features/mail/application/mail.service';
@@ -8,6 +15,7 @@ import { UsersService } from 'src/features/users/application/users.service';
 import { IsEmailNotConfirmed } from 'src/common/IsEmailNotConfirmed';
 import { IsUserNotExist } from 'src/common/IsUserNotExist';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
+import { Response } from 'express';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -36,8 +44,15 @@ class RegistrationConfirmationInputDto {
 
 class RegistrationEmailResendingInputDto {
   @IsNotEmpty()
+  @IsEmail()
   @IsUserAlreadyExist({ message: 'user dont exist' })
   @IsEmailNotConfirmed({ message: 'email already confirmed' })
+  email: string;
+}
+
+class RegistrationEmailPasswordRecoveryInputDto {
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
 }
 
@@ -101,6 +116,39 @@ export class AuthController {
         code: emailConfirmation.code,
       });
 
-    await this.userService.updateUserEmailConfirmation(user, emailConfirmation);
+    await this.emailService.sendEmail({
+      html: emailTemplate,
+      to: userInput.email,
+      from: 'eeugern@mail.ru',
+    });
+
+    return await this.userService.updateUserEmailConfirmation(
+      user,
+      emailConfirmation,
+    );
+  }
+
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistrationPasswordRecovery(
+    @Body() userInput: RegistrationEmailPasswordRecoveryInputDto,
+  ) {
+    const user = await this.userService.getByProperty('email', userInput.email);
+
+    if (user) {
+      const passwordRecovery =
+        this.emailService.generatePasswordRecoveryConfirmation();
+      const emailTemplate = this.emailService.generateRecoveryPasswordEmail({
+        recoveryCode: passwordRecovery.recoveryCode,
+      });
+
+      await this.emailService.sendEmail({
+        html: emailTemplate,
+        to: userInput.email,
+        from: 'eeugern@mail.ru',
+      });
+
+      await this.userService.updatePasswordRecovery(user, passwordRecovery);
+    }
   }
 }

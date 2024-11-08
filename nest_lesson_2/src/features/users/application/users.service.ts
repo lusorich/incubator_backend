@@ -46,4 +46,11 @@ export class UsersService {
   async getByProperty(property: string, value: string) {
     return await this.usersQueryRepository.getByProperty(property, value);
   }
+
+  async updatePasswordRecovery(user, passwordRecovery) {
+    return await this.usersCommandsRepository.updatePasswordRecovery(
+      user,
+      passwordRecovery,
+    );
+  }
 }

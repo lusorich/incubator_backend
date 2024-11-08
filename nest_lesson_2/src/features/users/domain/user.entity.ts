@@ -14,6 +14,18 @@ class EmailConfirmation {
 }
 
 @Schema()
+class PasswordRecovery {
+  @Prop()
+  recoveryCode: string;
+
+  @Prop()
+  expire: Date;
+
+  @Prop()
+  isUsed: boolean;
+}
+
+@Schema()
 export class User {
   @Prop()
   login: string;
@@ -26,6 +38,9 @@ export class User {
 
   @Prop()
   emailConfirmation?: EmailConfirmation;
+
+  @Prop()
+  passwordRecovery?: PasswordRecovery;
 
   static createUser(login: string, email: string, emailConfirmation) {
     const user = new this();
@@ -57,6 +72,7 @@ type UserModelStaticType = {
     login: string,
     email: string,
     emailConfirmation?: EmailConfirmation,
+    passwordRecoveryConfirmation?: PasswordRecovery,
   ) => UserDocument;
 };
 

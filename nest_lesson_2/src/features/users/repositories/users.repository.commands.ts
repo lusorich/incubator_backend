@@ -36,6 +36,14 @@ export class UsersCommandsRepository {
     );
   }
 
+  async updatePasswordRecovery(user, passwordRecovery) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      { $set: { passwordRecovery } },
+      { upsert: true },
+    );
+  }
+
   async delete(id: number) {
     return this.UserModel.deleteOne({ _id: id });
   }
