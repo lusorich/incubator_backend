@@ -27,6 +27,8 @@ import { IsUserByConfirmationCodeExistConstraint } from './common/IsUserByConfir
 import { IsEmailNotConfirmedConstraint } from './common/IsEmailNotConfirmed';
 import { IsUserNotExistConstraint } from './common/IsUserNotExist';
 import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
+import { IsUserByRecoveryCodeExistConstraint } from './common/IsUserByRecoveryCodeExist';
+import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecoveryCodeUsed';
 
 @Module({
   imports: [
@@ -79,6 +81,8 @@ import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
     IsUserByConfirmationCodeExistConstraint,
     IsEmailNotConfirmedConstraint,
     IsUserAlreadyExistConstraint,
+    IsUserByRecoveryCodeExistConstraint,
+    IsPasswordRecoveryCodeUsedConstraint,
 
     AuthService,
     AuthCommandsRepository,

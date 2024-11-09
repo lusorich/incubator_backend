@@ -34,6 +34,9 @@ export class User {
   email: string;
 
   @Prop()
+  password: string;
+
+  @Prop()
   createdAt: Date;
 
   @Prop()
@@ -42,11 +45,17 @@ export class User {
   @Prop()
   passwordRecovery?: PasswordRecovery;
 
-  static createUser(login: string, email: string, emailConfirmation) {
+  static createUser(
+    login: string,
+    email: string,
+    password: string,
+    emailConfirmation,
+  ) {
     const user = new this();
 
     user.login = login;
     user.email = email;
+    user.password = password;
     user.createdAt = new Date();
 
     if (emailConfirmation) {
@@ -71,6 +80,7 @@ type UserModelStaticType = {
   createUser: (
     login: string,
     email: string,
+    password: string,
     emailConfirmation?: EmailConfirmation,
     passwordRecoveryConfirmation?: PasswordRecovery,
   ) => UserDocument;

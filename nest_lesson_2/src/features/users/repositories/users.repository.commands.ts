@@ -6,10 +6,16 @@ import { User, UserDocument, UserModelType } from '../domain/user.entity';
 export class UsersCommandsRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async create(login: string, email: string, emailConfirmation) {
+  async create(
+    login: string,
+    email: string,
+    password: string,
+    emailConfirmation,
+  ) {
     const user: UserDocument = this.UserModel.createUser(
       login,
       email,
+      password,
       emailConfirmation,
     );
 
@@ -36,11 +42,17 @@ export class UsersCommandsRepository {
     );
   }
 
-  async updatePasswordRecovery(user, passwordRecovery) {
+  async updatePasswordRecovery(user) {
     return this.UserModel.updateOne(
       { login: user.login },
-      { $set: { passwordRecovery } },
-      { upsert: true },
+      { $set: { 'passwordRecovery.isUsed': true } },
+    );
+  }
+
+  async updatePassword(user, newPassword) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      { $set: { password: newPassword } },
     );
   }
 

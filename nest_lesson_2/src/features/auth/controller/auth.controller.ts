@@ -15,7 +15,8 @@ import { UsersService } from 'src/features/users/application/users.service';
 import { IsEmailNotConfirmed } from 'src/common/IsEmailNotConfirmed';
 import { IsUserNotExist } from 'src/common/IsUserNotExist';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
-import { Response } from 'express';
+import { IsUserByRecoveryCodeExist } from 'src/common/IsUserByRecoveryCodeExist';
+import { IsPasswordRecoveryCodeUsed } from 'src/common/IsPasswordRecoveryCodeUsed';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -54,6 +55,22 @@ class RegistrationEmailPasswordRecoveryInputDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+}
+
+class RegistrationNewPasswordInputDto {
+  @IsNotEmpty()
+  @Length(6, 20)
+  newPassword: string;
+
+  @IsNotEmpty()
+  @IsUserByRecoveryCodeExist({ message: 'wrong recovery code' })
+  @IsPasswordRecoveryCodeUsed({ message: 'recovery code expired' })
+  recoveryCode: string;
+}
+
+class UserLoginInputDto {
+  loginOrEmail: string;
+  password: string;
 }
 
 @Controller('auth')
@@ -148,7 +165,22 @@ export class AuthController {
         from: 'eeugern@mail.ru',
       });
 
-      await this.userService.updatePasswordRecovery(user, passwordRecovery);
+      return await this.userService.updatePasswordRecovery(user);
     }
+  }
+
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistrationNewPassword(
+    @Body() userInput: RegistrationNewPasswordInputDto,
+  ) {
+    const user = await this.userService.getByProperty(
+      'passwordRecovery.recoveryCode',
+      userInput.recoveryCode,
+    );
+
+    await this.userService.updatePasswordRecovery(user);
+
+    return await this.userService.updatePassword(user, userInput.newPassword);
   }
 }

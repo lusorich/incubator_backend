@@ -9,10 +9,16 @@ export class UsersService {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async create(login: string, email: string, emailConfirmation) {
+  async create(
+    login: string,
+    email: string,
+    password: string,
+    emailConfirmation,
+  ) {
     const result = await this.usersCommandsRepository.create(
       login,
       email,
+      password,
       emailConfirmation,
     );
 
@@ -47,10 +53,11 @@ export class UsersService {
     return await this.usersQueryRepository.getByProperty(property, value);
   }
 
-  async updatePasswordRecovery(user, passwordRecovery) {
-    return await this.usersCommandsRepository.updatePasswordRecovery(
-      user,
-      passwordRecovery,
-    );
+  async updatePasswordRecovery(user) {
+    return await this.usersCommandsRepository.updatePasswordRecovery(user);
+  }
+
+  async updatePassword(user, newPassword) {
+    return await this.usersCommandsRepository.updatePassword(user, newPassword);
   }
 }
