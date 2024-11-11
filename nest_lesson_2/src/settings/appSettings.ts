@@ -48,6 +48,9 @@ class APISettings {
   public readonly MAIL_USER: string;
   public readonly MAIL_PASSWORD: string;
 
+  // JWT
+  public readonly SECRET_JWT_KEY: string;
+
   constructor(private readonly envVariables: EnvironmentVariable) {
     // Application
     this.APP_PORT = this.getNumberOrDefault(
@@ -68,6 +71,9 @@ class APISettings {
     // Mail
     this.MAIL_USER = envVariables.MAIL_USER;
     this.MAIL_PASSWORD = envVariables.MAIL_PASSWORD;
+
+    // JWT
+    this.SECRET_JWT_KEY = envVariables.SECRET_JWT_KEY;
   }
 
   private getNumberOrDefault(value: any, defaultValue: number): number {

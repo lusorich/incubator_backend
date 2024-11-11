@@ -29,6 +29,8 @@ import { IsUserNotExistConstraint } from './common/IsUserNotExist';
 import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
 import { IsUserByRecoveryCodeExistConstraint } from './common/IsUserByRecoveryCodeExist';
 import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecoveryCodeUsed';
+import { LocalStrategy } from './features/auth/application/auth.local.strategy';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -40,7 +42,6 @@ import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecover
     MailerModule.forRoot({
       transport: {
         service: 'Mail.ru',
-        // service: 'Mail.ru',
         auth: {
           user: appSettings.api.MAIL_USER,
           pass: appSettings.api.MAIL_PASSWORD,
@@ -55,6 +56,10 @@ import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecover
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
     ]),
+    JwtModule.register({
+      secret: appSettings.api.SECRET_JWT_KEY,
+      signOptions: { expiresIn: '5m' },
+    }),
   ],
   controllers: [
     UsersController,
@@ -85,6 +90,7 @@ import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecover
     IsPasswordRecoveryCodeUsedConstraint,
 
     AuthService,
+    LocalStrategy,
     AuthCommandsRepository,
 
     EmailService,

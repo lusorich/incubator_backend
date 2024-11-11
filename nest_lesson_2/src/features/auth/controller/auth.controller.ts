@@ -4,7 +4,9 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Request,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthService } from '../application/auth.service';
@@ -17,6 +19,7 @@ import { IsUserNotExist } from 'src/common/IsUserNotExist';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { IsUserByRecoveryCodeExist } from 'src/common/IsUserByRecoveryCodeExist';
 import { IsPasswordRecoveryCodeUsed } from 'src/common/IsPasswordRecoveryCodeUsed';
+import { AuthGuard } from '@nestjs/passport';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -69,7 +72,10 @@ class RegistrationNewPasswordInputDto {
 }
 
 class UserLoginInputDto {
+  @IsNotEmpty()
   loginOrEmail: string;
+
+  @IsNotEmpty()
   password: string;
 }
 
@@ -81,8 +87,11 @@ export class AuthController {
     private readonly userService: UsersService,
   ) {}
 
+  @UseGuards(AuthGuard('local'))
   @Post('login')
-  async userLogin() {
+  async userLogin(@Request() req, @Body() userInput: UserLoginInputDto) {
+    console.log('req', req.user);
+
     return null;
   }
 
