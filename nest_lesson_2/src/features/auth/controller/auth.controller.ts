@@ -20,6 +20,7 @@ import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { IsUserByRecoveryCodeExist } from 'src/common/IsUserByRecoveryCodeExist';
 import { IsPasswordRecoveryCodeUsed } from 'src/common/IsPasswordRecoveryCodeUsed';
 import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from '../application/local.auth.guard';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -87,12 +88,10 @@ export class AuthController {
     private readonly userService: UsersService,
   ) {}
 
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async userLogin(@Request() req, @Body() userInput: UserLoginInputDto) {
-    console.log('req', req.user);
-
-    return null;
+    return this.authService.login(req.user);
   }
 
   @Post('registration')

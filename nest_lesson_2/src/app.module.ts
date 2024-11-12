@@ -31,6 +31,7 @@ import { IsUserByRecoveryCodeExistConstraint } from './common/IsUserByRecoveryCo
 import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecoveryCodeUsed';
 import { LocalStrategy } from './features/auth/application/auth.local.strategy';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './features/auth/application/auth.jwt.strategy';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { JwtModule } from '@nestjs/jwt';
       { name: Post.name, schema: PostSchema },
     ]),
     JwtModule.register({
+      global: true,
       secret: appSettings.api.SECRET_JWT_KEY,
       signOptions: { expiresIn: '5m' },
     }),
@@ -91,6 +93,7 @@ import { JwtModule } from '@nestjs/jwt';
 
     AuthService,
     LocalStrategy,
+    JwtStrategy,
     AuthCommandsRepository,
 
     EmailService,

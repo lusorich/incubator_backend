@@ -17,6 +17,7 @@ import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuard } from 'src/common/auth.guard';
+import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
 
 class CreateUserInputDto {
   @IsNotEmpty()
@@ -43,7 +44,7 @@ export class UsersController {
     this.usersService = usersService;
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers(
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
