@@ -16,7 +16,6 @@ import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
-import { AuthGuard } from 'src/common/auth.guard';
 import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
 
 class CreateUserInputDto {
@@ -69,6 +68,7 @@ export class UsersController {
     return result;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
@@ -82,6 +82,7 @@ export class UsersController {
     return this.usersQueryRepository.getById(result);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: number) {

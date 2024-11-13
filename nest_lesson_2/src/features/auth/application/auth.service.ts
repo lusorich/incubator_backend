@@ -27,22 +27,28 @@ export class AuthService {
     );
 
     if (userByLogin && userByLogin.password) {
-      const { password, ...rest } = userByLogin;
-
-      return rest;
+      return {
+        login: userByLogin.login,
+        email: userByLogin.email,
+        id: userByLogin.id,
+      };
     }
 
     if (userByEmail && userByEmail.password) {
-      const { password, ...rest } = userByEmail;
-
-      return rest;
+      return {
+        login: userByEmail.login,
+        email: userByEmail.email,
+        id: userByEmail.id,
+      };
     }
 
     return null;
   }
 
   async login(user) {
-    const payload = { login: user.login, sub: user.id };
+    const payload = { login: user.login, email: user.email, userId: user.id };
+
+    console.log('payload', payload);
 
     return {
       access_token: this.jwtService.sign(payload),

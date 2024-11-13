@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Request,
   Res,
   UseGuards,
@@ -19,8 +21,8 @@ import { IsUserNotExist } from 'src/common/IsUserNotExist';
 import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
 import { IsUserByRecoveryCodeExist } from 'src/common/IsUserByRecoveryCodeExist';
 import { IsPasswordRecoveryCodeUsed } from 'src/common/IsPasswordRecoveryCodeUsed';
-import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from '../application/local.auth.guard';
+import { JwtAuthGuard } from '../application/jwt.auth.guard';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -190,5 +192,11 @@ export class AuthController {
     await this.userService.updatePasswordRecovery(user);
 
     return await this.userService.updatePassword(user, userInput.newPassword);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async userInfo(@Request() req) {
+    return req.user;
   }
 }
