@@ -5,9 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Req,
   Request,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';

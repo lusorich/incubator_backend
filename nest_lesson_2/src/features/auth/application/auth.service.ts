@@ -26,7 +26,7 @@ export class AuthService {
       loginOrEmail,
     );
 
-    if (userByLogin && userByLogin.password) {
+    if (userByLogin && userByLogin.password === password) {
       return {
         login: userByLogin.login,
         email: userByLogin.email,
@@ -34,7 +34,7 @@ export class AuthService {
       };
     }
 
-    if (userByEmail && userByEmail.password) {
+    if (userByEmail && userByEmail.password === password) {
       return {
         login: userByEmail.login,
         email: userByEmail.email,
@@ -47,8 +47,6 @@ export class AuthService {
 
   async login(user) {
     const payload = { login: user.login, email: user.email, userId: user.id };
-
-    console.log('payload', payload);
 
     return {
       access_token: this.jwtService.sign(payload),

@@ -17,6 +17,7 @@ import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
+import { LocalAuthGuard } from 'src/features/auth/application/local.auth.guard';
 
 class CreateUserInputDto {
   @IsNotEmpty()
@@ -43,7 +44,7 @@ export class UsersController {
     this.usersService = usersService;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LocalAuthGuard)
   @Get()
   async getUsers(
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
@@ -68,7 +69,7 @@ export class UsersController {
     return result;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LocalAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
@@ -82,7 +83,7 @@ export class UsersController {
     return this.usersQueryRepository.getById(result);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LocalAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: number) {
