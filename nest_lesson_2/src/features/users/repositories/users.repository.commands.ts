@@ -56,8 +56,12 @@ export class UsersCommandsRepository {
     );
   }
 
-  async delete(id: number) {
-    return this.UserModel.deleteOne({ _id: id });
+  async delete(id: string) {
+    try {
+      return await this.UserModel.deleteOne({ _id: id });
+    } catch (e) {
+      return { deletedCount: 0 };
+    }
   }
 
   async deleteAll() {

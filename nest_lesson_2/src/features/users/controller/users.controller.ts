@@ -16,8 +16,7 @@ import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
-import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
-import { LocalAuthGuard } from 'src/features/auth/application/local.auth.guard';
+import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 
 class CreateUserInputDto {
   @IsNotEmpty()
@@ -44,7 +43,7 @@ export class UsersController {
     this.usersService = usersService;
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(AuthGuardBasic)
   @Get()
   async getUsers(
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
@@ -69,7 +68,7 @@ export class UsersController {
     return result;
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
@@ -83,10 +82,10 @@ export class UsersController {
     return this.usersQueryRepository.getById(result);
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: number) {
+  async deleteUser(@Param('id') id: string) {
     const result = await this.usersService.delete(id);
 
     if (result.deletedCount < 1) {

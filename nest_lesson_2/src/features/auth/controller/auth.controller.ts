@@ -90,6 +90,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async userLogin(@Request() req, @Body() userInput: UserLoginInputDto) {
     return this.authService.login(req.user);
   }

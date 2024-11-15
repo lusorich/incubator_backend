@@ -25,7 +25,7 @@ export class UsersService {
     return result.id;
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     const result = await this.usersCommandsRepository.delete(id);
 
     return result;
