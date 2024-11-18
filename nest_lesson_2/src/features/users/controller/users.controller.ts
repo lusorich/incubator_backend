@@ -10,10 +10,27 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
+import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { AuthGuardBasic } from 'src/common/auth.guard.basic';
+
+class CreateUserInputDto {
+  @IsNotEmpty()
+  @Length(3, 10)
+  @Matches(/^[a-zA-Z0-9_-]*$/)
+  login: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @Length(6, 20)
+  password: string;
+}
 
 @Controller('users')
 export class UsersController {
@@ -26,6 +43,7 @@ export class UsersController {
     this.usersService = usersService;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Get()
   async getUsers(
     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
@@ -50,20 +68,24 @@ export class UsersController {
     return result;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() inputModel: any) {
+  async createUser(@Body() userInput: CreateUserInputDto) {
     const result = await this.usersService.create(
-      inputModel.login,
-      inputModel.email,
+      userInput.login,
+      userInput.email,
+      userInput.password,
+      undefined,
     );
 
     return this.usersQueryRepository.getById(result);
   }
 
+  @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: number) {
+  async deleteUser(@Param('id') id: string) {
     const result = await this.usersService.delete(id);
 
     if (result.deletedCount < 1) {

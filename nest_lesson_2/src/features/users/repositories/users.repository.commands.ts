@@ -6,8 +6,18 @@ import { User, UserDocument, UserModelType } from '../domain/user.entity';
 export class UsersCommandsRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async create(login: string, email: string) {
-    const user: UserDocument = this.UserModel.createUser(login, email);
+  async create(
+    login: string,
+    email: string,
+    password: string,
+    emailConfirmation,
+  ) {
+    const user: UserDocument = this.UserModel.createUser(
+      login,
+      email,
+      password,
+      emailConfirmation,
+    );
 
     return this.save(user);
   }
@@ -16,8 +26,42 @@ export class UsersCommandsRepository {
     return user.save();
   }
 
-  async delete(id: number) {
-    return this.UserModel.deleteOne({ _id: id });
+  async updateUserIsConfirmed(user, isConfirmed) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      {
+        $set: { 'emailConfirmation.isConfirmed': isConfirmed },
+      },
+    );
+  }
+
+  async updateUserEmailConfirmation(user, emailConfirmation) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      { $set: { emailConfirmation } },
+    );
+  }
+
+  async updatePasswordRecovery(user) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      { $set: { 'passwordRecovery.isUsed': true } },
+    );
+  }
+
+  async updatePassword(user, newPassword) {
+    return this.UserModel.updateOne(
+      { login: user.login },
+      { $set: { password: newPassword } },
+    );
+  }
+
+  async delete(id: string) {
+    try {
+      return await this.UserModel.deleteOne({ _id: id });
+    } catch (e) {
+      return { deletedCount: 0 };
+    }
   }
 
   async deleteAll() {

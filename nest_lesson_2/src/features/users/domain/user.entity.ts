@@ -2,6 +2,30 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 
 @Schema()
+class EmailConfirmation {
+  @Prop()
+  code: string;
+
+  @Prop()
+  expire: Date;
+
+  @Prop()
+  isConfirmed: boolean;
+}
+
+@Schema()
+class PasswordRecovery {
+  @Prop()
+  recoveryCode: string;
+
+  @Prop()
+  expire: Date;
+
+  @Prop()
+  isUsed: boolean;
+}
+
+@Schema()
 export class User {
   @Prop()
   login: string;
@@ -10,14 +34,33 @@ export class User {
   email: string;
 
   @Prop()
+  password: string;
+
+  @Prop()
   createdAt: Date;
 
-  static createUser(login: string, email: string) {
+  @Prop()
+  emailConfirmation?: EmailConfirmation;
+
+  @Prop()
+  passwordRecovery?: PasswordRecovery;
+
+  static createUser(
+    login: string,
+    email: string,
+    password: string,
+    emailConfirmation,
+  ) {
     const user = new this();
 
     user.login = login;
     user.email = email;
+    user.password = password;
     user.createdAt = new Date();
+
+    if (emailConfirmation) {
+      user.emailConfirmation = emailConfirmation;
+    }
 
     return user;
   }
@@ -34,7 +77,13 @@ UserSchema.loadClass(User);
 export type UserDocument = HydratedDocument<User>;
 
 type UserModelStaticType = {
-  createUser: (login: string, email: string) => UserDocument;
+  createUser: (
+    login: string,
+    email: string,
+    password: string,
+    emailConfirmation?: EmailConfirmation,
+    passwordRecoveryConfirmation?: PasswordRecovery,
+  ) => UserDocument;
 };
 
 export type UserModelType = Model<UserDocument> & UserModelStaticType;

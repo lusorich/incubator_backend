@@ -16,10 +16,39 @@ import { PostsCommandsRepository } from './features/posts/repositories/posts.rep
 import { PostsController } from './features/posts/controller/posts.controller';
 import { Post, PostSchema } from './features/posts/domain/post.entity';
 import { TestingController } from './features/testing/controller/testing.controller';
+import { appSettings } from './settings/appSettings';
+import { AuthController } from './features/auth/controller/auth.controller';
+import { AuthService } from './features/auth/application/auth.service';
+import { AuthCommandsRepository } from './features/auth/repositories/auth.repository.commands';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailService } from './features/mail/application/mail.service';
+import { IsConfirmationCodeActiveConstraint } from './common/IsConfirmationCodeActive';
+import { IsUserByConfirmationCodeExistConstraint } from './common/IsUserByConfirmationCodeExist';
+import { IsEmailNotConfirmedConstraint } from './common/IsEmailNotConfirmed';
+import { IsUserNotExistConstraint } from './common/IsUserNotExist';
+import { IsUserAlreadyExistConstraint } from './common/IsUserAlreadyExist';
+import { IsUserByRecoveryCodeExistConstraint } from './common/IsUserByRecoveryCodeExist';
+import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecoveryCodeUsed';
+import { LocalStrategy } from './features/auth/application/auth.local.strategy';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './features/auth/application/auth.jwt.strategy';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017'),
+    MongooseModule.forRoot(
+      appSettings.env.isTesting()
+        ? appSettings.api.MONGO_CONNECTION_URI_FOR_TESTS
+        : appSettings.api.MONGO_CONNECTION_URI,
+    ),
+    MailerModule.forRoot({
+      transport: {
+        service: 'Mail.ru',
+        auth: {
+          user: appSettings.api.MAIL_USER,
+          pass: appSettings.api.MAIL_PASSWORD,
+        },
+      },
+    }),
     MongooseModule.forFeature([
       {
         name: User.name,
@@ -28,12 +57,18 @@ import { TestingController } from './features/testing/controller/testing.control
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
     ]),
+    JwtModule.register({
+      global: true,
+      secret: appSettings.api.SECRET_JWT_KEY,
+      signOptions: { expiresIn: '5m' },
+    }),
   ],
   controllers: [
     UsersController,
     BlogsController,
     PostsController,
     TestingController,
+    AuthController,
   ],
   providers: [
     UsersService,
@@ -47,6 +82,21 @@ import { TestingController } from './features/testing/controller/testing.control
     PostsService,
     PostsQueryRepository,
     PostsCommandsRepository,
+
+    IsUserNotExistConstraint,
+    IsConfirmationCodeActiveConstraint,
+    IsUserByConfirmationCodeExistConstraint,
+    IsEmailNotConfirmedConstraint,
+    IsUserAlreadyExistConstraint,
+    IsUserByRecoveryCodeExistConstraint,
+    IsPasswordRecoveryCodeUsedConstraint,
+
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    AuthCommandsRepository,
+
+    EmailService,
   ],
 })
 export class AppModule {}

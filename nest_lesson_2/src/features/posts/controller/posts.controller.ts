@@ -48,7 +48,6 @@ export class PostsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: any) {
-    console.log(inputModel);
     const blog = await this.blogsQueryRepository.getById(inputModel.blogId);
 
     if (!blog) {
