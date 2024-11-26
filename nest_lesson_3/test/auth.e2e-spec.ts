@@ -2,23 +2,23 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { testInitSettings } from 'src/common/test-init-settings';
 import { faker } from '@faker-js/faker';
+import { createUserAndLogin } from './helpers/auth.helpers';
 
 describe('Auth tests', () => {
   let app: INestApplication;
   let httpServer;
-  let userMock;
+  let user;
+  let accessToken;
 
   beforeAll(async () => {
     const result = await testInitSettings();
+    const res = await createUserAndLogin(httpServer);
 
     app = result.app;
     httpServer = result.httpServer;
 
-    userMock = {
-      login: faker.person.firstName(),
-      email: faker.internet.email(),
-      password: faker.internet.password({ length: 8 }),
-    };
+    accessToken = res.accessToken;
+    user = res.user;
   });
 
   afterAll(async () => {
@@ -28,7 +28,7 @@ describe('Auth tests', () => {
   test('Valid and non-exist User should return 200', () => {
     return request(httpServer)
       .post('/auth/registration')
-      .send(userMock)
+      .send(user)
       .expect(HttpStatus.NO_CONTENT);
   });
 
@@ -36,7 +36,7 @@ describe('Auth tests', () => {
     const response = await request(httpServer).get('/users');
     const users = response.body.items;
 
-    const found = users.find((user) => user.login === userMock.login);
+    const found = users.find((user) => user.login === user.login);
 
     expect(found).toBeDefined();
   });
@@ -46,8 +46,8 @@ describe('Auth tests', () => {
       .post('/auth/registration')
       .send({
         login: faker.person.firstName(),
-        email: userMock.email,
-        password: userMock.password,
+        email: user.email,
+        password: user.password,
       })
       .expect(HttpStatus.BAD_REQUEST);
   });
@@ -56,9 +56,9 @@ describe('Auth tests', () => {
     return request(httpServer)
       .post('/auth/registration')
       .send({
-        login: userMock.login,
+        login: user.login,
         email: faker.internet.email(),
-        password: userMock.password,
+        password: user.password,
       })
       .expect(HttpStatus.BAD_REQUEST);
   });
