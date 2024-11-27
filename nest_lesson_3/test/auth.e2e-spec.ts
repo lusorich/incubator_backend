@@ -8,16 +8,15 @@ describe('Auth tests', () => {
   let app: INestApplication;
   let httpServer;
   let user;
-  let accessToken;
 
   beforeAll(async () => {
     const result = await testInitSettings();
-    const res = await createUserAndLogin(httpServer);
 
     app = result.app;
     httpServer = result.httpServer;
 
-    accessToken = res.accessToken;
+    const res = await createUserAndLogin(httpServer);
+
     user = res.user;
   });
 
@@ -26,17 +25,26 @@ describe('Auth tests', () => {
   });
 
   test('Valid and non-exist User should return 200', () => {
+    const newUser = {
+      login: faker.person.firstName(),
+      email: faker.internet.email(),
+      password: faker.internet.password({ length: 12 }),
+    };
+
     return request(httpServer)
       .post('/auth/registration')
-      .send(user)
+      .send(newUser)
       .expect(HttpStatus.NO_CONTENT);
   });
 
   test('After registration user should exist in /users', async () => {
-    const response = await request(httpServer).get('/users');
+    const response = await request(httpServer)
+      .get('/users')
+      .set({ Authorization: 'Basic YWRtaW46cXdlcnR5' });
+
     const users = response.body.items;
 
-    const found = users.find((user) => user.login === user.login);
+    const found = users.find((item) => item.login === user.login);
 
     expect(found).toBeDefined();
   });

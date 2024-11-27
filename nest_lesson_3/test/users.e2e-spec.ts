@@ -19,13 +19,11 @@ describe('Users tests', () => {
   });
 
   describe('Auth user tests', () => {
-    let accessToken;
     let user;
 
     beforeAll(async () => {
       const res = await createUserAndLogin(httpServer);
 
-      accessToken = res.accessToken;
       user = res.user;
     });
 
