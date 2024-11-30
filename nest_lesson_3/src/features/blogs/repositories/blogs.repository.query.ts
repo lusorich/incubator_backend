@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
@@ -52,8 +52,12 @@ export class BlogsQueryRepository {
   }
 
   async getById(id: string) {
-    const blog = await this.BlogModel.findById(id);
+    try {
+      const blog = await this.BlogModel.findById(id);
 
-    return blogOutputModelMapper(blog);
+      return blogOutputModelMapper(blog);
+    } catch (e) {
+      return null;
+    }
   }
 }

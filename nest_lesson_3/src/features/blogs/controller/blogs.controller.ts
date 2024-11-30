@@ -17,6 +17,22 @@ import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
 import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
 import { PostsService } from 'src/features/posts/application/posts.service';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
+
+class CreateBlogInputDto {
+  @IsNotEmpty()
+  @Length(1, 15)
+  name: string;
+
+  @IsNotEmpty()
+  @Length(1, 500)
+  description: string;
+
+  @IsNotEmpty()
+  @Length(1, 100)
+  @IsEmail()
+  websiteUrl: string;
+}
 
 @Controller('blogs')
 export class BlogsController {
@@ -51,7 +67,7 @@ export class BlogsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: any) {
+  async createBlog(@Body() inputModel: CreateBlogInputDto) {
     const result = await this.blogsService.create({
       name: inputModel.name,
       description: inputModel.description,
