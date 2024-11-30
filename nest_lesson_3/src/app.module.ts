@@ -32,6 +32,7 @@ import { IsPasswordRecoveryCodeUsedConstraint } from './common/IsPasswordRecover
 import { LocalStrategy } from './features/auth/application/auth.local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './features/auth/application/auth.jwt.strategy';
+import { CommentsService } from './features/comments/application/comments.service';
 
 @Module({
   imports: [
@@ -97,6 +98,8 @@ import { JwtStrategy } from './features/auth/application/auth.jwt.strategy';
     AuthCommandsRepository,
 
     EmailService,
+
+    CommentsService,
   ],
 })
 export class AppModule {}
