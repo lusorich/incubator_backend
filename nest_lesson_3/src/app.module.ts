@@ -33,6 +33,13 @@ import { LocalStrategy } from './features/auth/application/auth.local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './features/auth/application/auth.jwt.strategy';
 import { CommentsService } from './features/comments/application/comments.service';
+import {
+  Comment,
+  CommentSchema,
+} from './features/comments/domain/comment.entity';
+import { CommentsController } from './features/comments/controller/comments.controller';
+import { CommentsCommandsRepository } from './features/comments/repositories/comments.repository.commands';
+import { CommentsQueryRepository } from './features/comments/repositories/comments.repository.query';
 
 @Module({
   imports: [
@@ -57,6 +64,7 @@ import { CommentsService } from './features/comments/application/comments.servic
       },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
+      { name: Comment.name, schema: CommentSchema },
     ]),
     JwtModule.register({
       global: true,
@@ -70,6 +78,7 @@ import { CommentsService } from './features/comments/application/comments.servic
     PostsController,
     TestingController,
     AuthController,
+    CommentsController,
   ],
   providers: [
     UsersService,
@@ -100,6 +109,8 @@ import { CommentsService } from './features/comments/application/comments.servic
     EmailService,
 
     CommentsService,
+    CommentsCommandsRepository,
+    CommentsQueryRepository,
   ],
 })
 export class AppModule {}

@@ -4,14 +4,11 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Request } from 'express';
-import { JwtService } from '@nestjs/jwt';
-import { appSettings } from 'src/settings/appSettings';
 
 @Injectable()
 export class AuthGuardBasic implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();

@@ -11,11 +11,21 @@ import {
   NotFoundException,
   Delete,
   Put,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { PostsService } from '../application/posts.service';
 import { PostsQueryRepository } from '../repositories/posts.repository.query';
 import { BlogsQueryRepository } from 'src/features/blogs/repositories/blogs.repository.query';
+import { IsNotEmpty, Length } from 'class-validator';
+import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
+
+class CreateCommentForPostDto {
+  @IsNotEmpty()
+  @Length(20, 300)
+  content: string;
+}
 
 @Controller('posts')
 export class PostsController {
@@ -63,6 +73,30 @@ export class PostsController {
     });
 
     return this.postsQueryRepository.getById(result);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':postId/comments')
+  @HttpCode(HttpStatus.CREATED)
+  async createCommentForPost(
+    @Param('postId') postId: string,
+    @Body() inputModel: CreateCommentForPostDto,
+    @Request() req,
+  ) {
+    const post = await this.postsQueryRepository.getById(postId);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const createdComment = await this.postsService.createCommentForPost({
+      content: inputModel.content,
+      postId,
+      userId: req.user.userId,
+      userLogin: req.user.login,
+    });
+
+    return createdComment;
   }
 
   @Put(':id')
