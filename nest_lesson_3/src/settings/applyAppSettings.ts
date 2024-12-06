@@ -6,6 +6,7 @@ import {
 import { useContainer } from 'class-validator';
 import { AppModule } from '../app.module';
 import { HttpExceptionFilter } from 'src/common/exception.filter';
+import { MongooseExceptionFilter } from 'src/common/mongoose.exception.filter';
 
 export const applyAppSettings = (app: INestApplication) => {
   // Для внедрения зависимостей в validator constraint
@@ -46,5 +47,8 @@ const setAppPipes = (app: INestApplication) => {
 };
 
 const setAppExceptionsFilters = (app: INestApplication) => {
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(
+    new HttpExceptionFilter(),
+    new MongooseExceptionFilter(),
+  );
 };

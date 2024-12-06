@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PostsCommandsRepository } from '../repositories/posts.repository.commands';
 import { CommentsService } from 'src/features/comments/application/comments.service';
+import { CommentsQueryRepository } from 'src/features/comments/repositories/comments.repository.query';
 
 @Injectable()
 export class PostsService {
   constructor(
     private postsCommandsRepository: PostsCommandsRepository,
     private commentsService: CommentsService,
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   async create({ title, shortDescription, content, blogId, blogName }) {
@@ -19,6 +21,13 @@ export class PostsService {
     });
 
     return result.id;
+  }
+
+  async getPostComments({ paginationParams, id }) {
+    return await this.commentsQueryRepository.getPostComments({
+      paginationParams,
+      postId: id,
+    });
   }
 
   async createCommentForPost({ content, postId, userId, userLogin }) {

@@ -99,6 +99,34 @@ export class PostsController {
     return createdComment;
   }
 
+  @Get(':id/comments')
+  async getPostComments(
+    @Param('id') id: string,
+    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
+    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
+    sortDirection: string,
+    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
+    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+  ) {
+    const post = await this.postsQueryRepository.getById(id);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const result = await this.postsService.getPostComments({
+      paginationParams: {
+        sortBy,
+        sortDirection,
+        pageSize,
+        pageNumber,
+      },
+      id,
+    });
+
+    return result;
+  }
+
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(@Param('id') id: string, @Body() inputModel: any) {

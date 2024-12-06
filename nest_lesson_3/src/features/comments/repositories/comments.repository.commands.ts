@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   Comment,
@@ -21,6 +21,19 @@ export class CommentsCommandsRepository {
     });
 
     return this.save(comment);
+  }
+
+  async updateComment({ id, content }) {
+    return this.CommentModel.updateOne(
+      { _id: id },
+      {
+        $set: { content },
+      },
+    );
+  }
+
+  async deleteComment({ id }) {
+    return this.CommentModel.deleteOne({ _id: id });
   }
 
   save(comment: CommentDocument) {

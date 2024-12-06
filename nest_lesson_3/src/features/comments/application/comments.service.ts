@@ -25,4 +25,12 @@ export class CommentsService {
 
     return outputComment;
   }
+
+  async updateComment({ id, content }) {
+    return await this.commentsCommandsRepository.updateComment({ id, content });
+  }
+
+  async deleteComment({ id }) {
+    return await this.commentsCommandsRepository.deleteComment({ id });
+  }
 }
