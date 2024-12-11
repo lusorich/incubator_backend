@@ -25,12 +25,12 @@ export class Like {
   @Prop()
   createdAt: Date;
 
-  static createLike({ user, parentId, likeStatus }) {
+  static createLike({ user, parentId }) {
     const like = new this();
 
     like.parentId = parentId;
     like.user = user;
-    like.status = likeStatus;
+    like.status = LIKE_STATUS.None;
     like.createdAt = new Date();
 
     return like;
@@ -47,11 +47,9 @@ type LikeModelStaticType = {
   createLike: ({
     user,
     parentId,
-    status,
   }: {
     user: LikeUser;
     parentId: string;
-    status: LIKE_STATUS;
   }) => LikeDocument;
 };
 
