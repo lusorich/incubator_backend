@@ -12,14 +12,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/comments.repository.query';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty, IsEnum, Length } from 'class-validator';
 import { CommentsService } from '../application/comments.service';
 import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
+import { LIKE_STATUS } from 'src/common/enums';
 
 class UpdateCommentInputDto {
   @IsNotEmpty()
   @Length(20, 300)
   content: string;
+}
+
+class UpdateLikeStatusInputDto {
+  @IsNotEmpty()
+  @IsEnum(LIKE_STATUS)
+  likeStatus: string;
 }
 
 @Controller('comments')
@@ -51,6 +58,20 @@ export class CommentsController {
       id,
       content: userInput.content,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateLikeStatus(
+    @Param('id') id: string,
+    @Body() userInput: UpdateLikeStatusInputDto,
+  ) {
+    const comment = this.commentsQueryRepository.getById(id);
+
+    if (!comment) {
+      throw new NotFoundException();
+    }
   }
 
   @UseGuards(JwtAuthGuard)

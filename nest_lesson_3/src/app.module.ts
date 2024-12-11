@@ -40,6 +40,7 @@ import {
 import { CommentsController } from './features/comments/controller/comments.controller';
 import { CommentsCommandsRepository } from './features/comments/repositories/comments.repository.commands';
 import { CommentsQueryRepository } from './features/comments/repositories/comments.repository.query';
+import { IsCommentExistConstraint } from './common/IsCommentExist';
 
 @Module({
   imports: [
@@ -100,6 +101,7 @@ import { CommentsQueryRepository } from './features/comments/repositories/commen
     IsUserAlreadyExistConstraint,
     IsUserByRecoveryCodeExistConstraint,
     IsPasswordRecoveryCodeUsedConstraint,
+    IsCommentExistConstraint,
 
     AuthService,
     LocalStrategy,

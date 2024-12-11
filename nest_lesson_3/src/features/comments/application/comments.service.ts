@@ -26,6 +26,13 @@ export class CommentsService {
     return outputComment;
   }
 
+  async updateCommentLikeStatus({ id, likeStatus }) {
+    //  return await this.commentsCommandsRepository.updateCommentLikeStatus({
+    // id,
+    // likeStatus,
+    // });
+  }
+
   async updateComment({ id, content }) {
     return await this.commentsCommandsRepository.updateComment({ id, content });
   }
