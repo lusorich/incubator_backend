@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
@@ -9,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/comments.repository.query';
@@ -16,6 +16,7 @@ import { IsNotEmpty, IsEnum, Length } from 'class-validator';
 import { CommentsService } from '../application/comments.service';
 import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
 import { LIKE_STATUS } from 'src/common/enums';
+import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
 
 class UpdateCommentInputDto {
   @IsNotEmpty()
@@ -34,9 +35,11 @@ export class CommentsController {
   constructor(
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly commentsService: CommentsService,
+    private readonly likesQueryRepository: LikesQueryRepository,
   ) {}
 
   @Get(':id')
+  //Если передан req.user ищем лайки, иначе Нон
   async getComment(@Param('id') id: string) {
     return await this.commentsQueryRepository.getById(id);
   }
@@ -61,17 +64,34 @@ export class CommentsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
+  @Put(':id/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
     @Param('id') id: string,
     @Body() userInput: UpdateLikeStatusInputDto,
+    @Req() req,
   ) {
-    const comment = this.commentsQueryRepository.getById(id);
+    await this.commentsQueryRepository.getById(id);
 
-    if (!comment) {
-      throw new NotFoundException();
+    const like = await this.likesQueryRepository.getByParentId(id, req.user);
+
+    if (like) {
+      await this.commentsService.updateCommentLikeStatus({
+        id,
+        likeStatus: userInput.likeStatus,
+        user: req.user,
+      });
+    } else {
+      await this.commentsService.createCommentLikeStatus({
+        id,
+        user: req.user,
+        likeStatus: userInput.likeStatus,
+      });
     }
+
+    await this.commentsService.recalculateLikes({
+      parentId: id,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

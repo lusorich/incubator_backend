@@ -41,6 +41,10 @@ import { CommentsController } from './features/comments/controller/comments.cont
 import { CommentsCommandsRepository } from './features/comments/repositories/comments.repository.commands';
 import { CommentsQueryRepository } from './features/comments/repositories/comments.repository.query';
 import { IsCommentExistConstraint } from './common/IsCommentExist';
+import { LikesService } from './features/likes/application/likes.service';
+import { LikesCommandsRepository } from './features/likes/repositories/likes.repository.commands';
+import { LikesQueryRepository } from './features/likes/repositories/likes.repository.query';
+import { Like, LikeSchema } from './features/likes/domain/like.entity';
 
 @Module({
   imports: [
@@ -66,6 +70,7 @@ import { IsCommentExistConstraint } from './common/IsCommentExist';
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Like.name, schema: LikeSchema },
     ]),
     JwtModule.register({
       global: true,
@@ -113,6 +118,10 @@ import { IsCommentExistConstraint } from './common/IsCommentExist';
     CommentsService,
     CommentsCommandsRepository,
     CommentsQueryRepository,
+
+    LikesService,
+    LikesCommandsRepository,
+    LikesQueryRepository,
   ],
 })
 export class AppModule {}

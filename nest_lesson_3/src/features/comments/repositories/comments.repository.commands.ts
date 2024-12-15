@@ -32,6 +32,18 @@ export class CommentsCommandsRepository {
     );
   }
 
+  async updateCommentLikes({ id, likes, dislikes }) {
+    return this.CommentModel.updateOne(
+      { _id: id },
+      {
+        $set: {
+          'likesInfo.likesCount': likes,
+          'likesInfo.dislikesCount': dislikes,
+        },
+      },
+    );
+  }
+
   async deleteComment({ id }) {
     return this.CommentModel.deleteOne({ _id: id });
   }

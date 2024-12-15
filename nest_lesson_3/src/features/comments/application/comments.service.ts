@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsCommandsRepository } from '../repositories/comments.repository.commands';
 import { CommentsQueryRepository } from '../repositories/comments.repository.query';
+import { LikesService } from 'src/features/likes/application/likes.service';
+import { LIKE_STATUS } from 'src/common/enums';
 
 @Injectable()
 export class CommentsService {
   constructor(
     private commentsCommandsRepository: CommentsCommandsRepository,
-
+    private likesService: LikesService,
     private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
@@ -26,11 +28,39 @@ export class CommentsService {
     return outputComment;
   }
 
-  async updateCommentLikeStatus({ id, likeStatus }) {
-    //  return await this.commentsCommandsRepository.updateCommentLikeStatus({
-    // id,
-    // likeStatus,
-    // });
+  async updateCommentLikeStatus({ id, likeStatus, user }) {
+    return await this.likesService.updateLike({
+      parentId: id,
+      likeStatus,
+      user,
+    });
+  }
+
+  async createCommentLikeStatus({ id, user, likeStatus }) {
+    return await this.likesService.createLike({
+      user,
+      parentId: id,
+      likeStatus,
+    });
+  }
+
+  async recalculateLikes({ parentId }) {
+    const allCommentLikes = await this.likesService.getLikesByParentId({
+      parentId,
+    });
+
+    const likes = allCommentLikes.filter(
+      (like) => like.likeStatus === LIKE_STATUS.Like,
+    );
+    const dislikes = allCommentLikes.filter(
+      (like) => like.likeStatus === LIKE_STATUS.Dislike,
+    );
+
+    return await this.commentsCommandsRepository.updateCommentLikes({
+      likes: likes.length,
+      dislikes: dislikes.length,
+      id: parentId,
+    });
   }
 
   async updateComment({ id, content }) {

@@ -7,13 +7,20 @@ import { Like } from '../domain/like.entity';
 export class LikesQueryRepository {
   constructor(@InjectModel(Like.name) private LikeModel: Model<Like>) {}
 
-  async getByParentId(parentId: string) {
-    const like = await this.LikeModel.findOne({ parentId });
+  async getByParentId(parentId: string, user) {
+    const like = await this.LikeModel.findOne({
+      parentId,
+      'user.login': user.login,
+    });
 
     if (!like) {
-      throw new NotFoundException();
+      return null;
     }
 
     return like;
+  }
+
+  async getLikesByParentId(parentId: string) {
+    return await this.LikeModel.find({ parentId });
   }
 }

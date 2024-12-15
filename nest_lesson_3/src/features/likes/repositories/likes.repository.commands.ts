@@ -6,15 +6,15 @@ import { Like, LikeDocument, LikeModelType } from '../domain/like.entity';
 export class LikesCommandsRepository {
   constructor(@InjectModel(Like.name) private LikeModel: LikeModelType) {}
 
-  async createLike({ parentId, user }) {
-    const like = this.LikeModel.createLike({ parentId, user });
+  async createLike({ parentId, user, likeStatus }) {
+    const like = this.LikeModel.createLike({ parentId, user, likeStatus });
 
     return this.save(like);
   }
 
   async updateLike({ parentId, likeStatus, user }) {
     return this.LikeModel.updateOne(
-      { $and: [parentId, { user: { userId: user.id } }] },
+      { $and: [{ parentId }, { 'user.login': user.login }] },
       {
         $set: { likeStatus },
       },
