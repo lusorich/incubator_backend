@@ -28,6 +28,23 @@ export class CommentsService {
     return outputComment;
   }
 
+  async getCommentWithCurrentUserLikeStatus({ id, user }) {
+    const comment = await this.commentsQueryRepository.getById(id);
+
+    if (user) {
+      const userLike = await this.likesService.getLikesByUserAndParentId({
+        parentId: id,
+        user,
+      });
+
+      comment.likesInfo.likeStatus = userLike.likeStatus;
+
+      return comment;
+    }
+
+    return comment;
+  }
+
   async updateCommentLikeStatus({ id, likeStatus, user }) {
     return await this.likesService.updateLike({
       parentId: id,

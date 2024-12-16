@@ -28,4 +28,8 @@ export class LikesService {
   async getLikesByParentId({ parentId }) {
     return this.likesQueryRepository.getLikesByParentId(parentId);
   }
+
+  async getLikesByUserAndParentId({ user, parentId }) {
+    return this.likesQueryRepository.getByParentId(parentId, user);
+  }
 }
