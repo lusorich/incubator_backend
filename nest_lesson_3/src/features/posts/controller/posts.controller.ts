@@ -13,18 +13,28 @@ import {
   Put,
   UseGuards,
   Request,
+  Req,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { PostsService } from '../application/posts.service';
 import { PostsQueryRepository } from '../repositories/posts.repository.query';
 import { BlogsQueryRepository } from 'src/features/blogs/repositories/blogs.repository.query';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsEnum, IsNotEmpty, Length } from 'class-validator';
 import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { LIKE_STATUS } from 'src/common/enums';
+import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()
   @Length(20, 300)
   content: string;
+}
+
+class UpdateLikeStatusInputDto {
+  @IsNotEmpty()
+  @IsEnum(LIKE_STATUS)
+  likeStatus: string;
 }
 
 @Controller('posts')
@@ -33,6 +43,8 @@ export class PostsController {
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
     private readonly blogsQueryRepository: BlogsQueryRepository,
+    private readonly jwtService: JwtService,
+    private readonly likesQueryRepository: LikesQueryRepository,
   ) {}
 
   @Get()
@@ -99,6 +111,37 @@ export class PostsController {
     return createdComment;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateLikeStatus(
+    @Param('id') id: string,
+    @Body() userInput: UpdateLikeStatusInputDto,
+    @Req() req,
+  ) {
+    await this.postsQueryRepository.getById(id);
+
+    const like = await this.likesQueryRepository.getByParentId(id, req.user);
+
+    if (like) {
+      await this.postsService.updatePostLikeStatus({
+        id,
+        likeStatus: userInput.likeStatus,
+        user: req.user,
+      });
+    } else {
+      await this.postsService.createPostLikeStatus({
+        id,
+        user: req.user,
+        likeStatus: userInput.likeStatus,
+      });
+    }
+
+    await this.postsService.recalculateLikes({
+      parentId: id,
+    });
+  }
+
   @Get(':id/comments')
   async getPostComments(
     @Param('id') id: string,
@@ -107,12 +150,22 @@ export class PostsController {
     sortDirection: string,
     @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Req() req,
   ) {
     const post = await this.postsQueryRepository.getById(id);
 
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+
+    const bearer = req.headers.authorization.replace('Bearer ', '');
+    let user = null;
+
+    try {
+      const verified = this.jwtService.verify(bearer);
+
+      user = verified;
+    } catch (e) {}
 
     const result = await this.postsService.getPostComments({
       paginationParams: {

@@ -17,7 +17,6 @@ import { CommentsService } from '../application/comments.service';
 import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
 import { LIKE_STATUS } from 'src/common/enums';
 import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
-import { JwtStrategy } from 'src/features/auth/application/auth.jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 
 class UpdateCommentInputDto {
@@ -38,18 +37,23 @@ export class CommentsController {
     private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly commentsService: CommentsService,
     private readonly likesQueryRepository: LikesQueryRepository,
-    private readonly JwtStrategy: JwtStrategy,
     private readonly jwtService: JwtService,
   ) {}
 
   @Get(':id')
   async getComment(@Param('id') id: string, @Req() req) {
     const bearer = req.headers.authorization.replace('Bearer ', '');
-    const decodeToken = this.jwtService.decode(bearer);
+    let user = null;
+
+    try {
+      const verified = this.jwtService.verify(bearer);
+
+      user = verified;
+    } catch (e) {}
 
     return await this.commentsService.getCommentWithCurrentUserLikeStatus({
       id,
-      user: req?.user ?? null,
+      user: user ?? null,
     });
   }
 

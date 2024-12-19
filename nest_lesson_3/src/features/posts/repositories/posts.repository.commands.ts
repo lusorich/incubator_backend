@@ -18,6 +18,18 @@ export class PostsCommandsRepository {
     return this.save(post);
   }
 
+  async updateCommentLikes({ id, likes, dislikes }) {
+    return this.PostModel.updateOne(
+      { _id: id },
+      {
+        $set: {
+          'extendedLikesInfo.likesCount': likes,
+          'extendedLikesInfo.dislikesCount': dislikes,
+        },
+      },
+    );
+  }
+
   async update({ newData, id }) {
     return this.PostModel.updateOne({ _id: id }, { ...newData });
   }
