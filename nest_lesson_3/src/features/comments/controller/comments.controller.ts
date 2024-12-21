@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -63,11 +64,16 @@ export class CommentsController {
   async updateComment(
     @Param('id') id: string,
     @Body() userInput: UpdateCommentInputDto,
+    @Req() req,
   ) {
     const comment = await this.commentsQueryRepository.getById(id);
 
     if (!comment) {
       throw new NotFoundException();
+    }
+
+    if (comment.commentatorInfo.userLogin !== req.user.login) {
+      throw new ForbiddenException();
     }
 
     return await this.commentsService.updateComment({

@@ -21,6 +21,6 @@ export class LikesQueryRepository {
   }
 
   async getLikesByParentId(parentId: string) {
-    return await this.LikeModel.find({ parentId });
+    return await this.LikeModel.find({ parentId }).sort({ createdAt: -1 });
   }
 }

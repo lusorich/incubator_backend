@@ -4,10 +4,12 @@ import { CommentsService } from 'src/features/comments/application/comments.serv
 import { CommentsQueryRepository } from 'src/features/comments/repositories/comments.repository.query';
 import { LikesService } from 'src/features/likes/application/likes.service';
 import { LIKE_STATUS } from 'src/common/enums';
+import { PostsQueryRepository } from '../repositories/posts.repository.query';
 
 @Injectable()
 export class PostsService {
   constructor(
+    private postsQueryRepository: PostsQueryRepository,
     private postsCommandsRepository: PostsCommandsRepository,
     private commentsService: CommentsService,
     private commentsQueryRepository: CommentsQueryRepository,
@@ -26,11 +28,61 @@ export class PostsService {
     return result.id;
   }
 
-  async getPostComments({ paginationParams, id }) {
-    return await this.commentsQueryRepository.getPostComments({
+  async getPosts({ paginationParams, user }) {
+    const posts = await this.postsQueryRepository.getPosts({
+      paginationParams,
+    });
+
+    if (user) {
+      await new Promise((res) => {
+        posts.items.map(async (post, index) => {
+          const userLikeForPost =
+            await this.likesService.getLikesByUserAndParentId({
+              user,
+              parentId: post.id,
+            });
+
+          if (userLikeForPost) {
+            post.extendedLikesInfo.myStatus = userLikeForPost.likeStatus;
+          }
+
+          if (index === posts.items.length - 1) {
+            res('');
+          }
+        });
+      });
+    }
+
+    return posts;
+  }
+
+  async getPostComments({ paginationParams, id, user }) {
+    const comments = await this.commentsQueryRepository.getPostComments({
       paginationParams,
       postId: id,
     });
+
+    if (user) {
+      await new Promise((res) => {
+        comments.items.map(async (comment, index) => {
+          const userLikeForComment =
+            await this.likesService.getLikesByUserAndParentId({
+              user,
+              parentId: comment.id,
+            });
+
+          if (userLikeForComment) {
+            comment.likesInfo.myStatus = userLikeForComment.likeStatus;
+          }
+
+          if (index === comments.items.length - 1) {
+            res('');
+          }
+        });
+      });
+    }
+
+    return comments;
   }
 
   async createCommentForPost({ content, postId, userId, userLogin }) {
@@ -61,21 +113,35 @@ export class PostsService {
   }
 
   async recalculateLikes({ parentId }) {
-    const allCommentLikes = await this.likesService.getLikesByParentId({
+    const allPostLikes = await this.likesService.getLikesByParentId({
       parentId,
     });
 
-    const likes = allCommentLikes.filter(
+    const likes = allPostLikes.filter(
       (like) => like.likeStatus === LIKE_STATUS.Like,
     );
-    const dislikes = allCommentLikes.filter(
+    const dislikes = allPostLikes.filter(
       (like) => like.likeStatus === LIKE_STATUS.Dislike,
     );
 
-    return await this.postsCommandsRepository.updateCommentLikes({
+    const newestLikes = likes.reduce((acc, val, index) => {
+      if (index < 3) {
+        acc.push({
+          addedAt: val.createdAt,
+          //@ts-ignore
+          userId: val.user._id,
+          userLogin: val.user.login,
+        });
+      }
+
+      return acc;
+    }, []);
+
+    return await this.postsCommandsRepository.updatePostLike({
       likes: likes.length,
       dislikes: dislikes.length,
       id: parentId,
+      newestLikes,
     });
   }
 

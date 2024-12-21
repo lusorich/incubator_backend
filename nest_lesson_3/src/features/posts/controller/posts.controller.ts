@@ -54,14 +54,25 @@ export class PostsController {
     sortDirection: string,
     @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Req() req,
   ) {
-    const result = await this.postsQueryRepository.getPosts({
+    const bearer = req.headers.authorization.replace('Bearer ', '');
+    let user = null;
+
+    try {
+      const verified = this.jwtService.verify(bearer);
+
+      user = verified;
+    } catch (e) {}
+
+    const result = await this.postsService.getPosts({
       paginationParams: {
         sortBy,
         sortDirection,
         pageSize,
         pageNumber,
       },
+      user,
     });
 
     return result;
@@ -119,7 +130,11 @@ export class PostsController {
     @Body() userInput: UpdateLikeStatusInputDto,
     @Req() req,
   ) {
-    await this.postsQueryRepository.getById(id);
+    const post = await this.postsQueryRepository.getById(id);
+
+    if (!post) {
+      throw new NotFoundException('post not found');
+    }
 
     const like = await this.likesQueryRepository.getByParentId(id, req.user);
 
@@ -175,6 +190,7 @@ export class PostsController {
         pageNumber,
       },
       id,
+      user,
     });
 
     return result;
@@ -193,11 +209,27 @@ export class PostsController {
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string) {
+  async getPostById(@Param('id') id: string, @Req() req) {
     const post = await this.postsQueryRepository.getById(id);
 
     if (!post) {
       throw new NotFoundException('Post not found');
+    }
+
+    const bearer = req.headers.authorization?.replace?.('Bearer ', '');
+    let user = null;
+
+    try {
+      const verified = this.jwtService.verify(bearer);
+
+      user = verified;
+    } catch (e) {}
+
+    if (user) {
+      const postLike = await this.likesQueryRepository.getByParentId(id, user);
+
+      post.extendedLikesInfo.myStatus =
+        postLike?.likeStatus || LIKE_STATUS.None;
     }
 
     return post;
