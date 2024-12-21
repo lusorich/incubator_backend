@@ -87,4 +87,8 @@ export class CommentsService {
   async deleteComment({ id }) {
     return await this.commentsCommandsRepository.deleteComment({ id });
   }
+
+  async deleteAll() {
+    return await this.commentsCommandsRepository.deleteAll();
+  }
 }

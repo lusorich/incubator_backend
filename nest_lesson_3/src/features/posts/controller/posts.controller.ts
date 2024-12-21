@@ -24,6 +24,7 @@ import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { LIKE_STATUS } from 'src/common/enums';
 import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
+import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()
@@ -78,6 +79,7 @@ export class PostsController {
     return result;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: any) {
@@ -196,6 +198,7 @@ export class PostsController {
     return result;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(@Param('id') id: string, @Body() inputModel: any) {
@@ -235,6 +238,7 @@ export class PostsController {
     return post;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') id: number) {

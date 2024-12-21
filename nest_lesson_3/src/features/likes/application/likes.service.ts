@@ -32,4 +32,8 @@ export class LikesService {
   async getLikesByUserAndParentId({ user, parentId }) {
     return this.likesQueryRepository.getByParentId(parentId, user);
   }
+
+  async deleteAll() {
+    return this.likesCommandsRepository.deleteAll();
+  }
 }

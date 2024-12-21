@@ -11,13 +11,16 @@ import {
   NotFoundException,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
 import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
 import { PostsService } from 'src/features/posts/application/posts.service';
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsUrl, Length } from 'class-validator';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
@@ -30,7 +33,7 @@ class CreateBlogInputDto {
 
   @IsNotEmpty()
   @Length(1, 100)
-  @IsEmail()
+  @IsUrl()
   websiteUrl: string;
 }
 
@@ -65,6 +68,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: CreateBlogInputDto) {
@@ -77,6 +81,7 @@ export class BlogsController {
     return this.blogsQueryRepository.getById(result);
   }
 
+  @UseGuards(AuthGuardBasic)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(@Param('id') id: string, @Body() inputModel: any) {
@@ -100,6 +105,7 @@ export class BlogsController {
     return blog;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: number) {
@@ -138,6 +144,7 @@ export class BlogsController {
     return result;
   }
 
+  @UseGuards(AuthGuardBasic)
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostByBlog(@Param('id') id: string, @Body() inputModel: any) {

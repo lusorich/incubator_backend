@@ -51,4 +51,8 @@ export class CommentsCommandsRepository {
   save(comment: CommentDocument) {
     return comment.save();
   }
+
+  deleteAll() {
+    return this.CommentModel.deleteMany({});
+  }
 }

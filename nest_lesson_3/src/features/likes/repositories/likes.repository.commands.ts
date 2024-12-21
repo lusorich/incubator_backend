@@ -28,4 +28,8 @@ export class LikesCommandsRepository {
   save(like: LikeDocument) {
     return like.save();
   }
+
+  async deleteAll() {
+    return this.LikeModel.deleteMany({});
+  }
 }
