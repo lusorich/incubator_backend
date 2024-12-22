@@ -25,9 +25,11 @@ import { JwtService } from '@nestjs/jwt';
 import { LIKE_STATUS } from 'src/common/enums';
 import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
+import { Trim } from 'src/common/trim.decorator';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()
+  @Trim()
   @Length(20, 300)
   content: string;
 }

@@ -19,7 +19,7 @@ export class BlogsService {
     await this.blogsCommandsRepository.update({ newData, id });
   }
 
-  async delete(id: number) {
+  async delete(id) {
     const result = await this.blogsCommandsRepository.delete(id);
 
     return result;

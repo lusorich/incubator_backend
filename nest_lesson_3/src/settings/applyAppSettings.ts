@@ -7,6 +7,7 @@ import { useContainer } from 'class-validator';
 import { AppModule } from '../app.module';
 import { HttpExceptionFilter } from 'src/common/exception.filter';
 import { MongooseExceptionFilter } from 'src/common/mongoose.exception.filter';
+import * as cookieParser from 'cookie-parser';
 
 export const applyAppSettings = (app: INestApplication) => {
   // Для внедрения зависимостей в validator constraint
@@ -18,6 +19,7 @@ export const applyAppSettings = (app: INestApplication) => {
 
   setAppExceptionsFilters(app);
 
+  app.use(cookieParser());
   app.enableCors();
 };
 

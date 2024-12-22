@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
@@ -21,6 +22,7 @@ import { IsUserByRecoveryCodeExist } from 'src/common/IsUserByRecoveryCodeExist'
 import { IsPasswordRecoveryCodeUsed } from 'src/common/IsPasswordRecoveryCodeUsed';
 import { LocalAuthGuard } from '../application/local.auth.guard';
 import { JwtAuthGuard } from '../application/jwt.auth.guard';
+import { Trim } from 'src/common/trim.decorator';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -34,6 +36,7 @@ class RegistrationInputDto {
   email: string;
 
   @IsNotEmpty()
+  @Trim()
   @Length(6, 20)
   password: string;
 }
@@ -91,7 +94,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async userLogin(@Request() req, @Body() userInput: UserLoginInputDto) {
+  async userLogin(@Request() req, @Res({ passthrough: true }) res) {
+    res.cookie('refreshToken', '.', { httpOnly: true, secure: true });
     return this.authService.login(req.user);
   }
 

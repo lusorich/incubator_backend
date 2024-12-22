@@ -24,7 +24,7 @@ export class BlogsCommandsRepository {
     return blog.save();
   }
 
-  async delete(id: number) {
+  async delete(id) {
     return this.BlogModel.deleteOne({ _id: id });
   }
 

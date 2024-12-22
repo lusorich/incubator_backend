@@ -18,16 +18,18 @@ import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
 import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
 import { PostsService } from 'src/features/posts/application/posts.service';
-import { IsEmail, IsNotEmpty, IsUrl, Length } from 'class-validator';
-import { AuthGuard } from '@nestjs/passport';
+import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
+import { Trim } from 'src/common/trim.decorator';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
+  @Trim()
   @Length(1, 15)
   name: string;
 
   @IsNotEmpty()
+  @Trim()
   @Length(1, 500)
   description: string;
 
@@ -84,7 +86,10 @@ export class BlogsController {
   @UseGuards(AuthGuardBasic)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(@Param('id') id: string, @Body() inputModel: any) {
+  async updateBlog(
+    @Param('id') id: string,
+    @Body() inputModel: CreateBlogInputDto,
+  ) {
     const blog = await this.blogsQueryRepository.getById(id);
 
     if (!blog) {
@@ -103,17 +108,6 @@ export class BlogsController {
     }
 
     return blog;
-  }
-
-  @UseGuards(AuthGuardBasic)
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: number) {
-    const result = await this.blogsService.delete(id);
-
-    if (result.deletedCount < 1) {
-      throw new NotFoundException('Blog not found');
-    }
   }
 
   @Get(':id/posts')
@@ -165,5 +159,18 @@ export class BlogsController {
     });
 
     return await this.postsQueryRepository.getById(post);
+  }
+
+  @UseGuards(AuthGuardBasic)
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBlog(@Param('id') id: string) {
+    const blog = await this.blogsQueryRepository.getById(id);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    return await this.blogsService.delete(id);
   }
 }

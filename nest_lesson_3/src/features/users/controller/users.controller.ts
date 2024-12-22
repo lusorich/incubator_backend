@@ -17,6 +17,7 @@ import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
+import { Trim } from 'src/common/trim.decorator';
 
 class CreateUserInputDto {
   @IsNotEmpty()
@@ -28,6 +29,7 @@ class CreateUserInputDto {
   email: string;
 
   @IsNotEmpty()
+  @Trim()
   @Length(6, 20)
   password: string;
 }
