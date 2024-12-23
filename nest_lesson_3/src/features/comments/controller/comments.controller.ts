@@ -43,7 +43,7 @@ export class CommentsController {
 
   @Get(':id')
   async getComment(@Param('id') id: string, @Req() req) {
-    const bearer = req.headers.authorization.replace('Bearer ', '');
+    const bearer = req?.headers?.authorization?.replace('Bearer ', '');
     let user = null;
 
     try {

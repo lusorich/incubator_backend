@@ -130,7 +130,7 @@ export class PostsService {
           addedAt: val.createdAt,
           //@ts-ignore
           userId: val.user._id,
-          userLogin: val.user.login,
+          login: val.user.login,
         });
       }
 

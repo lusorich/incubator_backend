@@ -59,7 +59,7 @@ export class PostsController {
     @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
     @Req() req,
   ) {
-    const bearer = req.headers.authorization.replace('Bearer ', '');
+    const bearer = req?.headers?.authorization?.replace('Bearer ', '');
     let user = null;
 
     try {
@@ -177,7 +177,7 @@ export class PostsController {
       throw new NotFoundException('Post not found');
     }
 
-    const bearer = req.headers.authorization.replace('Bearer ', '');
+    const bearer = req?.headers?.authorization?.replace('Bearer ', '');
     let user = null;
 
     try {
@@ -221,7 +221,7 @@ export class PostsController {
       throw new NotFoundException('Post not found');
     }
 
-    const bearer = req.headers.authorization?.replace?.('Bearer ', '');
+    const bearer = req.headers?.authorization?.replace?.('Bearer ', '');
     let user = null;
 
     try {

@@ -37,7 +37,7 @@ export class CommentsService {
         user,
       });
 
-      comment.likesInfo.myStatus = userLike.likeStatus;
+      comment.likesInfo.myStatus = userLike?.likeStatus || LIKE_STATUS.None;
 
       return comment;
     }

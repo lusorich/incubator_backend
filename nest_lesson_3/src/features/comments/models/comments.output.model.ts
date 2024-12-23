@@ -8,7 +8,10 @@ export const commentOutputModelMapper = (comment?: CommentDocument | null) => {
   return {
     id: comment.id,
     content: comment.content,
-    commentatorInfo: comment.commentatorInfo,
+    commentatorInfo: {
+      userId: comment.commentatorInfo.userId,
+      userLogin: comment.commentatorInfo.userLogin,
+    },
     createdAt: comment.createdAt,
     likesInfo: comment.likesInfo,
   };

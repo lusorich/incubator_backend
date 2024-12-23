@@ -16,7 +16,7 @@ export class LikesCommandsRepository {
     return this.LikeModel.updateOne(
       { $and: [{ parentId }, { 'user.login': user.login }] },
       {
-        $set: { likeStatus },
+        $set: { likeStatus, createdAt: new Date() },
       },
     );
   }
