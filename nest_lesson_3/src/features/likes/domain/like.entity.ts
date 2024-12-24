@@ -28,8 +28,8 @@ export class Like {
   static createLike({ user, parentId, likeStatus }) {
     const like = new this();
 
+    like.user = { id: user.userId, login: user.login };
     like.parentId = parentId;
-    like.user = user;
     like.likeStatus = likeStatus;
     like.createdAt = new Date();
 

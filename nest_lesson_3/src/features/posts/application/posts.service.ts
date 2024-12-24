@@ -128,8 +128,7 @@ export class PostsService {
       if (index < 3) {
         acc.push({
           addedAt: val.createdAt,
-          //@ts-ignore
-          userId: val.user._id,
+          userId: val.user.id,
           login: val.user.login,
         });
       }
@@ -149,7 +148,7 @@ export class PostsService {
     await this.postsCommandsRepository.update({ newData, id });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     const result = await this.postsCommandsRepository.delete(id);
 
     return result;

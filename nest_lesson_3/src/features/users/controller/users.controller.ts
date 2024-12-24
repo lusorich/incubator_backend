@@ -18,14 +18,17 @@ import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
+import { IsUserNotExist } from 'src/common/IsUserNotExist';
 
 class CreateUserInputDto {
   @IsNotEmpty()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)
+  @IsUserNotExist({ message: 'User already exist' })
   login: string;
 
   @IsEmail()
+  @IsUserNotExist({ message: 'User already exist' })
   email: string;
 
   @IsNotEmpty()

@@ -45,6 +45,7 @@ import { LikesService } from './features/likes/application/likes.service';
 import { LikesCommandsRepository } from './features/likes/repositories/likes.repository.commands';
 import { LikesQueryRepository } from './features/likes/repositories/likes.repository.query';
 import { Like, LikeSchema } from './features/likes/domain/like.entity';
+import { IsBlogExistConstraint } from './common/IsBlogExist';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { Like, LikeSchema } from './features/likes/domain/like.entity';
     IsUserByRecoveryCodeExistConstraint,
     IsPasswordRecoveryCodeUsedConstraint,
     IsCommentExistConstraint,
+    IsBlogExistConstraint,
 
     AuthService,
     LocalStrategy,

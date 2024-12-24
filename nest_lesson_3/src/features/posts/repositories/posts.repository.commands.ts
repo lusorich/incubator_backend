@@ -39,7 +39,7 @@ export class PostsCommandsRepository {
     return post.save();
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.PostModel.deleteOne({ _id: id });
   }
 

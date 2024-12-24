@@ -14,6 +14,7 @@ import {
   UseGuards,
   Request,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { PostsService } from '../application/posts.service';
@@ -26,6 +27,7 @@ import { LIKE_STATUS } from 'src/common/enums';
 import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
+import { IsBlogExist } from 'src/common/IsBlogExist';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()
@@ -38,6 +40,27 @@ class UpdateLikeStatusInputDto {
   @IsNotEmpty()
   @IsEnum(LIKE_STATUS)
   likeStatus: string;
+}
+
+class CreatePostInputDto {
+  @IsNotEmpty()
+  @Trim()
+  @Length(0, 30)
+  title: string;
+
+  @IsNotEmpty()
+  @Trim()
+  @Length(0, 100)
+  shortDescription: string;
+
+  @IsNotEmpty()
+  @Trim()
+  @Length(0, 1000)
+  content: string;
+
+  @IsNotEmpty()
+  @IsBlogExist({ message: 'Blog doesnt exist' })
+  blogId: string;
 }
 
 @Controller('posts')
@@ -84,12 +107,8 @@ export class PostsController {
   @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createPost(@Body() inputModel: any) {
+  async createPost(@Body() inputModel: CreatePostInputDto) {
     const blog = await this.blogsQueryRepository.getById(inputModel.blogId);
-
-    if (!blog) {
-      throw new NotFoundException('Blog not found');
-    }
 
     const result = await this.postsService.create({
       title: inputModel.title,
@@ -243,11 +262,13 @@ export class PostsController {
   @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('id') id: number) {
-    const result = await this.postsService.delete(id);
+  async deletePost(@Param('id') id: string) {
+    const post = await this.postsQueryRepository.getById(id);
 
-    if (result.deletedCount < 1) {
+    if (!post) {
       throw new NotFoundException('Post not found');
     }
+
+    return await this.postsService.delete(id);
   }
 }
