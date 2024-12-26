@@ -116,8 +116,12 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteComment(@Param('id') id: string) {
+  async deleteComment(@Param('id') id: string, @Req() req) {
     const comment = await this.commentsQueryRepository.getById(id);
+
+    if (comment.commentatorInfo.userLogin !== req.user.login) {
+      throw new ForbiddenException();
+    }
 
     if (!comment) {
       throw new NotFoundException();

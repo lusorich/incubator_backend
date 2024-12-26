@@ -39,6 +39,23 @@ class CreateBlogInputDto {
   websiteUrl: string;
 }
 
+class CreatePostInputDto {
+  @IsNotEmpty()
+  @Trim()
+  @Length(0, 30)
+  title: string;
+
+  @IsNotEmpty()
+  @Trim()
+  @Length(0, 100)
+  shortDescription: string;
+
+  @IsNotEmpty()
+  @Trim()
+  @Length(0, 1000)
+  content: string;
+}
+
 @Controller('blogs')
 export class BlogsController {
   constructor(
@@ -141,7 +158,10 @@ export class BlogsController {
   @UseGuards(AuthGuardBasic)
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
-  async createPostByBlog(@Param('id') id: string, @Body() inputModel: any) {
+  async createPostByBlog(
+    @Param('id') id: string,
+    @Body() inputModel: CreatePostInputDto,
+  ) {
     const { title, shortDescription, content } = inputModel;
 
     const blog = await this.blogsQueryRepository.getById(id);

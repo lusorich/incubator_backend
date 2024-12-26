@@ -222,7 +222,10 @@ export class PostsController {
   @UseGuards(AuthGuardBasic)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(@Param('id') id: string, @Body() inputModel: any) {
+  async updatePost(
+    @Param('id') id: string,
+    @Body() inputModel: CreatePostInputDto,
+  ) {
     const post = await this.postsQueryRepository.getById(id);
 
     if (!post) {
