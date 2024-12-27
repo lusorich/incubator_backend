@@ -63,8 +63,8 @@ export class PostsService {
     });
 
     if (user) {
-      await new Promise((res) => {
-        comments.items.map(async (comment, index) => {
+      await Promise.all(
+        comments.items.map(async (comment) => {
           const userLikeForComment =
             await this.likesService.getLikesByUserAndParentId({
               user,
@@ -74,12 +74,8 @@ export class PostsService {
           if (userLikeForComment) {
             comment.likesInfo.myStatus = userLikeForComment.likeStatus;
           }
-
-          if (index === comments.items.length - 1) {
-            res('');
-          }
-        });
-      });
+        }),
+      );
     }
 
     return comments;

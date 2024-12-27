@@ -14,7 +14,6 @@ import {
   UseGuards,
   Request,
   Req,
-  BadRequestException,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { PostsService } from '../application/posts.service';

@@ -12,6 +12,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
@@ -21,6 +22,7 @@ import { PostsService } from 'src/features/posts/application/posts.service';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
+import { JwtService } from '@nestjs/jwt';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
@@ -63,6 +65,7 @@ export class BlogsController {
     private readonly blogsService: BlogsService,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly postsService: PostsService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Get()
@@ -135,14 +138,23 @@ export class BlogsController {
     sortDirection: string,
     @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Req() req,
   ) {
     const blog = await this.blogsQueryRepository.getById(id);
+    const bearer = req?.headers?.authorization?.replace('Bearer ', '');
+    let user = null;
+
+    try {
+      const verified = this.jwtService.verify(bearer);
+
+      user = verified;
+    } catch (e) {}
 
     if (!blog) {
       throw new NotFoundException('Blog not found');
     }
 
-    const result = await this.postsQueryRepository.getPostsByBlog({
+    const result = await this.blogsService.getBlogPosts({
       paginationParams: {
         sortBy,
         sortDirection,
@@ -150,6 +162,7 @@ export class BlogsController {
         pageNumber,
       },
       blogId: id,
+      user,
     });
 
     return result;
