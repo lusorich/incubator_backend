@@ -20,13 +20,13 @@ import { PostsService } from '../application/posts.service';
 import { PostsQueryRepository } from '../repositories/posts.repository.query';
 import { BlogsQueryRepository } from 'src/features/blogs/repositories/blogs.repository.query';
 import { IsEnum, IsNotEmpty, Length } from 'class-validator';
-import { JwtAuthGuard } from 'src/features/auth/application/jwt.auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { LIKE_STATUS } from 'src/common/enums';
 import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
 import { IsBlogExist } from 'src/common/IsBlogExist';
+import { JwtAuthGuard } from 'src/modules/usersModule/auth/application/jwt.auth.guard';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()

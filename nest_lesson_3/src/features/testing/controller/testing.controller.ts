@@ -1,9 +1,9 @@
 import { Controller, HttpStatus, HttpCode, Delete } from '@nestjs/common';
 import { PostsService } from 'src/features/posts/application/posts.service';
-import { UsersService } from 'src/features/users/application/users.service';
 import { BlogsService } from 'src/features/blogs/application/blogs.service';
 import { CommentsService } from 'src/features/comments/application/comments.service';
 import { LikesService } from 'src/features/likes/application/likes.service';
+import { UsersService } from 'src/modules/usersModule/users/application/users.service';
 
 @Controller('testing')
 export class TestingController {

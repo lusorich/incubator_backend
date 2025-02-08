@@ -12,17 +12,17 @@ import {
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthService } from '../application/auth.service';
 import { EmailService } from 'src/features/mail/application/mail.service';
-import { IsConfirmationCodeActive } from 'src/common/IsConfirmationCodeActive';
-import { IsUserByConfirmationCodeExist } from 'src/common/IsUserByConfirmationCodeExist';
-import { UsersService } from 'src/features/users/application/users.service';
-import { IsEmailNotConfirmed } from 'src/common/IsEmailNotConfirmed';
-import { IsUserNotExist } from 'src/common/IsUserNotExist';
-import { IsUserAlreadyExist } from 'src/common/IsUserAlreadyExist';
-import { IsUserByRecoveryCodeExist } from 'src/common/IsUserByRecoveryCodeExist';
-import { IsPasswordRecoveryCodeUsed } from 'src/common/IsPasswordRecoveryCodeUsed';
 import { LocalAuthGuard } from '../application/local.auth.guard';
 import { JwtAuthGuard } from '../application/jwt.auth.guard';
 import { Trim } from 'src/common/trim.decorator';
+import { UsersService } from '../../users/application/users.service';
+import { IsUserNotExist } from '../../guards/IsUserNotExist';
+import { IsUserByConfirmationCodeExist } from '../../guards/IsUserByConfirmationCodeExist';
+import { IsConfirmationCodeActive } from '../../guards/IsConfirmationCodeActive';
+import { IsUserAlreadyExist } from '../../guards/IsUserAlreadyExist';
+import { IsEmailNotConfirmed } from '../../guards/IsEmailNotConfirmed';
+import { IsUserByRecoveryCodeExist } from '../../guards/IsUserByRecoveryCodeExist';
+import { IsPasswordRecoveryCodeUsed } from '../../guards/IsPasswordRecoveryCodeUsed';
 
 class RegistrationInputDto {
   @IsNotEmpty()

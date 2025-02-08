@@ -18,7 +18,7 @@ import { SORT_DIRECTION } from 'src/common/types';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
-import { IsUserNotExist } from 'src/common/IsUserNotExist';
+import { IsUserNotExist } from '../../guards/IsUserNotExist';
 
 class CreateUserInputDto {
   @IsNotEmpty()

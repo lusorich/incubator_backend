@@ -5,18 +5,19 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsUserAlreadyExistConstraint
+export class IsUserByConfirmationCodeExistConstraint
   implements ValidatorConstraintInterface
 {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
 
   async validate(arg: string, options: ValidationArguments) {
-    const property = options.property;
-
-    const user = await this.UsersQueryRepository.getByProperty(property, arg);
+    const user = await this.UsersQueryRepository.getByProperty(
+      'emailConfirmation.code',
+      arg,
+    );
 
     if (!user) {
       return false;
@@ -26,14 +27,16 @@ export class IsUserAlreadyExistConstraint
   }
 }
 
-export function IsUserAlreadyExist(validationOptions?: ValidationOptions) {
+export function IsUserByConfirmationCodeExist(
+  validationOptions?: ValidationOptions,
+) {
   return function (object: Record<any, any>, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserAlreadyExistConstraint,
+      validator: IsUserByConfirmationCodeExistConstraint,
     });
   };
 }

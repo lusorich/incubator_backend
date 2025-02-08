@@ -1,22 +1,22 @@
 import {
   registerDecorator,
+  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsUserByRecoveryCodeExistConstraint
+export class IsUserAlreadyExistConstraint
   implements ValidatorConstraintInterface
 {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
 
-  async validate(arg: string) {
-    const user = await this.UsersQueryRepository.getByProperty(
-      'passwordRecovery.recoveryCode',
-      arg,
-    );
+  async validate(arg: string, options: ValidationArguments) {
+    const property = options.property;
+
+    const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
     if (!user) {
       return false;
@@ -26,16 +26,14 @@ export class IsUserByRecoveryCodeExistConstraint
   }
 }
 
-export function IsUserByRecoveryCodeExist(
-  validationOptions?: ValidationOptions,
-) {
+export function IsUserAlreadyExist(validationOptions?: ValidationOptions) {
   return function (object: Record<any, any>, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserByRecoveryCodeExistConstraint,
+      validator: IsUserAlreadyExistConstraint,
     });
   };
 }

@@ -5,17 +5,24 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
+import { isAfter } from 'date-fns';
+import { UsersQueryRepository } from '../users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsEmailNotConfirmedConstraint
+export class IsConfirmationCodeActiveConstraint
   implements ValidatorConstraintInterface
 {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
 
   async validate(arg: string, options: ValidationArguments) {
-    const property = options.property;
-    const user = await this.UsersQueryRepository.getByProperty(property, arg);
+    const user = await this.UsersQueryRepository.getByProperty(
+      'emailConfirmation.code',
+      arg,
+    );
+
+    if (user && isAfter(new Date(), user.emailConfirmation.expire)) {
+      return false;
+    }
 
     if (user && user.emailConfirmation.isConfirmed) {
       return false;
@@ -25,14 +32,16 @@ export class IsEmailNotConfirmedConstraint
   }
 }
 
-export function IsEmailNotConfirmed(validationOptions?: ValidationOptions) {
+export function IsConfirmationCodeActive(
+  validationOptions?: ValidationOptions,
+) {
   return function (object: Record<any, any>, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsEmailNotConfirmedConstraint,
+      validator: IsConfirmationCodeActiveConstraint,
     });
   };
 }
