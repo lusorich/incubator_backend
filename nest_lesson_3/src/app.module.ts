@@ -12,7 +12,6 @@ import { PostsController } from './features/posts/controller/posts.controller';
 import { Post, PostSchema } from './features/posts/domain/post.entity';
 import { appSettings } from './settings/appSettings';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { EmailService } from './features/mail/application/mail.service';
 import { JwtModule } from '@nestjs/jwt';
 import { CommentsService } from './features/comments/application/comments.service';
 import {
@@ -30,6 +29,7 @@ import { Like, LikeSchema } from './features/likes/domain/like.entity';
 import { IsBlogExistConstraint } from './common/IsBlogExist';
 import { UsersModule } from './modules/usersModule/users.module';
 import { CommonModule } from './modules/commonModule/common.module';
+import { NotificationModule } from './modules/notificationModule/notifications.module';
 
 @Module({
   imports: [
@@ -60,6 +60,7 @@ import { CommonModule } from './modules/commonModule/common.module';
     }),
     UsersModule,
     CommonModule,
+    NotificationModule,
   ],
   controllers: [
     BlogsController,
@@ -78,8 +79,6 @@ import { CommonModule } from './modules/commonModule/common.module';
 
     IsCommentExistConstraint,
     IsBlogExistConstraint,
-
-    EmailService,
 
     CommentsService,
     CommentsCommandsRepository,

@@ -9,12 +9,19 @@ import { UsersCommandsRepository } from './users/repositories/users.repository.c
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './users/domain/user.entity';
 import { CommonModule } from '../commonModule/common.module';
-import { EmailService } from 'src/features/mail/application/mail.service';
+import { NotificationModule } from '../notificationModule/notifications.module';
+import { IsUserNotExistConstraint } from './guards/IsUserNotExist';
+import { IsConfirmationCodeActiveConstraint } from './guards/IsConfirmationCodeActive';
+import { IsEmailNotConfirmedConstraint } from './guards/IsEmailNotConfirmed';
+import { IsPasswordRecoveryCodeUsedConstraint } from './guards/IsPasswordRecoveryCodeUsed';
+import { IsUserAlreadyExistConstraint } from './guards/IsUserAlreadyExist';
+import { IsUserByRecoveryCodeExistConstraint } from './guards/IsUserByRecoveryCodeExist';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     CommonModule,
+    NotificationModule,
   ],
   controllers: [AuthController, UsersController],
   providers: [
@@ -23,6 +30,13 @@ import { EmailService } from 'src/features/mail/application/mail.service';
     UsersService,
     UsersCommandsRepository,
     UsersQueryRepository,
+    IsUserNotExistConstraint,
+    IsConfirmationCodeActiveConstraint,
+    IsEmailNotConfirmedConstraint,
+    IsPasswordRecoveryCodeUsedConstraint,
+    IsUserAlreadyExistConstraint,
+    IsUserByRecoveryCodeExistConstraint,
+    IsUserByRecoveryCodeExistConstraint,
   ],
   exports: [UsersQueryRepository, UsersService],
 })

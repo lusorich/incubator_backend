@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthService } from '../application/auth.service';
-import { EmailService } from 'src/features/mail/application/mail.service';
 import { LocalAuthGuard } from '../application/local.auth.guard';
 import { JwtAuthGuard } from '../application/jwt.auth.guard';
 import { Trim } from 'src/common/trim.decorator';
@@ -23,6 +22,7 @@ import { IsUserAlreadyExist } from '../../guards/IsUserAlreadyExist';
 import { IsEmailNotConfirmed } from '../../guards/IsEmailNotConfirmed';
 import { IsUserByRecoveryCodeExist } from '../../guards/IsUserByRecoveryCodeExist';
 import { IsPasswordRecoveryCodeUsed } from '../../guards/IsPasswordRecoveryCodeUsed';
+import { EmailService } from 'src/modules/notificationModule/mail.service';
 
 class RegistrationInputDto {
   @IsNotEmpty()
