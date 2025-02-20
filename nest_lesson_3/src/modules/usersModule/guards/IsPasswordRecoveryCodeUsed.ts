@@ -1,25 +1,29 @@
 import {
   registerDecorator,
-  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
+import { isAfter } from 'date-fns';
+import { UsersQueryRepository } from '../users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsUserByConfirmationCodeExistConstraint
+export class IsPasswordRecoveryCodeUsedConstraint
   implements ValidatorConstraintInterface
 {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
 
-  async validate(arg: string, options: ValidationArguments) {
+  async validate(arg: string) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'emailConfirmation.code',
+      'passwordRecovery.recoveryCode',
       arg,
     );
 
-    if (!user) {
+    if (user && isAfter(new Date(), user.passwordRecovery.expire)) {
+      return false;
+    }
+
+    if (user && user.passwordRecovery.isUsed) {
       return false;
     }
 
@@ -27,7 +31,7 @@ export class IsUserByConfirmationCodeExistConstraint
   }
 }
 
-export function IsUserByConfirmationCodeExist(
+export function IsPasswordRecoveryCodeUsed(
   validationOptions?: ValidationOptions,
 ) {
   return function (object: Record<any, any>, propertyName: string) {
@@ -36,7 +40,7 @@ export function IsUserByConfirmationCodeExist(
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserByConfirmationCodeExistConstraint,
+      validator: IsPasswordRecoveryCodeUsedConstraint,
     });
   };
 }

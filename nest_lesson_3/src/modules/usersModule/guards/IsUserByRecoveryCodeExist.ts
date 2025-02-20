@@ -1,15 +1,13 @@
 import {
   registerDecorator,
-  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { isAfter } from 'date-fns';
-import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
-export class IsPasswordRecoveryCodeUsedConstraint
+export class IsUserByRecoveryCodeExistConstraint
   implements ValidatorConstraintInterface
 {
   constructor(private readonly UsersQueryRepository: UsersQueryRepository) {}
@@ -20,11 +18,7 @@ export class IsPasswordRecoveryCodeUsedConstraint
       arg,
     );
 
-    if (user && isAfter(new Date(), user.passwordRecovery.expire)) {
-      return false;
-    }
-
-    if (user && user.passwordRecovery.isUsed) {
+    if (!user) {
       return false;
     }
 
@@ -32,7 +26,7 @@ export class IsPasswordRecoveryCodeUsedConstraint
   }
 }
 
-export function IsPasswordRecoveryCodeUsed(
+export function IsUserByRecoveryCodeExist(
   validationOptions?: ValidationOptions,
 ) {
   return function (object: Record<any, any>, propertyName: string) {
@@ -41,7 +35,7 @@ export function IsPasswordRecoveryCodeUsed(
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsPasswordRecoveryCodeUsedConstraint,
+      validator: IsUserByRecoveryCodeExistConstraint,
     });
   };
 }

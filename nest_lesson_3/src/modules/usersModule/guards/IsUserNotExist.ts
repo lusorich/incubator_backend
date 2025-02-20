@@ -5,7 +5,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from 'src/features/users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/repositories/users.repository.query';
 
 @ValidatorConstraint({ async: true })
 export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
@@ -13,7 +13,6 @@ export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
 
   async validate(arg: string, options: ValidationArguments) {
     const property = options.property;
-
     const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
     if (user) {
