@@ -19,6 +19,7 @@ import { Blog, BlogSchema } from './blogs/domain/blog.entity';
 import { Post, PostSchema } from './posts/domain/post.entity';
 import { Like, LikeSchema } from './likes/domain/like.entity';
 import { CommentSchema } from './comments/domain/comment.entity';
+import { Comment } from './comments/domain/comment.entity';
 
 @Module({
   imports: [
@@ -45,6 +46,6 @@ import { CommentSchema } from './comments/domain/comment.entity';
     CommentsService,
     LikesService,
   ],
-  exports: [],
+  exports: [BlogsService, PostsService, CommentsService, LikesService],
 })
 export class BlogsModule {}

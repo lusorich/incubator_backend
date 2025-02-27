@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BlogsCommandsRepository } from '../repositories/blogs.repository.commands';
-import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
-import { LikesService } from 'src/features/likes/application/likes.service';
+import { PostsQueryRepository } from '../../posts/repositories/posts.repository.query';
+import { LikesService } from '../../likes/application/likes.service';
 
 @Injectable()
 export class BlogsService {

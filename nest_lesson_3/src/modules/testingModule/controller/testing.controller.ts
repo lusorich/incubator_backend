@@ -1,8 +1,8 @@
 import { Controller, HttpStatus, HttpCode, Delete } from '@nestjs/common';
-import { PostsService } from 'src/features/posts/application/posts.service';
-import { BlogsService } from 'src/features/blogs/application/blogs.service';
-import { CommentsService } from 'src/features/comments/application/comments.service';
-import { LikesService } from 'src/features/likes/application/likes.service';
+import { BlogsService } from 'src/modules/blogsModule/blogs/application/blogs.service';
+import { CommentsService } from 'src/modules/blogsModule/comments/application/comments.service';
+import { LikesService } from 'src/modules/blogsModule/likes/application/likes.service';
+import { PostsService } from 'src/modules/blogsModule/posts/application/posts.service';
 import { UsersService } from 'src/modules/usersModule/users/application/users.service';
 
 @Controller('testing')

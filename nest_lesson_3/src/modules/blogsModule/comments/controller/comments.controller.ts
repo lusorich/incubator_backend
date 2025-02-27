@@ -16,9 +16,9 @@ import { CommentsQueryRepository } from '../repositories/comments.repository.que
 import { IsNotEmpty, IsEnum, Length } from 'class-validator';
 import { CommentsService } from '../application/comments.service';
 import { LIKE_STATUS } from 'src/common/enums';
-import { LikesQueryRepository } from 'src/features/likes/repositories/likes.repository.query';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from 'src/modules/usersModule/auth/application/jwt.auth.guard';
+import { LikesQueryRepository } from '../../likes/repositories/likes.repository.query';
 
 class UpdateCommentInputDto {
   @IsNotEmpty()

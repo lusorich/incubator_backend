@@ -7,6 +7,7 @@ import { CommonModule } from './modules/commonModule/common.module';
 import { NotificationModule } from './modules/notificationModule/notifications.module';
 import { appSettings } from './settings/appSettings';
 import { BlogsModule } from './modules/blogsModule/blogs.module';
+import { TestingModule } from './modules/testingModule/testing.module';
 
 @Module({
   imports: [
@@ -34,10 +35,9 @@ import { BlogsModule } from './modules/blogsModule/blogs.module';
     CommonModule,
     NotificationModule,
     BlogsModule,
+    TestingModule,
   ],
-  controllers: [
-    //    TestingController,
-  ],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PostsCommandsRepository } from '../repositories/posts.repository.commands';
-import { CommentsService } from 'src/features/comments/application/comments.service';
-import { CommentsQueryRepository } from 'src/features/comments/repositories/comments.repository.query';
-import { LikesService } from 'src/features/likes/application/likes.service';
 import { LIKE_STATUS } from 'src/common/enums';
 import { PostsQueryRepository } from '../repositories/posts.repository.query';
+import { CommentsService } from '../../comments/application/comments.service';
+import { CommentsQueryRepository } from '../../comments/repositories/comments.repository.query';
+import { LikesService } from '../../likes/application/likes.service';
 
 @Injectable()
 export class PostsService {

@@ -17,12 +17,12 @@ import {
 import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
-import { PostsQueryRepository } from 'src/features/posts/repositories/posts.repository.query';
-import { PostsService } from 'src/features/posts/application/posts.service';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
 import { JwtService } from '@nestjs/jwt';
+import { PostsService } from '../../posts/application/posts.service';
+import { PostsQueryRepository } from '../../posts/repositories/posts.repository.query';
 
 class CreateBlogInputDto {
   @IsNotEmpty()

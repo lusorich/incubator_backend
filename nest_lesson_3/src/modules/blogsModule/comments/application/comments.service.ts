@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsCommandsRepository } from '../repositories/comments.repository.commands';
 import { CommentsQueryRepository } from '../repositories/comments.repository.query';
-import { LikesService } from 'src/features/likes/application/likes.service';
 import { LIKE_STATUS } from 'src/common/enums';
+import { LikesService } from '../../likes/application/likes.service';
 
 @Injectable()
 export class CommentsService {
