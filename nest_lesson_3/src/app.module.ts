@@ -26,11 +26,6 @@ import { TestingModule } from './modules/testingModule/testing.module';
       },
     }),
 
-    JwtModule.register({
-      global: true,
-      secret: appSettings.api.SECRET_JWT_KEY,
-      signOptions: { expiresIn: '5m' },
-    }),
     UsersModule,
     CommonModule,
     NotificationModule,

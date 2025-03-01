@@ -16,12 +16,23 @@ import { IsEmailNotConfirmedConstraint } from './guards/IsEmailNotConfirmed';
 import { IsPasswordRecoveryCodeUsedConstraint } from './guards/IsPasswordRecoveryCodeUsed';
 import { IsUserAlreadyExistConstraint } from './guards/IsUserAlreadyExist';
 import { IsUserByRecoveryCodeExistConstraint } from './guards/IsUserByRecoveryCodeExist';
+import { JwtModule } from '@nestjs/jwt';
+import { appSettings } from 'src/settings/appSettings';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './auth/application/auth.local.strategy';
+import { JwtStrategy } from './auth/application/auth.jwt.strategy';
 
 @Module({
   imports: [
+    JwtModule.register({
+      global: true,
+      secret: appSettings.api.SECRET_JWT_KEY,
+      signOptions: { expiresIn: '5m' },
+    }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     CommonModule,
     NotificationModule,
+    PassportModule,
   ],
   controllers: [AuthController, UsersController],
   providers: [
@@ -37,6 +48,8 @@ import { IsUserByRecoveryCodeExistConstraint } from './guards/IsUserByRecoveryCo
     IsUserAlreadyExistConstraint,
     IsUserByRecoveryCodeExistConstraint,
     IsUserByRecoveryCodeExistConstraint,
+    LocalStrategy,
+    JwtStrategy,
   ],
   exports: [UsersQueryRepository, UsersService],
 })

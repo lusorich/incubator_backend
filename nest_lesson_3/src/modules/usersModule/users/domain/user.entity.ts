@@ -49,8 +49,8 @@ export class User {
     login: string,
     email: string,
     password: string,
-    emailConfirmation,
-  ) {
+    emailConfirmation: EmailConfirmation,
+  ): UserDocument {
     const user = new this();
 
     user.login = login;
@@ -62,7 +62,7 @@ export class User {
       user.emailConfirmation = emailConfirmation;
     }
 
-    return user;
+    return user as UserDocument;
   }
 
   getLogin() {
