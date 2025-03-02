@@ -75,14 +75,6 @@ class RegistrationNewPasswordInputDto {
   recoveryCode: string;
 }
 
-class UserLoginInputDto {
-  @IsNotEmpty()
-  loginOrEmail: string;
-
-  @IsNotEmpty()
-  password: string;
-}
-
 @Controller('auth')
 export class AuthController {
   constructor(

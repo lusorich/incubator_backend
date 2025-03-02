@@ -77,12 +77,10 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
-    const result = await this.usersService.create(
-      userInput.login,
-      userInput.email,
-      userInput.password,
-      undefined,
-    );
+    const result = await this.usersService.create({
+      ...userInput,
+      emailConfirmation: undefined,
+    });
 
     return this.usersQueryRepository.getById(result);
   }

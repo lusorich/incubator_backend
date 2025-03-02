@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
+import { CreateUserInput } from '../models/users.input.model';
 
 @Injectable()
 export class UsersService {
@@ -9,18 +10,8 @@ export class UsersService {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async create(
-    login: string,
-    email: string,
-    password: string,
-    emailConfirmation,
-  ) {
-    const result = await this.usersCommandsRepository.create(
-      login,
-      email,
-      password,
-      emailConfirmation,
-    );
+  async create(createUserInput: CreateUserInput) {
+    const result = await this.usersCommandsRepository.create(createUserInput);
 
     return result.id;
   }
