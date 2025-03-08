@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
-import { CreateUserInput } from '../models/users.input.model';
+import { CreateUserInput } from '../models/users.dto';
 
 @Injectable()
 export class UsersCommandsRepository {

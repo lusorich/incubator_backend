@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { CreateUserInput } from '../models/users.input.model';
+import { CreateUserInput } from '../models/users.dto';
 
 @Schema()
 export class EmailConfirmation {
@@ -26,7 +26,7 @@ class PasswordRecovery {
   isUsed: boolean;
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @Prop()
   login: string;
@@ -37,7 +37,6 @@ export class User {
   @Prop()
   password: string;
 
-  @Prop()
   createdAt: Date;
 
   @Prop()
@@ -52,7 +51,6 @@ export class User {
     user.login = createUserInput.login;
     user.email = createUserInput.email;
     user.password = createUserInput.password;
-    user.createdAt = new Date();
 
     if (createUserInput?.emailConfirmation) {
       user.emailConfirmation = createUserInput.emailConfirmation;

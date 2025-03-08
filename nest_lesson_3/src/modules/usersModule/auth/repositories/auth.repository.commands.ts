@@ -6,11 +6,6 @@ export class AuthCommandsRepository {
   constructor(private readonly UsersService: UsersService) {}
 
   async registration(registrationUserInputModel) {
-    return this.UsersService.create(
-      registrationUserInputModel.login,
-      registrationUserInputModel.email,
-      registrationUserInputModel.password,
-      registrationUserInputModel.emailConfirmation,
-    );
+    return this.UsersService.create(registrationUserInputModel);
   }
 }

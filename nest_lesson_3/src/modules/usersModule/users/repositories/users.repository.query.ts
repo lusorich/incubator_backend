@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../domain/user.entity';
 import { Model } from 'mongoose';
-import { userOutputModelMapper } from '../models/users.output.model';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
+import { UserViewDto } from '../models/users.dto';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -27,7 +27,7 @@ export class UsersQueryRepository {
 
     const filteredUsers = (
       await this.UserModel.find({
-        $or: [
+        $and: [
           { login: { $regex: searchLoginTerm || /./, $options: 'i' } },
           { email: { $regex: searchEmailTerm || /./, $options: 'i' } },
         ],
@@ -35,12 +35,11 @@ export class UsersQueryRepository {
         .limit(pageSize)
         .skip((pageNumber - 1) * pageSize)
         .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
-    ).map(userOutputModelMapper);
+    ).map(UserViewDto.getUserView);
 
     if (searchLoginTerm || searchEmailTerm) {
       return {
         pagesCount: Math.ceil(filteredUsers.length / pageSize),
-
         totalCount: filteredUsers.length,
         pageSize: Number(pageSize),
         page: Number(pageNumber),
@@ -60,7 +59,7 @@ export class UsersQueryRepository {
   async getById(id: string) {
     const user = await this.UserModel.findById(id);
 
-    return userOutputModelMapper(user);
+    return UserViewDto.getUserView(user);
   }
 
   async getByProperty(property: string, value: string) {

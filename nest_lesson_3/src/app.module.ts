@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from './modules/usersModule/users.module';
 import { CommonModule } from './modules/commonModule/common.module';
 import { NotificationModule } from './modules/notificationModule/notifications.module';
