@@ -20,6 +20,41 @@ import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
 import { IsUserNotExist } from '../../guards/IsUserNotExist';
 
+class PaginationParams {
+  pageNumber: number = 1;
+  pageSize: number = 10;
+  sortDirection: SORT_DIRECTION = SORT_DIRECTION.DESC;
+}
+
+abstract class BaseSortablePaginationParams<T> extends PaginationParams {
+  abstract sortBy: T;
+}
+
+enum USERS_SORT_BY {
+  'createdAt' = 'createdAt',
+  'login' = 'login',
+  'email' = 'email',
+}
+
+class GetUsersQueryParams extends BaseSortablePaginationParams<USERS_SORT_BY> {
+  sortBy = USERS_SORT_BY.createdAt;
+  searchLoginTerm: string | null;
+  searchEmailTerm: string | null;
+}
+
+abstract class PaginatedViewDto<T> {
+  abstract items: T;
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+}
+
+// @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
+// @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
+// @Query('searchEmailTerm') searchEmailTerm: string,
+// @Query('searchLoginTerm') searchLoginTerm: string,
+
 class CreateUserInputDto {
   @IsNotEmpty()
   @Length(3, 10)
