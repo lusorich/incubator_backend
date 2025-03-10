@@ -4,6 +4,7 @@ import { User } from '../domain/user.entity';
 import { Model } from 'mongoose';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
 import { UserViewDto } from '../models/users.dto';
+import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -38,21 +39,19 @@ export class UsersQueryRepository {
     ).map(UserViewDto.getUserView);
 
     if (searchLoginTerm || searchEmailTerm) {
-      return {
-        pagesCount: Math.ceil(filteredUsers.length / pageSize),
+      return PaginatedViewDto.getPaginatedDataDto({
         totalCount: filteredUsers.length,
         pageSize: Number(pageSize),
         page: Number(pageNumber),
         items: filteredUsers,
-      };
+      });
     } else {
-      return {
-        pagesCount: Math.ceil(users.length / pageSize),
+      return PaginatedViewDto.getPaginatedDataDto({
         totalCount: users.length,
         pageSize: Number(pageSize),
         page: Number(pageNumber),
         items: filteredUsers,
-      };
+      });
     }
   }
 

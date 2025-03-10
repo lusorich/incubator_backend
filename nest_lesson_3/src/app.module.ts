@@ -7,6 +7,7 @@ import { NotificationModule } from './modules/notificationModule/notifications.m
 import { appSettings } from './settings/appSettings';
 import { BlogsModule } from './modules/blogsModule/blogs.module';
 import { TestingModule } from './modules/testingModule/testing.module';
+import { SwaggerModule } from '@nestjs/swagger';
 
 @Module({
   imports: [
@@ -24,6 +25,8 @@ import { TestingModule } from './modules/testingModule/testing.module';
         },
       },
     }),
+
+    SwaggerModule,
 
     UsersModule,
     CommonModule,

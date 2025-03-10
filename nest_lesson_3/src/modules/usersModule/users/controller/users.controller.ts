@@ -19,16 +19,11 @@ import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
 import { IsUserNotExist } from '../../guards/IsUserNotExist';
-
-class PaginationParams {
-  pageNumber: number = 1;
-  pageSize: number = 10;
-  sortDirection: SORT_DIRECTION = SORT_DIRECTION.DESC;
-}
-
-abstract class BaseSortablePaginationParams<T> extends PaginationParams {
-  abstract sortBy: T;
-}
+import {
+  BaseSortablePaginationParams,
+  PaginatedViewDto,
+} from 'src/common/PaginationQuery.dto';
+import { UserViewDto } from '../models/users.dto';
 
 enum USERS_SORT_BY {
   'createdAt' = 'createdAt',
@@ -41,19 +36,6 @@ class GetUsersQueryParams extends BaseSortablePaginationParams<USERS_SORT_BY> {
   searchLoginTerm: string | null;
   searchEmailTerm: string | null;
 }
-
-abstract class PaginatedViewDto<T> {
-  abstract items: T;
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-}
-
-// @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-// @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
-// @Query('searchEmailTerm') searchEmailTerm: string,
-// @Query('searchLoginTerm') searchLoginTerm: string,
 
 class CreateUserInputDto {
   @IsNotEmpty()
@@ -86,14 +68,17 @@ export class UsersController {
   @UseGuards(AuthGuardBasic)
   @Get()
   async getUsers(
-    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
-    sortDirection: string,
-    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
-    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
-    @Query('searchEmailTerm') searchEmailTerm: string,
-    @Query('searchLoginTerm') searchLoginTerm: string,
-  ) {
+    @Query() query: GetUsersQueryParams,
+  ): Promise<PaginatedViewDto<UserViewDto[]>> {
+    const {
+      sortBy,
+      sortDirection,
+      pageSize,
+      pageNumber,
+      searchEmailTerm,
+      searchLoginTerm,
+    } = query;
+
     const result = await this.usersQueryRepository.getUsers({
       paginationParams: {
         sortBy,

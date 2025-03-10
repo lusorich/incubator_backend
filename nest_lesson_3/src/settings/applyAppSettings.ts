@@ -8,6 +8,7 @@ import { AppModule } from '../app.module';
 import { HttpExceptionFilter } from 'src/common/exception.filter';
 import { MongooseExceptionFilter } from 'src/common/mongoose.exception.filter';
 import * as cookieParser from 'cookie-parser';
+import { swaggerSetup } from './swaggerSetup';
 
 export const applyAppSettings = (app: INestApplication) => {
   // Для внедрения зависимостей в validator constraint
@@ -18,6 +19,8 @@ export const applyAppSettings = (app: INestApplication) => {
   setAppPipes(app);
 
   setAppExceptionsFilters(app);
+
+  swaggerSetup(app);
 
   app.use(cookieParser());
   app.enableCors();
