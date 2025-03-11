@@ -23,6 +23,12 @@ import { Trim } from 'src/common/trim.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { PostsService } from '../../posts/application/posts.service';
 import { PostsQueryRepository } from '../../posts/repositories/posts.repository.query';
+import {
+  BaseSortablePaginationParams,
+  PaginatedViewDto,
+} from 'src/common/PaginationQuery.dto';
+import { BlogViewDto } from '../domain/blogs.dto';
+import { Blog } from '../domain/blog.entity';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
@@ -58,6 +64,15 @@ class CreatePostInputDto {
   content: string;
 }
 
+class GetBlogsQueryParams extends BaseSortablePaginationParams<
+  keyof BlogViewDto
+> {
+  sortBy = 'createdAt' as const;
+  searchNameTerm: string | null;
+}
+
+class GetBlogsPostsParams {}
+
 @Controller('blogs')
 export class BlogsController {
   constructor(
@@ -70,13 +85,11 @@ export class BlogsController {
 
   @Get()
   async getBlogs(
-    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
-    sortDirection: string,
-    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
-    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
-    @Query('searchNameTerm', new DefaultValuePipe(null)) searchNameTerm: string,
-  ) {
+    @Query() query: GetBlogsQueryParams,
+  ): Promise<PaginatedViewDto<BlogViewDto[]>> {
+    const { sortBy, sortDirection, pageSize, pageNumber, searchNameTerm } =
+      query;
+
     const result = await this.blogsQueryRepository.getBlogs({
       paginationParams: {
         sortBy,

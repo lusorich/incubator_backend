@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
 import { Blog } from '../domain/blog.entity';
 import { blogOutputModelMapper } from '../models/blogs.output.model';
+import { BlogViewDto } from '../domain/blogs.dto';
+import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -30,25 +32,23 @@ export class BlogsQueryRepository {
         .limit(pageSize)
         .skip((pageNumber - 1) * pageSize)
         .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
-    ).map(blogOutputModelMapper);
+    ).map(BlogViewDto.getBlogView);
 
     if (searchNameTerm) {
-      return {
-        pagesCount: Math.ceil(filteredBlogs.length / pageSize),
+      return PaginatedViewDto.getPaginatedDataDto({
         totalCount: filteredBlogs.length,
         pageSize: Number(pageSize),
         page: Number(pageNumber),
         items: filteredBlogs,
-      };
+      });
     }
 
-    return {
-      pagesCount: Math.ceil(blogs.length / pageSize),
+    return PaginatedViewDto.getPaginatedDataDto({
       totalCount: blogs.length,
       pageSize: Number(pageSize),
       page: Number(pageNumber),
       items: filteredBlogs,
-    };
+    });
   }
 
   async getById(id: string) {
