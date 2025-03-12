@@ -14,7 +14,6 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { SORT_DIRECTION } from 'src/common/types';
 import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 import { BlogsService } from '../application/blogs.service';
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
@@ -27,7 +26,7 @@ import {
   BaseSortablePaginationParams,
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
-import { BlogViewDto } from '../domain/blogs.dto';
+import { BlogPostVewDto, BlogViewDto } from '../domain/blogs.dto';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
@@ -70,7 +69,11 @@ class GetBlogsQueryParams extends BaseSortablePaginationParams<
   searchNameTerm: string | null;
 }
 
-class GetBlogsPostsParams {}
+class GetBlogPostsQueryParams extends BaseSortablePaginationParams<
+  keyof BlogPostVewDto
+> {
+  sortBy = 'createdAt' as const;
+}
 
 @Controller('blogs')
 export class BlogsController {
@@ -144,17 +147,14 @@ export class BlogsController {
 
   @Get(':id/posts')
   async getPostsByBlog(
+    @Query() query: GetBlogPostsQueryParams,
     @Param('id') id: string,
-    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
-    sortDirection: string,
-    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
-    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
     @Req() req,
-  ) {
+  ): Promise<PaginatedViewDto<BlogPostVewDto[]>> {
     const blog = await this.blogsQueryRepository.getById(id);
     const bearer = req?.headers?.authorization?.replace('Bearer ', '');
     let user = null;
+    const { sortBy, sortDirection, pageSize, pageNumber } = query;
 
     try {
       const verified = this.jwtService.verify(bearer);
@@ -166,7 +166,8 @@ export class BlogsController {
       throw new NotFoundException('Blog not found');
     }
 
-    const result = await this.blogsService.getBlogPosts({
+    //TODO: remove as, better to duplicate posts from posts.repo to blogs.repo
+    const result = (await this.blogsService.getBlogPosts({
       paginationParams: {
         sortBy,
         sortDirection,
@@ -175,7 +176,7 @@ export class BlogsController {
       },
       blogId: id,
       user,
-    });
+    })) as PaginatedViewDto<BlogPostVewDto[]>;
 
     return result;
   }

@@ -30,5 +30,10 @@ export class BlogPostVewDto {
   blogId: string;
   blogName: string;
   createdAt: Date;
-  extendedLikedInfo: any;
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: 'None' | 'Like' | 'Dislike';
+    newestLikes: { addedAt: Date; userId: string; login: string }[];
+  };
 }
