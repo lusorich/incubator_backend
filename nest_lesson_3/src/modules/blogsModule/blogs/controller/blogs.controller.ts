@@ -28,7 +28,6 @@ import {
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
 import { BlogViewDto } from '../domain/blogs.dto';
-import { Blog } from '../domain/blog.entity';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
