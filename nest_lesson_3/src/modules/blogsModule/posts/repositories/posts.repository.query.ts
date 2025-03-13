@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
 import { Post } from '../domain/post.entity';
 import { postOutputModelMapper } from '../models/posts.output.model';
+import { PostViewDto } from '../domain/post.dto';
+import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -23,15 +25,14 @@ export class PostsQueryRepository {
         .limit(pageSize)
         .skip((pageNumber - 1) * pageSize)
         .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
-    ).map(postOutputModelMapper);
+    ).map(PostViewDto.getPostView);
 
-    return {
-      pagesCount: Math.ceil(posts.length / pageSize),
+    return PaginatedViewDto.getPaginatedDataDto({
       totalCount: posts.length,
       pageSize: Number(pageSize),
       page: Number(pageNumber),
       items: filteredBlogs,
-    };
+    });
   }
 
   async getById(id: string) {

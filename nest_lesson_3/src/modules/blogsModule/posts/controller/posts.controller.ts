@@ -27,6 +27,11 @@ import { JwtAuthGuard } from 'src/modules/usersModule/auth/application/jwt.auth.
 import { BlogsQueryRepository } from '../../blogs/repositories/blogs.repository.query';
 import { LikesQueryRepository } from '../../likes/repositories/likes.repository.query';
 import { IsBlogExist } from '../../guards/IsBlogExist';
+import {
+  BaseSortablePaginationParams,
+  PaginatedViewDto,
+} from 'src/common/PaginationQuery.dto';
+import { PostCommentViewDto, PostViewDto } from '../domain/post.dto';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()
@@ -62,6 +67,18 @@ class CreatePostInputDto {
   blogId: string;
 }
 
+class GetPostsQueryParams extends BaseSortablePaginationParams<
+  keyof PostViewDto
+> {
+  sortBy = 'createdAt' as const;
+}
+
+class GetPostCommentsQueryParams extends BaseSortablePaginationParams<
+  keyof PostCommentViewDto
+> {
+  sortBy = 'createdAt' as const;
+}
+
 @Controller('posts')
 export class PostsController {
   constructor(
@@ -74,15 +91,12 @@ export class PostsController {
 
   @Get()
   async getPosts(
-    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
-    sortDirection: string,
-    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
-    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Query() query: GetPostsQueryParams,
     @Req() req,
-  ) {
+  ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const bearer = req?.headers?.authorization?.replace('Bearer ', '');
     let user = null;
+    const { sortBy, sortDirection, pageSize, pageNumber } = query;
 
     try {
       const verified = this.jwtService.verify(bearer);
@@ -182,14 +196,11 @@ export class PostsController {
   @Get(':id/comments')
   async getPostComments(
     @Param('id') id: string,
-    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy: string,
-    @Query('sortDirection', new DefaultValuePipe(SORT_DIRECTION.DESC))
-    sortDirection: string,
-    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber: number,
-    @Query('pageSize', new DefaultValuePipe(10)) pageSize: number,
+    @Query() query: GetPostCommentsQueryParams,
     @Req() req,
   ) {
     const post = await this.postsQueryRepository.getById(id);
+    const { sortBy, sortDirection, pageSize, pageNumber } = query;
 
     if (!post) {
       throw new NotFoundException('Post not found');
