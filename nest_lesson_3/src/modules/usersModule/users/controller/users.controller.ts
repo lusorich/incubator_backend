@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
@@ -17,12 +16,11 @@ import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
 import { Trim } from 'src/common/trim.decorator';
-import { IsUserNotExist } from '../../guards/IsUserNotExist';
 import {
   BaseSortablePaginationParams,
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
-import { UserViewDto } from '../models/users.dto';
+import { CreateUserInput, UserViewDto } from '../models/users.dto';
 
 enum USERS_SORT_BY {
   'createdAt' = 'createdAt',
@@ -36,15 +34,14 @@ class GetUsersQueryParams extends BaseSortablePaginationParams<USERS_SORT_BY> {
   searchEmailTerm: string | null;
 }
 
-class CreateUserInputDto {
+//TODO: Move to users.dto.ts
+class CreateUserInputDto implements CreateUserInput {
   @IsNotEmpty()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)
-  @IsUserNotExist({ message: 'User already exist' })
   login: string;
 
   @IsEmail()
-  @IsUserNotExist({ message: 'User already exist' })
   email: string;
 
   @IsNotEmpty()
@@ -96,10 +93,12 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
-    const result = await this.usersService.create({
+    const createUser: CreateUserInput = {
       ...userInput,
       emailConfirmation: undefined,
-    });
+    };
+
+    const result = await this.usersService.create(createUser);
 
     return this.usersQueryRepository.getById(result);
   }

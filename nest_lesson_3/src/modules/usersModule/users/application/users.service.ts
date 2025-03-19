@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { CreateUserInput } from '../models/users.dto';
@@ -11,6 +15,18 @@ export class UsersService {
   ) {}
 
   async create(createUserInput: CreateUserInput) {
+    const existedUser = await this.usersQueryRepository.getByProperties([
+      { email: createUserInput.email },
+      { login: createUserInput.login },
+    ]);
+    //TODO: Domain exceptions
+    if (existedUser) {
+      throw new BadRequestException({
+        field: 'email',
+        message: [{ field: 'email', message: 'not correct' }],
+      });
+    }
+
     const result = await this.usersCommandsRepository.create(createUserInput);
 
     return result.id;

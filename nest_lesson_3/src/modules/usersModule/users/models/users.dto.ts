@@ -19,7 +19,6 @@ export class UserViewDto {
   }
 }
 
-//TODO: we've createUserInputDto in controller
 export class CreateUserInput {
   login: string;
   email: string;

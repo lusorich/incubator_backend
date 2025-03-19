@@ -66,4 +66,12 @@ export class UsersQueryRepository {
 
     return user;
   }
+
+  async getByProperties(properties: Record<string, string>[]) {
+    const user = await this.UserModel.findOne({
+      $or: properties,
+    });
+
+    return user;
+  }
 }
