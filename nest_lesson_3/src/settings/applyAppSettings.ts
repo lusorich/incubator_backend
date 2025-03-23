@@ -34,6 +34,8 @@ const setAppPipes = (app: INestApplication) => {
       exceptionFactory: (errors) => {
         const errorsForResponse = [];
 
+        console.log('pipe errors', errors);
+
         errors.forEach((err) => {
           const keys = Object.keys(err.constraints);
 
