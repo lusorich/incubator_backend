@@ -9,6 +9,11 @@ import { HttpExceptionFilter } from 'src/common/exception.filter';
 import { MongooseExceptionFilter } from 'src/common/mongoose.exception.filter';
 import * as cookieParser from 'cookie-parser';
 import { swaggerSetup } from './swaggerSetup';
+import {
+  DomainException,
+  DomainHttpExceptionsFilter,
+} from 'src/common/exceptions/domain.exceptions';
+import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 
 export const applyAppSettings = (app: INestApplication) => {
   // Для внедрения зависимостей в validator constraint
@@ -34,8 +39,6 @@ const setAppPipes = (app: INestApplication) => {
       exceptionFactory: (errors) => {
         const errorsForResponse = [];
 
-        console.log('pipe errors', errors);
-
         errors.forEach((err) => {
           const keys = Object.keys(err.constraints);
 
@@ -47,6 +50,11 @@ const setAppPipes = (app: INestApplication) => {
           });
         });
 
+        throw new DomainException({
+          code: DomainExceptionCode.ValidationError,
+          errorsMessages: errorsForResponse,
+        });
+
         throw new BadRequestException(errorsForResponse);
       },
     }),
@@ -55,6 +63,7 @@ const setAppPipes = (app: INestApplication) => {
 
 const setAppExceptionsFilters = (app: INestApplication) => {
   app.useGlobalFilters(
+    new DomainHttpExceptionsFilter(),
     new HttpExceptionFilter(),
     new MongooseExceptionFilter(),
   );

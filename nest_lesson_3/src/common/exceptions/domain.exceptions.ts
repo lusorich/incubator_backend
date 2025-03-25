@@ -4,23 +4,29 @@ import {
   ExceptionFilter,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { DomainExceptionCode } from './domain.exception.codes';
+
+interface ValidationFieldError {
+  message: string;
+  field: string;
+}
 
 export class DomainException extends Error {
   message: string;
   code: DomainExceptionCode;
-  extensions: any[];
+  errorsMessages: ValidationFieldError[];
 
+  //TODO: need better types
   constructor(errorInfo: {
     code: DomainExceptionCode;
-    message: string;
-    extensions?: any[];
+    message?: string;
+    errorsMessages?: ValidationFieldError[];
   }) {
     super(errorInfo.message);
-    this.message = errorInfo.message;
+    this.message = errorInfo.message ?? '';
     this.code = errorInfo.code;
-    this.extensions = errorInfo.extensions || [];
+    this.errorsMessages = errorInfo.errorsMessages;
   }
 }
 
@@ -29,12 +35,9 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
   catch(exception: DomainException, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-
-    console.log('domain exception', exception);
 
     const status = this.mapToHttpStatus(exception.code);
-    const responseBody = this.buildResponseBody(exception, request.url);
+    const responseBody = this.buildResponseBody(exception);
 
     response.status(status).json(responseBody);
   }
@@ -60,16 +63,15 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
     }
   }
 
-  private buildResponseBody(
-    exception: DomainException,
-    requestUrl: string,
-  ): any {
-    return {
-      timestamp: new Date().toISOString(),
-      path: requestUrl,
-      message: exception.message,
-      code: exception.code,
-      extensions: exception.extensions,
-    };
+  private buildResponseBody(exception: DomainException): {
+    message?: string;
+    errorsMessages?: ValidationFieldError[];
+  } {
+    return Object.fromEntries(
+      Object.entries({
+        message: exception.message,
+        errorsMessages: exception.errorsMessages,
+      }).filter(([_, value]) => value !== undefined),
+    );
   }
 }

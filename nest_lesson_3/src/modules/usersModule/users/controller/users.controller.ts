@@ -21,6 +21,8 @@ import {
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
 import { CreateUserInput, UserViewDto } from '../models/users.dto';
+import { DomainException } from 'src/common/exceptions/domain.exceptions';
+import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 
 enum USERS_SORT_BY {
   'createdAt' = 'createdAt',
@@ -110,7 +112,10 @@ export class UsersController {
     const result = await this.usersService.delete(id);
 
     if (result.deletedCount < 1) {
-      throw new NotFoundException('User not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'User not found',
+      });
     }
   }
 }
