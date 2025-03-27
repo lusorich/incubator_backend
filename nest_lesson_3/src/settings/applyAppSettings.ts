@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   INestApplication,
+  ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
 import { useContainer } from 'class-validator';
@@ -14,6 +15,23 @@ import {
   DomainHttpExceptionsFilter,
 } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+
+const getOutputValidationErrors = (errors: ValidationError[]) => {
+  const outputErrors = [];
+
+  errors.forEach((err) => {
+    const keys = Object.keys(err.constraints);
+
+    keys.forEach((k) => {
+      outputErrors.push({
+        message: err.constraints[k],
+        field: err.property,
+      });
+    });
+  });
+
+  return outputErrors;
+};
 
 export const applyAppSettings = (app: INestApplication) => {
   // Для внедрения зависимостей в validator constraint
@@ -37,25 +55,12 @@ const setAppPipes = (app: INestApplication) => {
       stopAtFirstError: true,
       transform: true,
       exceptionFactory: (errors) => {
-        const errorsForResponse = [];
-
-        errors.forEach((err) => {
-          const keys = Object.keys(err.constraints);
-
-          keys.forEach((k) => {
-            errorsForResponse.push({
-              message: err.constraints[k],
-              field: err.property,
-            });
-          });
-        });
+        const errorsForResponse = getOutputValidationErrors(errors);
 
         throw new DomainException({
           code: DomainExceptionCode.ValidationError,
           errorsMessages: errorsForResponse,
         });
-
-        throw new BadRequestException(errorsForResponse);
       },
     }),
   );

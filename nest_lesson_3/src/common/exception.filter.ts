@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
 
     const exceptionResult = exception.getResponse();
-
+    //TODO: maybe it's all wrong
     if (status === HttpStatus.UNAUTHORIZED) {
       return response.sendStatus(HttpStatus.UNAUTHORIZED);
     }

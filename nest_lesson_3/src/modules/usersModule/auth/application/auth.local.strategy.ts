@@ -1,7 +1,9 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { DomainException } from 'src/common/exceptions/domain.exceptions';
+import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -17,7 +19,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     }
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'Unauthorized',
+      });
     }
 
     return { login: user.login, email: user.email, id: user.id };
