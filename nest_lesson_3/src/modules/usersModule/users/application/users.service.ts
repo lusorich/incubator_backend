@@ -6,6 +6,8 @@ import {
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import { CreateUserInput } from '../models/users.dto';
+import { DomainException } from 'src/common/exceptions/domain.exceptions';
+import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 
 @Injectable()
 export class UsersService {
@@ -19,11 +21,11 @@ export class UsersService {
       { email: createUserInput.email },
       { login: createUserInput.login },
     ]);
-    //TODO: Domain exceptions
+
     if (existedUser) {
-      throw new BadRequestException({
-        field: 'email',
-        message: [{ field: 'email', message: 'not correct' }],
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        errorsMessages: [{ field: 'email', message: 'not correct' }],
       });
     }
 

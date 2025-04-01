@@ -71,7 +71,7 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
       Object.entries({
         message: exception.message,
         errorsMessages: exception.errorsMessages,
-      }).filter(([_, value]) => value !== undefined),
+      }).filter(([_, value]) => !!value),
     );
   }
 }

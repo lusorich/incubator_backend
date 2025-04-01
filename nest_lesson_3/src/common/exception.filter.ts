@@ -15,19 +15,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
 
     const exceptionResult = exception.getResponse();
-    //TODO: maybe it's all wrong
+
+    //TODO: Here we catch jwt auth errors, but we can do it in jwt guard
     if (status === HttpStatus.UNAUTHORIZED) {
       return response.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
-    if (typeof exceptionResult === 'object' && 'message' in exceptionResult) {
-      response.status(status).json({
-        errorsMessages: exceptionResult.message,
-      });
-    } else {
-      response.status(status).json({
-        exceptionResult,
-      });
-    }
+    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(exceptionResult);
   }
 }
