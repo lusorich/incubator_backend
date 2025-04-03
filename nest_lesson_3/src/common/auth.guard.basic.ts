@@ -1,10 +1,7 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
+import { DomainException } from './exceptions/domain.exceptions';
+import { DomainExceptionCode } from './exceptions/domain.exception.codes';
 
 @Injectable()
 export class AuthGuardBasic implements CanActivate {
@@ -15,7 +12,10 @@ export class AuthGuardBasic implements CanActivate {
     const basic = this.extractBasicFromHeader(request);
 
     if (!basic || basic !== 'Basic YWRtaW46cXdlcnR5') {
-      throw new UnauthorizedException();
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'Unauthorized',
+      });
     }
 
     return true;
