@@ -49,7 +49,8 @@ class APISettings {
   public readonly MAIL_PASSWORD: string;
 
   // JWT
-  public readonly SECRET_JWT_KEY: string;
+  public readonly SECRET_ACCESS_TOKEN: string;
+  public readonly SECRET_REFRESH_TOKEN: string;
 
   constructor(private readonly envVariables: EnvironmentVariable) {
     // Application
@@ -73,7 +74,8 @@ class APISettings {
     this.MAIL_PASSWORD = envVariables.MAIL_PASSWORD;
 
     // JWT
-    this.SECRET_JWT_KEY = envVariables.SECRET_JWT_KEY;
+    this.SECRET_ACCESS_TOKEN = envVariables.SECRET_ACCESS_TOKEN;
+    this.SECRET_REFRESH_TOKEN = envVariables.SECRET_REFRESH_TOKEN;
   }
 
   private getNumberOrDefault(value: any, defaultValue: number): number {

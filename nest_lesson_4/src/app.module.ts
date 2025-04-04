@@ -27,8 +27,7 @@ import { JwtModule } from '@nestjs/jwt';
       },
     }),
     JwtModule.register({
-      global: true,
-      secret: appSettings.api.SECRET_JWT_KEY,
+      secret: appSettings.api.SECRET_ACCESS_TOKEN,
       signOptions: { expiresIn: '5m' },
     }),
 
