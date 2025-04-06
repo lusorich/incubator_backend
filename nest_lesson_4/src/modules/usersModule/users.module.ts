@@ -18,11 +18,19 @@ import { IsUserAlreadyExistConstraint } from './guards/IsUserAlreadyExist';
 import { IsUserByRecoveryCodeExistConstraint } from './guards/IsUserByRecoveryCodeExist';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './auth/application/auth.local.strategy';
-import { JwtStrategy } from './auth/application/auth.jwt.strategy';
+import { JwtAccessStrategy } from './auth/application/auth.jwt.access-strategy';
+import { JwtRefreshStrategy } from './auth/application/auth.jwt.refresh-strategy';
+import { JwtModule } from '@nestjs/jwt';
+import { appSettings } from 'src/settings/appSettings';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    JwtModule.register({
+      global: true,
+      secret: appSettings.api.SECRET_ACCESS_TOKEN,
+      signOptions: { expiresIn: '5m' },
+    }),
     CommonModule,
     NotificationModule,
     PassportModule,
@@ -42,7 +50,8 @@ import { JwtStrategy } from './auth/application/auth.jwt.strategy';
     IsUserByRecoveryCodeExistConstraint,
     IsUserByRecoveryCodeExistConstraint,
     LocalStrategy,
-    JwtStrategy,
+    JwtAccessStrategy,
+    JwtRefreshStrategy,
   ],
   exports: [UsersQueryRepository, UsersService],
 })

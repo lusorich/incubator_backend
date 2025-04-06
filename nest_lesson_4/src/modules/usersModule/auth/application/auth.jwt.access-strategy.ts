@@ -4,12 +4,13 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { appSettings } from 'src/settings/appSettings';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: appSettings.api.SECRET_ACCESS_TOKEN,
+      signOptions: { expiresIn: '10s' },
     });
   }
 

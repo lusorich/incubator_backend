@@ -26,10 +26,6 @@ import { JwtModule } from '@nestjs/jwt';
         },
       },
     }),
-    JwtModule.register({
-      secret: appSettings.api.SECRET_ACCESS_TOKEN,
-      signOptions: { expiresIn: '5m' },
-    }),
 
     SwaggerModule,
 
