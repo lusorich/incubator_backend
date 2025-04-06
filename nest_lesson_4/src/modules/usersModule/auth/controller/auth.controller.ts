@@ -23,6 +23,7 @@ import { IsEmailNotConfirmed } from '../../guards/IsEmailNotConfirmed';
 import { IsUserByRecoveryCodeExist } from '../../guards/IsUserByRecoveryCodeExist';
 import { IsPasswordRecoveryCodeUsed } from '../../guards/IsPasswordRecoveryCodeUsed';
 import { EmailService } from 'src/modules/notificationModule/mail.service';
+import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -87,8 +88,16 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async userLogin(@Request() req, @Res({ passthrough: true }) res) {
-    res.cookie('refreshToken', '.', { httpOnly: true, secure: true });
-    return this.authService.login(req.user);
+    const { accessToken, refreshToken } = await this.authService.login(
+      req.user,
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken };
   }
 
   @Post('registration')
@@ -172,6 +181,12 @@ export class AuthController {
 
       return await this.userService.updatePasswordRecovery(user);
     }
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('refresh-token')
+  async updateTokens(@Request() req) {
+    console.log('req', req.user);
   }
 
   @Post('new-password')
