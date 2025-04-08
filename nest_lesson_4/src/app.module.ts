@@ -9,6 +9,7 @@ import { BlogsModule } from './modules/blogsModule/blogs.module';
 import { TestingModule } from './modules/testingModule/testing.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { JwtModule } from '@nestjs/jwt';
+import { SecurityModule } from './modules/securityModule/security.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { JwtModule } from '@nestjs/jwt';
     NotificationModule,
     BlogsModule,
     TestingModule,
+    SecurityModule,
   ],
   controllers: [],
   providers: [],

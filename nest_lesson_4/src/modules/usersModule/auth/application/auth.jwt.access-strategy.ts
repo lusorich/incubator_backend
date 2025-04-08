@@ -10,7 +10,8 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: appSettings.api.SECRET_ACCESS_TOKEN,
-      signOptions: { expiresIn: '10s' },
+      //10s
+      signOptions: { expiresIn: '5m' },
     });
   }
 
