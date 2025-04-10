@@ -3,7 +3,7 @@ import { SecurityDocument } from '../domain/security.entity';
 export class SecurityViewDto {
   private ip: string;
   private title: string;
-  private lastActiveDate: string;
+  private lastActiveDate: Date;
   private deviceId: string;
 
   static getSecurityView(security: SecurityDocument): SecurityViewDto {
@@ -22,7 +22,7 @@ export class CreateDeviceSessionInput {
   userId: string;
   deviceId: string;
   deviceName: string;
-  iat: string;
-  exp: string;
+  iat: Date;
+  exp: Date;
   ip: string;
 }

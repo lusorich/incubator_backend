@@ -19,6 +19,8 @@ export class SecurityCommandsRepository {
     const deviceSession: SecurityDocument =
       this.SecurityModel.createDeviceSession(createDeviceSessionInput);
 
+    console.log('deviceSession', deviceSession);
+
     return this.save(deviceSession);
   }
 

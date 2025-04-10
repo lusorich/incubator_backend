@@ -3,6 +3,9 @@ import { AuthCommandsRepository } from '../repositories/auth.repository.commands
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../../users/application/users.service';
 import { appSettings } from 'src/settings/appSettings';
+import { SecurityService } from 'src/modules/securityModule/application/security.service';
+import { randomUUID } from 'crypto';
+import { formatISO, fromUnixTime, parseISO } from 'date-fns';
 
 @Injectable()
 export class AuthService {
@@ -10,6 +13,7 @@ export class AuthService {
     private readonly authCommandsRepository: AuthCommandsRepository,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly securityService: SecurityService,
   ) {}
 
   async registration(userRegistrationInputModel) {
@@ -46,10 +50,22 @@ export class AuthService {
     return null;
   }
 
-  async login(user) {
+  async login({ user, deviceName, ip }) {
     const payload = { login: user.login, email: user.email, userId: user.id };
 
-    return await this.getTokens(payload);
+    const { refreshToken, accessToken } = await this.getTokens(payload);
+    const decodedRefreshToken = this.jwtService.decode(refreshToken);
+
+    await this.securityService.createDeviceSession({
+      userId: user.id,
+      deviceId: randomUUID(),
+      deviceName,
+      iat: parseISO(formatISO(fromUnixTime(decodedRefreshToken.iat))),
+      exp: parseISO(formatISO(fromUnixTime(decodedRefreshToken.exp))),
+      ip,
+    });
+
+    return { refreshToken, accessToken };
   }
 
   async getTokens(payload) {

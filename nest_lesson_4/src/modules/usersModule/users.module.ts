@@ -22,6 +22,7 @@ import { JwtAccessStrategy } from './auth/application/auth.jwt.access-strategy';
 import { JwtRefreshStrategy } from './auth/application/auth.jwt.refresh-strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { appSettings } from 'src/settings/appSettings';
+import { SecurityModule } from '../securityModule/security.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { appSettings } from 'src/settings/appSettings';
     CommonModule,
     NotificationModule,
     PassportModule,
+    SecurityModule,
   ],
   controllers: [AuthController, UsersController],
   providers: [

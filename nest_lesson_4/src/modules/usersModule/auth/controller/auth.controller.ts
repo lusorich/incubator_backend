@@ -88,9 +88,11 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async userLogin(@Request() req, @Res({ passthrough: true }) res) {
-    const { accessToken, refreshToken } = await this.authService.login(
-      req.user,
-    );
+    const { accessToken, refreshToken } = await this.authService.login({
+      user: req.user,
+      deviceName: req.get('User-Agent') ?? 'unknown',
+      ip: req.ip,
+    });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

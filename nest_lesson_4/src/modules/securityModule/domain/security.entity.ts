@@ -1,7 +1,8 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateDeviceSessionInput } from '../models/security.model';
 
+@Schema()
 export class Security {
   @Prop()
   userId: string;
@@ -13,10 +14,10 @@ export class Security {
   deviceName: string;
 
   @Prop()
-  iat: string;
+  iat: Date;
 
   @Prop()
-  exp: string;
+  exp: Date;
 
   @Prop()
   ip: string;
