@@ -5,7 +5,7 @@ import { JwtRefreshAuthGuard } from 'src/modules/usersModule/auth/application/jw
 export class SecurityController {
   @UseGuards(JwtRefreshAuthGuard)
   @Get('devices')
-  async getUsers(@Request() req): Promise<any[]> {
+  async getDevices(@Request() req): Promise<any[]> {
     console.log('req', req?.user);
 
     return [];

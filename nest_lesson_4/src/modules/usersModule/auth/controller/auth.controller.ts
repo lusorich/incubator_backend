@@ -7,6 +7,7 @@ import {
   Post,
   Request,
   Res,
+  Response,
   UseGuards,
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
@@ -24,6 +25,7 @@ import { IsUserByRecoveryCodeExist } from '../../guards/IsUserByRecoveryCodeExis
 import { IsPasswordRecoveryCodeUsed } from '../../guards/IsPasswordRecoveryCodeUsed';
 import { EmailService } from 'src/modules/notificationModule/mail.service';
 import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
+import { JwtService } from '@nestjs/jwt';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -82,6 +84,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly emailService: EmailService,
     private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
   //TODO: Maybe wrong
   @UseGuards(LocalAuthGuard)
@@ -187,8 +190,29 @@ export class AuthController {
 
   @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh-token')
-  async updateTokens(@Request() req) {
-    console.log('req', req.user);
+  @HttpCode(HttpStatus.OK)
+  async updateTokens(@Request() req, @Res({ passthrough: true }) res) {
+    const decodedPrevRefreshToken = this.jwtService.decode(
+      req.user.refreshToken,
+    );
+
+    const payload = {
+      login: decodedPrevRefreshToken.login,
+      email: decodedPrevRefreshToken.email,
+      userId: decodedPrevRefreshToken.userId,
+      deviceId: decodedPrevRefreshToken.deviceId,
+      deviceName: decodedPrevRefreshToken.deviceName,
+    };
+
+    const { accessToken, refreshToken } =
+      await this.authService.getTokens(payload);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken };
   }
 
   @Post('new-password')

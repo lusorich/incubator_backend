@@ -51,15 +51,21 @@ export class AuthService {
   }
 
   async login({ user, deviceName, ip }) {
-    const payload = { login: user.login, email: user.email, userId: user.id };
+    const payload = {
+      login: user.login,
+      email: user.email,
+      userId: user.id,
+      deviceId: randomUUID(),
+      deviceName,
+    };
 
     const { refreshToken, accessToken } = await this.getTokens(payload);
     const decodedRefreshToken = this.jwtService.decode(refreshToken);
 
     await this.securityService.createDeviceSession({
-      userId: user.id,
-      deviceId: randomUUID(),
-      deviceName,
+      userId: decodedRefreshToken.userId,
+      deviceId: decodedRefreshToken.deviceId,
+      deviceName: decodedRefreshToken.deviceName,
       iat: parseISO(formatISO(fromUnixTime(decodedRefreshToken.iat))),
       exp: parseISO(formatISO(fromUnixTime(decodedRefreshToken.exp))),
       ip,
