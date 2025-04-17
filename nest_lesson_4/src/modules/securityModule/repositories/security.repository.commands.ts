@@ -43,6 +43,26 @@ export class SecurityCommandsRepository {
     );
   }
 
+  async deleteDeviceSession({ deviceId }: { deviceId: string }) {
+    return this.SecurityModel.deleteOne({ deviceId });
+  }
+
+  async deleteUserSessionsExceptCurrent({
+    userId,
+    deviceId,
+  }: {
+    userId: string;
+    deviceId: string;
+  }) {
+    return this.SecurityModel.deleteMany({
+      userId,
+      deviceId: { $ne: deviceId },
+    });
+  }
+
+  async deleteAll() {
+    return this.SecurityModel.deleteMany({});
+  }
   async save(deviceSession: SecurityDocument) {
     return deviceSession.save();
   }

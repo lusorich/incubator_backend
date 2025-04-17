@@ -66,7 +66,7 @@ export class AuthService {
       userId: decodedRefreshToken.userId,
       deviceId: decodedRefreshToken.deviceId,
       deviceName: decodedRefreshToken.deviceName,
-      iat: parseISO(formatISO(fromUnixTime(decodedRefreshToken.iat))),
+      iat: decodedRefreshToken.iat,
       exp: parseISO(formatISO(fromUnixTime(decodedRefreshToken.exp))),
       ip,
     });

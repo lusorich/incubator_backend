@@ -14,7 +14,7 @@ export class Security {
   deviceName: string;
 
   @Prop()
-  iat: Date;
+  iat: number;
 
   @Prop()
   exp: Date;

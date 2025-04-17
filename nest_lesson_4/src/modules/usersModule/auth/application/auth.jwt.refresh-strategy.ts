@@ -25,7 +25,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
   async validate(req: Request, payload) {
     const refreshToken = req.cookies.refreshToken;
-    console.log('req', payload);
     let userSession = null;
 
     try {
@@ -37,6 +36,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
         ],
       });
     } catch (e) {
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'unauthorized',
+      });
+    }
+
+    if (!userSession) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'unauthorized',
