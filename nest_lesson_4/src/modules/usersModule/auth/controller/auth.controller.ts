@@ -7,7 +7,6 @@ import {
   Post,
   Request,
   Res,
-  Response,
   UseGuards,
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
@@ -26,6 +25,7 @@ import { IsPasswordRecoveryCodeUsed } from '../../guards/IsPasswordRecoveryCodeU
 import { EmailService } from 'src/modules/notificationModule/mail.service';
 import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
 import { JwtService } from '@nestjs/jwt';
+import { SecurityService } from 'src/modules/securityModule/application/security.service';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -85,6 +85,7 @@ export class AuthController {
     private readonly emailService: EmailService,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly securityService: SecurityService,
   ) {}
   //TODO: Maybe wrong
   @UseGuards(LocalAuthGuard)
@@ -206,10 +207,18 @@ export class AuthController {
 
     const { accessToken, refreshToken } =
       await this.authService.getTokens(payload);
+    const decodedRefreshToken = this.jwtService.decode(refreshToken);
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
+    });
+
+    await this.securityService.updateDeviceSession({
+      userId: decodedPrevRefreshToken.userId,
+      deviceId: decodedPrevRefreshToken.deviceId,
+      iat: decodedRefreshToken?.iat ?? '',
+      exp: decodedRefreshToken?.exp ?? '',
     });
 
     return { accessToken };

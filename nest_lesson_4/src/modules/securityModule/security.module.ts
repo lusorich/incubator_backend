@@ -4,6 +4,7 @@ import { SecurityCommandsRepository } from './repositories/security.repository.c
 import { SecurityService } from './application/security.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Security, SecuritySchema } from './domain/security.entity';
+import { SecurityQueryRepository } from './repositories/security.repository.query';
 
 @Module({
   imports: [
@@ -12,7 +13,11 @@ import { Security, SecuritySchema } from './domain/security.entity';
     ]),
   ],
   controllers: [SecurityController],
-  providers: [SecurityCommandsRepository, SecurityService],
+  providers: [
+    SecurityQueryRepository,
+    SecurityCommandsRepository,
+    SecurityService,
+  ],
   exports: [SecurityService],
 })
 export class SecurityModule {}

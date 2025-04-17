@@ -19,9 +19,28 @@ export class SecurityCommandsRepository {
     const deviceSession: SecurityDocument =
       this.SecurityModel.createDeviceSession(createDeviceSessionInput);
 
-    console.log('deviceSession', deviceSession);
-
     return this.save(deviceSession);
+  }
+
+  async updateDeviceSession({
+    userId,
+    deviceId,
+    iat,
+    exp,
+  }: {
+    userId: string;
+    deviceId: string;
+    iat: string;
+    exp: string;
+  }) {
+    return this.SecurityModel.updateOne(
+      {
+        $and: [{ userId }, { deviceId }],
+      },
+      {
+        $set: { iat, exp },
+      },
+    );
   }
 
   async save(deviceSession: SecurityDocument) {
