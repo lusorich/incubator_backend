@@ -19,6 +19,7 @@ import { LIKE_STATUS } from 'src/common/enums';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from 'src/modules/usersModule/auth/application/jwt.auth.guard';
 import { LikesQueryRepository } from '../../likes/repositories/likes.repository.query';
+import { SkipThrottle } from '@nestjs/throttler';
 
 class UpdateCommentInputDto {
   @IsNotEmpty()
@@ -32,6 +33,7 @@ class UpdateLikeStatusInputDto {
   likeStatus: string;
 }
 
+@SkipThrottle()
 @Controller('comments')
 export class CommentsController {
   constructor(

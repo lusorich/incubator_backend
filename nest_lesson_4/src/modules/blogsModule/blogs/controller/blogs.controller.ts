@@ -1,6 +1,5 @@
 import {
   Controller,
-  DefaultValuePipe,
   Get,
   Post,
   HttpStatus,
@@ -27,6 +26,7 @@ import {
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
 import { BlogPostVewDto, BlogViewDto } from '../domain/blogs.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
 class CreateBlogInputDto {
   @IsNotEmpty()
@@ -75,6 +75,7 @@ class GetBlogPostsQueryParams extends BaseSortablePaginationParams<
   sortBy = 'createdAt' as const;
 }
 
+@SkipThrottle()
 @Controller('blogs')
 export class BlogsController {
   constructor(

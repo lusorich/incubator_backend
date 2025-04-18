@@ -1,6 +1,5 @@
 import {
   Controller,
-  DefaultValuePipe,
   Get,
   Post,
   HttpStatus,
@@ -15,7 +14,6 @@ import {
   Request,
   Req,
 } from '@nestjs/common';
-import { SORT_DIRECTION } from 'src/common/types';
 import { PostsService } from '../application/posts.service';
 import { PostsQueryRepository } from '../repositories/posts.repository.query';
 import { IsEnum, IsNotEmpty, Length } from 'class-validator';
@@ -32,6 +30,7 @@ import {
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
 import { PostCommentViewDto, PostViewDto } from '../domain/post.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
 class CreateCommentForPostDto {
   @IsNotEmpty()
@@ -79,6 +78,7 @@ class GetPostCommentsQueryParams extends BaseSortablePaginationParams<
   sortBy = 'createdAt' as const;
 }
 
+@SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(

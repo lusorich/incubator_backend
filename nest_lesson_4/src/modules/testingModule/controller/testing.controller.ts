@@ -1,4 +1,5 @@
 import { Controller, HttpStatus, HttpCode, Delete } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { BlogsService } from 'src/modules/blogsModule/blogs/application/blogs.service';
 import { CommentsService } from 'src/modules/blogsModule/comments/application/comments.service';
 import { LikesService } from 'src/modules/blogsModule/likes/application/likes.service';
@@ -6,6 +7,7 @@ import { PostsService } from 'src/modules/blogsModule/posts/application/posts.se
 import { SecurityService } from 'src/modules/securityModule/application/security.service';
 import { UsersService } from 'src/modules/usersModule/users/application/users.service';
 
+@SkipThrottle()
 @Controller('testing')
 export class TestingController {
   constructor(

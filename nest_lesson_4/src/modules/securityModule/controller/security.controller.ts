@@ -12,7 +12,9 @@ import { JwtRefreshAuthGuard } from 'src/modules/usersModule/auth/application/jw
 import { SecurityViewDto } from '../models/security.model';
 import { SecurityQueryRepository } from '../repositories/security.repository.query';
 import { SecurityService } from '../application/security.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('security')
 export class SecurityController {
   constructor(

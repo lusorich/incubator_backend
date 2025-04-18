@@ -8,8 +8,9 @@ import { appSettings } from './settings/appSettings';
 import { BlogsModule } from './modules/blogsModule/blogs.module';
 import { TestingModule } from './modules/testingModule/testing.module';
 import { SwaggerModule } from '@nestjs/swagger';
-import { JwtModule } from '@nestjs/jwt';
 import { SecurityModule } from './modules/securityModule/security.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -28,6 +29,10 @@ import { SecurityModule } from './modules/securityModule/security.module';
       },
     }),
 
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 10000, limit: 5 }],
+    }),
+
     SwaggerModule,
 
     UsersModule,
@@ -38,6 +43,11 @@ import { SecurityModule } from './modules/securityModule/security.module';
     SecurityModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

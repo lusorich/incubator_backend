@@ -22,6 +22,7 @@ import {
 import { CreateUserInput, UserViewDto } from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+import { SkipThrottle } from '@nestjs/throttler';
 
 enum USERS_SORT_BY {
   'createdAt' = 'createdAt',
@@ -51,6 +52,7 @@ class CreateUserInputDto implements CreateUserInput {
   password: string;
 }
 
+@SkipThrottle()
 @Controller('users')
 export class UsersController {
   usersService: UsersService;

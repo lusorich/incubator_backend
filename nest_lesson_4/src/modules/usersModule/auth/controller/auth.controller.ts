@@ -26,6 +26,7 @@ import { EmailService } from 'src/modules/notificationModule/mail.service';
 import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { SecurityService } from 'src/modules/securityModule/application/security.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -189,6 +190,7 @@ export class AuthController {
     }
   }
 
+  @SkipThrottle()
   @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
@@ -239,6 +241,7 @@ export class AuthController {
     return await this.userService.updatePassword(user, userInput.newPassword);
   }
 
+  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async userInfo(@Request() req) {

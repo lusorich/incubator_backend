@@ -21,6 +21,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return response.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
+    if (status === HttpStatus.TOO_MANY_REQUESTS) {
+      return response
+        .status(HttpStatus.TOO_MANY_REQUESTS)
+        .json(exceptionResult);
+    }
+
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(exceptionResult);
   }
 }
