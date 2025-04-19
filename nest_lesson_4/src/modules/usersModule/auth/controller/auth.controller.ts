@@ -247,4 +247,14 @@ export class AuthController {
   async userInfo(@Request() req) {
     return req.user;
   }
+
+  @SkipThrottle()
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Request() req) {
+    const { userId, deviceId } = req.user;
+
+    return await this.securityService.deleteDeviceSession({ userId, deviceId });
+  }
 }
