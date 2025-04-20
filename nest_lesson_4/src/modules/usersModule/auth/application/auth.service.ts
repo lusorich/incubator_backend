@@ -83,7 +83,7 @@ export class AuthService {
         {
           secret: appSettings.api.SECRET_ACCESS_TOKEN,
           //10s
-          expiresIn: '5m',
+          expiresIn: '10s',
         },
       ),
       this.jwtService.sign(
@@ -93,7 +93,7 @@ export class AuthService {
         {
           secret: appSettings.api.SECRET_REFRESH_TOKEN,
           //20s
-          expiresIn: '20m',
+          expiresIn: '20s',
         },
       ),
     ];
