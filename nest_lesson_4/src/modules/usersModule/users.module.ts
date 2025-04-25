@@ -23,6 +23,7 @@ import { JwtRefreshStrategy } from './auth/application/auth.jwt.refresh-strategy
 import { JwtModule } from '@nestjs/jwt';
 import { appSettings } from 'src/settings/appSettings';
 import { SecurityModule } from '../securityModule/security.module';
+import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfirmationCodeExist';
 
 @Module({
   imports: [
@@ -50,7 +51,7 @@ import { SecurityModule } from '../securityModule/security.module';
     IsPasswordRecoveryCodeUsedConstraint,
     IsUserAlreadyExistConstraint,
     IsUserByRecoveryCodeExistConstraint,
-    IsUserByRecoveryCodeExistConstraint,
+    IsUserByConfirmationCodeExistConstraint,
     LocalStrategy,
     JwtAccessStrategy,
     JwtRefreshStrategy,
