@@ -5,10 +5,14 @@ import { Model } from 'mongoose';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
 import { UserViewDto } from '../models/users.dto';
 import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
+import { Database } from 'src/modules/databaseModule/database';
 
 @Injectable()
 export class UsersQueryRepository {
-  constructor(@InjectModel(User.name) private UserModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private UserModel: Model<User>,
+    private database: Database,
+  ) {}
 
   async getUsers({
     paginationParams = {},
@@ -25,6 +29,10 @@ export class UsersQueryRepository {
     } = paginationParams;
 
     const users = await this.UserModel.find({});
+    console.log(
+      'db',
+      await this.database.selectFrom('users').selectAll().execute(),
+    );
 
     const filteredUsers = (
       await this.UserModel.find({
