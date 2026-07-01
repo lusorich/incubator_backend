@@ -103,6 +103,8 @@ export class UsersController {
 
     const result = await this.usersService.create(createUser);
 
+    console.log('result', result);
+
     return this.usersQueryRepository.getById(result);
   }
 

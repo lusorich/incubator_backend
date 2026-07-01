@@ -2,13 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { CreateUserInput } from '../models/users.dto';
+import { Database } from 'src/modules/databaseModule/database';
 
 @Injectable()
 export class UsersCommandsRepository {
-  constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
+  constructor(
+    @InjectModel(User.name) private UserModel: UserModelType,
+    private database: Database,
+  ) {}
 
   async create(createUserInput: CreateUserInput) {
     const user: UserDocument = this.UserModel.createUser(createUserInput);
+
+    return this.database
+      .insertInto('users')
+      .values(createUserInput)
+      .returningAll()
+      .executeTakeFirstOrThrow();
 
     return this.save(user);
   }
