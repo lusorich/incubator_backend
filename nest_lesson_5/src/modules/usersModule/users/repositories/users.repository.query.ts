@@ -69,17 +69,33 @@ export class UsersQueryRepository {
     return UserViewDto.getUserView(user);
   }
 
-  async getByProperty(property: string, value: string) {
-    const user = await this.UserModel.findOne({ [property]: value });
+  //ts
+  async getByProperty(property: any, value: string) {
+    const user = await this.database
+      .selectFrom('users')
+      .selectAll()
+      .where(property, '=', value)
+      .execute();
 
-    return user;
+    console.log('user', user);
+
+    return user as any;
   }
 
-  async getByProperties(properties: Record<string, string>[]) {
-    const user = await this.UserModel.findOne({
-      $or: properties,
-    });
+  async getByProperties(properties: Record<string, string>) {
+    const users = await this.database
+      .selectFrom('users')
+      .selectAll()
+      .where((eb) =>
+        eb.or([
+          eb('login', '=', properties['login']),
+          eb('email', '=', properties['email']),
+        ]),
+      )
+      .execute();
 
-    return user;
+    console.log('users', users);
+
+    return users;
   }
 }

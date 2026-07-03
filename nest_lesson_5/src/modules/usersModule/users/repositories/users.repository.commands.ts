@@ -19,8 +19,6 @@ export class UsersCommandsRepository {
       .values(createUserInput)
       .returningAll()
       .executeTakeFirstOrThrow();
-
-    return this.save(user);
   }
 
   async save(user: UserDocument) {

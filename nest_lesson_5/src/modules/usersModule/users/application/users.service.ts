@@ -17,12 +17,12 @@ export class UsersService {
   ) {}
 
   async create(createUserInput: CreateUserInput) {
-    const existedUser = await this.usersQueryRepository.getByProperties([
-      { email: createUserInput.email },
-      { login: createUserInput.login },
-    ]);
+    const existedUsers = await this.usersQueryRepository.getByProperties({
+      email: createUserInput.email,
+      login: createUserInput.login,
+    });
 
-    if (existedUser) {
+    if (existedUsers.length > 0) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         errorsMessages: [{ field: 'email', message: 'not correct' }],

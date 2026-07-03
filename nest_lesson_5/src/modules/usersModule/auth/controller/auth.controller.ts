@@ -122,6 +122,8 @@ export class AuthController {
       html: emailTemplate,
     });
 
+    console.log('reg');
+
     return await this.authService.registration({
       ...userInput,
       emailConfirmation,
