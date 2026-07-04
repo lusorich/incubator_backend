@@ -12,13 +12,13 @@ export class UsersCommandsRepository {
   ) {}
 
   async create(createUserInput: CreateUserInput) {
-    const user: UserDocument = this.UserModel.createUser(createUserInput);
-
-    return this.database
+    const user = this.database
       .insertInto('users')
       .values(createUserInput)
       .returningAll()
       .executeTakeFirstOrThrow();
+
+    return user;
   }
 
   async save(user: UserDocument) {
@@ -26,12 +26,13 @@ export class UsersCommandsRepository {
   }
 
   async updateUserIsConfirmed(user, isConfirmed) {
-    return this.UserModel.updateOne(
-      { login: user.login },
-      {
-        $set: { 'emailConfirmation.isConfirmed': isConfirmed },
-      },
-    );
+    const up = await this.database
+      .updateTable('users')
+      .set('email_confirmation_is_confirmed', isConfirmed)
+      .where('id', '=', user.id)
+      .executeTakeFirst();
+
+    return up;
   }
 
   async updateUserEmailConfirmation(user, emailConfirmation) {

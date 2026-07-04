@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
-import { CreateUserInput } from '../models/users.dto';
+import { CreateUserInput, CreateUserInputMongoType } from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 

@@ -13,9 +13,9 @@ export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
 
   async validate(arg: string, options: ValidationArguments) {
     const property = options.property;
-    const users = await this.UsersQueryRepository.getByProperty(property, arg);
+    const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
-    if (users.length > 0) {
+    if (user > 0) {
       return false;
     }
 

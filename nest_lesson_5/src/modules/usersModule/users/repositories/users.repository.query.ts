@@ -75,9 +75,7 @@ export class UsersQueryRepository {
       .selectFrom('users')
       .selectAll()
       .where(property, '=', value)
-      .execute();
-
-    console.log('user', user);
+      .executeTakeFirst();
 
     return user as any;
   }

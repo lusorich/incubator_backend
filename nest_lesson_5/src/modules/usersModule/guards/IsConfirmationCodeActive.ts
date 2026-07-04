@@ -16,15 +16,15 @@ export class IsConfirmationCodeActiveConstraint
 
   async validate(arg: string, options: ValidationArguments) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'emailConfirmation.code',
+      'email_confirmation_code',
       arg,
     );
 
-    if (user && isAfter(new Date(), user.emailConfirmation.expire)) {
+    if (user && isAfter(new Date(), user.email_confirmation_expire)) {
       return false;
     }
 
-    if (user && user.emailConfirmation.isConfirmed) {
+    if (user && user.email_confirmation_is_confirmed) {
       return false;
     }
 

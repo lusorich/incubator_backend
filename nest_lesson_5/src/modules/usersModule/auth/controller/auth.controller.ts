@@ -110,33 +110,37 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
-    const emailConfirmation = this.emailService.generateUserEmailConfirmation();
+    const emailConfirmation =
+      this.emailService.generateUserEmailConfirmationPg();
     const emailTemplate =
       this.emailService.generateRegistrationConfirmationEmail({
-        code: emailConfirmation.code,
+        code: emailConfirmation.email_confirmation_code,
       });
-
+    // need try catch, but where?
     await this.emailService.sendEmail({
       from: 'eeugern@mail.ru',
       to: userInput.email,
       html: emailTemplate,
     });
 
-    console.log('reg');
-
-    return await this.authService.registration({
+    const newUser = await this.authService.registration({
       ...userInput,
-      emailConfirmation,
+      ...emailConfirmation,
     });
+    console.log('newUser', newUser);
+
+    return newUser;
   }
 
+  // i don't like logic cause in guards we check our user by doing sql queries
+  // and there we use getByProperty and search user again
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistationConfirmation(
     @Body() userInput: RegistrationConfirmationInputDto,
   ) {
     const user = await this.userService.getByProperty(
-      'emailConfirmation.code',
+      'email_confirmation_code',
       userInput.code,
     );
 

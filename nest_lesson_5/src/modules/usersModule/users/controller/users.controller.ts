@@ -19,7 +19,11 @@ import {
   BaseSortablePaginationParams,
   PaginatedViewDto,
 } from 'src/common/PaginationQuery.dto';
-import { CreateUserInput, UserViewDto } from '../models/users.dto';
+import {
+  CreateUserInput,
+  CreateUserInputMongoType,
+  UserViewDto,
+} from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -37,7 +41,7 @@ class GetUsersQueryParams extends BaseSortablePaginationParams<USERS_SORT_BY> {
 }
 
 //TODO: Move to users.dto.ts
-class CreateUserInputDto implements CreateUserInput {
+class CreateUserInputDto implements CreateUserInputMongoType {
   @IsNotEmpty()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)
@@ -96,7 +100,7 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
-    const createUser: CreateUserInput = {
+    const createUser: any = {
       ...userInput,
       emailConfirmation: undefined,
     };

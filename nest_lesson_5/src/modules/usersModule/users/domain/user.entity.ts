@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { CreateUserInput } from '../models/users.dto';
+import { CreateUserInput, CreateUserInputMongoType } from '../models/users.dto';
 
 @Schema()
 export class EmailConfirmation {
@@ -45,7 +45,7 @@ export class User {
   @Prop()
   passwordRecovery?: PasswordRecovery;
 
-  static createUser(createUserInput: CreateUserInput): UserDocument {
+  static createUser(createUserInput: CreateUserInputMongoType): UserDocument {
     const user = new this();
 
     user.login = createUserInput.login;

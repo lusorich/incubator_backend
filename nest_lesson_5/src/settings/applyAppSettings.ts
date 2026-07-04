@@ -15,6 +15,7 @@ import {
   DomainHttpExceptionsFilter,
 } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+import { BigIntInterceptor } from 'src/common/bigint.interceptor';
 
 const getOutputValidationErrors = (errors: ValidationError[]) => {
   const outputErrors = [];
@@ -42,6 +43,8 @@ export const applyAppSettings = (app: INestApplication) => {
   setAppPipes(app);
 
   setAppExceptionsFilters(app);
+
+  setAppInterceptors(app);
 
   swaggerSetup(app);
 
@@ -72,4 +75,8 @@ const setAppExceptionsFilters = (app: INestApplication) => {
     new HttpExceptionFilter(),
     new MongooseExceptionFilter(),
   );
+};
+
+const setAppInterceptors = (app: INestApplication) => {
+  app.useGlobalInterceptors(new BigIntInterceptor());
 };

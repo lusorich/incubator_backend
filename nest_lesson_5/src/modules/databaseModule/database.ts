@@ -6,11 +6,9 @@ export interface UserTable {
   email: string;
   password: string;
   created_at: ColumnType<Date, string | undefined, string>;
-  // emailConfirmation: {
-  //   code: string;
-  //   expire: ColumnType<Date, string | undefined, string>;
-  //   isConfirmed: boolean;
-  // };
+  email_confirmation_code: string | null;
+  email_confirmation_expire: Date | null;
+  email_confirmation_is_confirmed: boolean | null;
 }
 
 export interface DB {

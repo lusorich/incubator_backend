@@ -15,7 +15,7 @@ export class IsUserByConfirmationCodeExistConstraint
 
   async validate(arg: string, options: ValidationArguments) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'emailConfirmation.code',
+      'email_confirmation_code',
       arg,
     );
 

@@ -1,0 +1,159 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1783183717660,
+  "projectRoot": "D:\\kamasutra\\samurai\\nest_lesson_5",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "@nestjs/core",
+        "version": "10.0.0",
+        "category": "backend"
+      },
+      {
+        "name": "jest",
+        "version": "29.5.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "yarn",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "yarn build",
+    "testCommand": "yarn test",
+    "lintCommand": "yarn lint",
+    "devCommand": "yarn start",
+    "scripts": {
+      "build": "nest build",
+      "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+      "start": "nest start",
+      "start:dev": "nest start --watch",
+      "start:debug": "nest start --debug --watch",
+      "start:prod": "node dist/main",
+      "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+      "test": "jest",
+      "test:watch": "jest --watch",
+      "test:cov": "jest --coverage",
+      "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+      "test:e2e": "set ENV=TESTING && jest --config ./test/jest-e2e.json --runInBand"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase/PascalCase",
+    "importStyle": "ES modules",
+    "testPattern": "*.test.ts",
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src",
+      "test"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 7,
+      "lastAccessed": 1783183717608,
+      "keyFiles": [
+        "app.module.d.ts",
+        "app.module.js",
+        "app.module.js.map",
+        "main.d.ts",
+        "main.js"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 2,
+      "lastAccessed": 1783183717609,
+      "keyFiles": [
+        "app.module.ts",
+        "main.ts"
+      ]
+    },
+    "test": {
+      "path": "test",
+      "purpose": "Test files",
+      "fileCount": 5,
+      "lastAccessed": 1783183717621,
+      "keyFiles": [
+        "app.test.ts",
+        "auth.e2e-spec.ts",
+        "blogs.e2e-spec.ts",
+        "jest-e2e.json",
+        "users.e2e-spec.ts"
+      ]
+    },
+    "test\\helpers": {
+      "path": "test\\helpers",
+      "purpose": "Helper functions",
+      "fileCount": 2,
+      "lastAccessed": 1783183717622,
+      "keyFiles": [
+        "auth.helpers.ts",
+        "blogs.helpers.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src\\settings\\applyAppSettings.ts",
+      "accessCount": 5,
+      "lastAccessed": 1783183984701,
+      "type": "file"
+    },
+    {
+      "path": "src\\main.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783183890848,
+      "type": "file"
+    },
+    {
+      "path": "src\\common\\exception.filter.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783183892545,
+      "type": "file"
+    },
+    {
+      "path": "src\\app.module.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783183892591,
+      "type": "file"
+    },
+    {
+      "path": "src\\common\\bigint.interceptor.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783183947464,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

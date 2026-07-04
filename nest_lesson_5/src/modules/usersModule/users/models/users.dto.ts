@@ -19,9 +19,18 @@ export class UserViewDto {
   }
 }
 
-export class CreateUserInput {
+export class CreateUserInputMongoType {
   login: string;
   email: string;
   password: string;
   emailConfirmation?: EmailConfirmation;
+}
+
+export class CreateUserInput {
+  login: string;
+  email: string;
+  password: string;
+  email_confirmation_code: string | null;
+  email_confirmation_expire: Date | null;
+  email_confirmation_is_confirmed: boolean | null;
 }

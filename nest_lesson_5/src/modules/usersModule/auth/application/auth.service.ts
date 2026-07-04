@@ -17,7 +17,6 @@ export class AuthService {
   ) {}
 
   async registration(userRegistrationInputModel) {
-    console.log('resg');
     return this.authCommandsRepository.registration(userRegistrationInputModel);
   }
 
