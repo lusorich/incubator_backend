@@ -106,7 +106,7 @@ export class AuthController {
 
     return { accessToken };
   }
-
+  // done
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
@@ -127,7 +127,6 @@ export class AuthController {
       ...userInput,
       ...emailConfirmation,
     });
-    console.log('newUser', newUser);
 
     return newUser;
   }
@@ -146,7 +145,7 @@ export class AuthController {
 
     return await this.userService.updateUserIsConfirmed(user, true);
   }
-
+  // done
   @Post('registration-email-resending')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistrationEmailResending(
@@ -192,7 +191,10 @@ export class AuthController {
         from: 'eeugern@mail.ru',
       });
 
-      return await this.userService.updatePasswordRecovery(user);
+      return await this.userService.updatePasswordRecovery(
+        user,
+        passwordRecovery,
+      );
     }
   }
 
@@ -238,11 +240,17 @@ export class AuthController {
     @Body() userInput: RegistrationNewPasswordInputDto,
   ) {
     const user = await this.userService.getByProperty(
-      'passwordRecovery.recoveryCode',
+      'password_recovery_code',
       userInput.recoveryCode,
     );
 
-    await this.userService.updatePasswordRecovery(user);
+    console.log('new-pass user', user);
+
+    await this.userService.updatePasswordRecovery(user, {
+      isUsed: true,
+      recoveryCode: null,
+      expire: null,
+    });
 
     return await this.userService.updatePassword(user, userInput.newPassword);
   }

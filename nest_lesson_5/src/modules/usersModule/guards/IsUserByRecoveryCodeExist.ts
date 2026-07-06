@@ -14,7 +14,7 @@ export class IsUserByRecoveryCodeExistConstraint
 
   async validate(arg: string) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'passwordRecovery.recoveryCode',
+      'password_recovery_code',
       arg,
     );
 

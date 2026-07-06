@@ -9,6 +9,9 @@ export interface UserTable {
   email_confirmation_code: string | null;
   email_confirmation_expire: Date | null;
   email_confirmation_is_confirmed: boolean | null;
+  password_recovery_code: string | null;
+  password_recovery_is_used: boolean | null;
+  password_recovery_expire: Date | null;
 }
 
 export interface DB {

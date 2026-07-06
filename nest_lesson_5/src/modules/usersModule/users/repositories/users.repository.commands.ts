@@ -26,34 +26,39 @@ export class UsersCommandsRepository {
   }
 
   async updateUserIsConfirmed(user, isConfirmed) {
-    const up = await this.database
+    return await this.database
       .updateTable('users')
       .set('email_confirmation_is_confirmed', isConfirmed)
       .where('id', '=', user.id)
       .executeTakeFirst();
-
-    return up;
   }
 
   async updateUserEmailConfirmation(user, emailConfirmation) {
-    return this.UserModel.updateOne(
-      { login: user.login },
-      { $set: { emailConfirmation } },
-    );
+    return await this.database
+      .updateTable('users')
+      .set('email_confirmation_is_confirmed', emailConfirmation.isConfirmed)
+      .set('email_confirmation_code', emailConfirmation.code)
+      .set('email_confirmation_expire', emailConfirmation.expire)
+      .where('login', '=', user.login)
+      .executeTakeFirst();
   }
 
-  async updatePasswordRecovery(user) {
-    return this.UserModel.updateOne(
-      { login: user.login },
-      { $set: { 'passwordRecovery.isUsed': true } },
-    );
+  async updatePasswordRecovery(user, passwordRecovery) {
+    return await this.database
+      .updateTable('users')
+      .set('password_recovery_is_used', passwordRecovery.isUsed)
+      .set('password_recovery_code', passwordRecovery.recoveryCode)
+      .set('password_recovery_expire', passwordRecovery.expire)
+      .where('login', '=', user.login)
+      .executeTakeFirst();
   }
 
   async updatePassword(user, newPassword) {
-    return this.UserModel.updateOne(
-      { login: user.login },
-      { $set: { password: newPassword } },
-    );
+    return await this.database
+      .updateTable('users')
+      .set('password', newPassword)
+      .where('login', '=', user.login)
+      .executeTakeFirst();
   }
 
   async delete(id: string) {
