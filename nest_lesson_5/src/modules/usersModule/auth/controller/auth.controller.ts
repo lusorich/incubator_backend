@@ -89,6 +89,7 @@ export class AuthController {
     private readonly securityService: SecurityService,
   ) {}
   //TODO: Maybe wrong
+  // done
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -133,6 +134,7 @@ export class AuthController {
 
   // i don't like logic cause in guards we check our user by doing sql queries
   // and there we use getByProperty and search user again
+  // done
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistationConfirmation(
@@ -170,7 +172,7 @@ export class AuthController {
       emailConfirmation,
     );
   }
-
+  // done
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistrationPasswordRecovery(
@@ -197,12 +199,13 @@ export class AuthController {
       );
     }
   }
-
+  //done but need refactoring
   @SkipThrottle()
   @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   async updateTokens(@Request() req, @Res({ passthrough: true }) res) {
+    console.log('req', req.user.refreshToken);
     const decodedPrevRefreshToken = this.jwtService.decode(
       req.user.refreshToken,
     );
@@ -224,16 +227,20 @@ export class AuthController {
       secure: true,
     });
 
+    console.log('exp', decodedRefreshToken?.exp);
+
     await this.securityService.updateDeviceSession({
       userId: decodedPrevRefreshToken.userId,
       deviceId: decodedPrevRefreshToken.deviceId,
       iat: decodedRefreshToken?.iat ?? '',
-      exp: decodedRefreshToken?.exp ?? '',
+      exp: decodedRefreshToken?.exp
+        ? new Date(decodedRefreshToken.exp * 1000)
+        : '',
     });
 
     return { accessToken };
   }
-
+  // done
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistrationNewPassword(
@@ -243,8 +250,6 @@ export class AuthController {
       'password_recovery_code',
       userInput.recoveryCode,
     );
-
-    console.log('new-pass user', user);
 
     await this.userService.updatePasswordRecovery(user, {
       isUsed: true,

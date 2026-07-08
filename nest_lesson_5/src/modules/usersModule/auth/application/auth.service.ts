@@ -49,7 +49,7 @@ export class AuthService {
 
     return null;
   }
-
+  // done
   async login({ user, deviceName, ip }) {
     const payload = {
       login: user.login,

@@ -6,20 +6,28 @@ import {
   SecurityModelType,
 } from '../domain/security.entity';
 import { CreateDeviceSessionInput } from '../models/security.model';
+import { Database } from 'src/modules/databaseModule/database';
 
 @Injectable()
 export class SecurityCommandsRepository {
   constructor(
     @InjectModel(Security.name) private SecurityModel: SecurityModelType,
+    private database: Database,
   ) {}
 
-  async createDeviceSession(
-    createDeviceSessionInput: CreateDeviceSessionInput,
-  ) {
-    const deviceSession: SecurityDocument =
-      this.SecurityModel.createDeviceSession(createDeviceSessionInput);
-
-    return this.save(deviceSession);
+  async createDeviceSession(createDeviceSessionInput: {
+    user_id: string;
+    device_id: string;
+    device_name: string;
+    iat: string | number;
+    exp: Date;
+    ip: string;
+  }) {
+    return await this.database
+      .insertInto('security_devices')
+      .values(createDeviceSessionInput)
+      .returningAll()
+      .executeTakeFirst();
   }
 
   async updateDeviceSession({
@@ -30,17 +38,22 @@ export class SecurityCommandsRepository {
   }: {
     userId: string;
     deviceId: string;
-    iat: string;
-    exp: string;
+    iat: number | string;
+    exp: Date | string;
   }) {
-    return this.SecurityModel.updateOne(
-      {
-        $and: [{ userId }, { deviceId }],
-      },
-      {
-        $set: { iat, exp },
-      },
-    );
+    console.log('upadte deviceSession');
+
+    const hm = await this.database
+      .updateTable('security_devices')
+      .set('iat', iat)
+      .set('exp', exp)
+      .where('user_id', '=', userId)
+      .where('device_id', '=', deviceId)
+      .executeTakeFirst();
+
+    console.log('hm', hm);
+
+    return hm;
   }
 
   async deleteDeviceSession({ deviceId }: { deviceId: string }) {

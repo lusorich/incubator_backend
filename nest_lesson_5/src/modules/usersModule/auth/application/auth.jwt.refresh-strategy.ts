@@ -19,7 +19,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       secretOrKey: appSettings.api.SECRET_REFRESH_TOKEN,
       passReqToCallback: true,
       //20s
-      signOptions: { expiresIn: '20s' },
+      signOptions: { expiresIn: '6m' },
     });
   }
 
@@ -28,13 +28,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
     let userSession = null;
 
     try {
-      userSession = await this.securityService.getUserSessionByProperties({
-        properties: [
-          { deviceId: payload.deviceId },
-          { userId: payload.userId },
-          { iat: payload.iat },
-        ],
+      userSession = await this.securityService.getUserSessionByPropertiesPg({
+        deviceId: payload.deviceId,
+        userId: payload.userId,
+        iat: payload.iat,
       });
+
+      console.log('userS', userSession);
     } catch (e) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,

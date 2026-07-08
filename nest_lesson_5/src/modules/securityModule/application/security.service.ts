@@ -4,20 +4,27 @@ import { CreateDeviceSessionInput } from '../models/security.model';
 import { SecurityQueryRepository } from '../repositories/security.repository.query';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+import { Database } from 'src/modules/databaseModule/database';
 
 @Injectable()
 export class SecurityService {
   constructor(
     private readonly securityCommandsRepository: SecurityCommandsRepository,
     private readonly securityQueryRepository: SecurityQueryRepository,
+    private database: Database,
   ) {}
 
   async createDeviceSession(
     createDeviceSessionInput: CreateDeviceSessionInput,
   ) {
-    return this.securityCommandsRepository.createDeviceSession(
-      createDeviceSessionInput,
-    );
+    return this.securityCommandsRepository.createDeviceSession({
+      device_id: createDeviceSessionInput.deviceId,
+      device_name: createDeviceSessionInput.deviceName,
+      user_id: createDeviceSessionInput.userId,
+      exp: createDeviceSessionInput.exp,
+      iat: createDeviceSessionInput.iat,
+      ip: createDeviceSessionInput.ip,
+    });
   }
 
   async getUserSessionByProperties({
@@ -30,6 +37,12 @@ export class SecurityService {
     });
   }
 
+  async getUserSessionByPropertiesPg(properties: any) {
+    return this.securityQueryRepository.getUserSessionByPropertiesPg(
+      properties,
+    );
+  }
+
   async updateDeviceSession({
     userId,
     deviceId,
@@ -39,7 +52,7 @@ export class SecurityService {
     userId: string;
     deviceId: string;
     iat: string;
-    exp: string;
+    exp: Date | string;
   }) {
     return this.securityCommandsRepository.updateDeviceSession({
       userId,
@@ -60,6 +73,8 @@ export class SecurityService {
       await this.securityQueryRepository.getUserSessionByProperties({
         properties: [{ deviceId }],
       });
+
+    console.log('sessionByDeviceId', sessionByDeviceId);
 
     if (!sessionByDeviceId) {
       throw new DomainException({

@@ -14,8 +14,19 @@ export interface UserTable {
   password_recovery_expire: Date | null;
 }
 
+export interface SecurityDevicesTable {
+  id: Generated<string>;
+  user_id: string;
+  device_id: string;
+  device_name: string;
+  iat: number | string;
+  exp: ColumnType<Date, Date | undefined, string | Date>;
+  ip: string;
+}
+
 export interface DB {
   users: UserTable;
+  security_devices: SecurityDevicesTable;
 }
 
 export type User = Selectable<UserTable>;
