@@ -64,9 +64,13 @@ export class UsersQueryRepository {
   }
 
   async getById(id: string) {
-    const user = await this.UserModel.findById(id);
+    const user = await this.database
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
 
-    return UserViewDto.getUserView(user);
+    return UserViewDto.getUserView(user as any);
   }
 
   //ts

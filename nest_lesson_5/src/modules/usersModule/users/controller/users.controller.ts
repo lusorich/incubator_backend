@@ -95,7 +95,7 @@ export class UsersController {
 
     return result;
   }
-
+  // done
   @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -107,16 +107,14 @@ export class UsersController {
 
     const result = await this.usersService.create(createUser);
 
-    console.log('result', result);
-
     return this.usersQueryRepository.getById(result);
   }
-
+  // done
   @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string) {
-    const result = await this.usersService.delete(id);
+    const result: any = await this.usersService.delete(id);
 
     if (result.deletedCount < 1) {
       throw new DomainException({

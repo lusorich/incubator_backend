@@ -41,23 +41,20 @@ export class SecurityCommandsRepository {
     iat: number | string;
     exp: Date | string;
   }) {
-    console.log('upadte deviceSession');
-
-    const hm = await this.database
+    return await this.database
       .updateTable('security_devices')
       .set('iat', iat)
       .set('exp', exp)
       .where('user_id', '=', userId)
       .where('device_id', '=', deviceId)
       .executeTakeFirst();
-
-    console.log('hm', hm);
-
-    return hm;
   }
 
   async deleteDeviceSession({ deviceId }: { deviceId: string }) {
-    return this.SecurityModel.deleteOne({ deviceId });
+    return await this.database
+      .deleteFrom('security_devices')
+      .where('device_id', '=', deviceId)
+      .executeTakeFirst();
   }
 
   async deleteUserSessionsExceptCurrent({
@@ -67,14 +64,17 @@ export class SecurityCommandsRepository {
     userId: string;
     deviceId: string;
   }) {
-    return this.SecurityModel.deleteMany({
-      userId,
-      deviceId: { $ne: deviceId },
-    });
+    return await this.database
+      .deleteFrom('security_devices')
+      .where((eb) =>
+        eb.and([eb('user_id', '=', userId), eb('device_id', '!=', deviceId)]),
+      )
+      .executeTakeFirst();
   }
 
   async deleteAll() {
-    return this.SecurityModel.deleteMany({});
+    await this.SecurityModel.deleteMany({});
+    return await this.database.deleteFrom('security_devices').execute();
   }
   async save(deviceSession: SecurityDocument) {
     return deviceSession.save();

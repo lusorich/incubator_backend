@@ -7,13 +7,13 @@ export class SecurityViewDto {
   private lastActiveDate: Date;
   private deviceId: string;
 
-  static getSecurityView(security: SecurityDocument): SecurityViewDto {
+  static getSecurityView(security: any): SecurityViewDto {
     const dto = new SecurityViewDto();
 
     dto.ip = security.ip;
-    dto.title = security.deviceName;
+    dto.title = security.device_name;
     dto.lastActiveDate = parseISO(formatISO(fromUnixTime(security.iat)));
-    dto.deviceId = security.deviceId;
+    dto.deviceId = security.device_id;
 
     return dto;
   }

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { CreateUserInput } from '../models/users.dto';
 import { Database } from 'src/modules/databaseModule/database';
+import { sql } from 'kysely';
 
 @Injectable()
 export class UsersCommandsRepository {
@@ -63,13 +64,27 @@ export class UsersCommandsRepository {
 
   async delete(id: string) {
     try {
-      return await this.UserModel.deleteOne({ _id: id });
+      await this.database
+        .deleteFrom('security_devices')
+        .where('user_id', '=', id)
+        .execute();
+      const res = await this.database
+        .deleteFrom('users')
+        .where('id', '=', id)
+        .executeTakeFirstOrThrow();
+
+      if (res.numDeletedRows.toString() === '0') {
+        throw new Error();
+      }
+
+      return res;
     } catch (e) {
       return { deletedCount: 0 };
     }
   }
 
   async deleteAll() {
-    return this.UserModel.deleteMany({});
+    await this.UserModel.deleteMany({});
+    return await sql`TRUNCATE TABLE users CASCADE`.execute(this.database);
   }
 }

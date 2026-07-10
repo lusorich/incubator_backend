@@ -205,7 +205,6 @@ export class AuthController {
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   async updateTokens(@Request() req, @Res({ passthrough: true }) res) {
-    console.log('req', req.user.refreshToken);
     const decodedPrevRefreshToken = this.jwtService.decode(
       req.user.refreshToken,
     );
@@ -226,8 +225,6 @@ export class AuthController {
       httpOnly: true,
       secure: true,
     });
-
-    console.log('exp', decodedRefreshToken?.exp);
 
     await this.securityService.updateDeviceSession({
       userId: decodedPrevRefreshToken.userId,
@@ -259,14 +256,14 @@ export class AuthController {
 
     return await this.userService.updatePassword(user, userInput.newPassword);
   }
-
+  // done
   @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async userInfo(@Request() req) {
     return req.user;
   }
-
+  // done
   @SkipThrottle()
   @UseGuards(JwtRefreshAuthGuard)
   @Post('logout')

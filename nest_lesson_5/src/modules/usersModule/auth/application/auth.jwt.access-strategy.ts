@@ -11,7 +11,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
       ignoreExpiration: false,
       secretOrKey: appSettings.api.SECRET_ACCESS_TOKEN,
       //10s
-      signOptions: { expiresIn: '10s' },
+      signOptions: { expiresIn: '6m' },
     });
   }
 

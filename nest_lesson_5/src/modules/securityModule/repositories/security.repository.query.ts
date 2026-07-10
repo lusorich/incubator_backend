@@ -13,9 +13,15 @@ export class SecurityQueryRepository {
   ) {}
 
   async getUserSessions({ userId }: { userId: string }) {
-    const userSessions = await this.SecurityModel.find({ userId });
+    const userSessions = await this.database
+      .selectFrom('security_devices')
+      .selectAll()
+      .where('user_id', '=', userId)
+      .execute();
 
-    return userSessions.map(SecurityViewDto.getSecurityView);
+    console.log('userSessions', userSessions);
+
+    return (userSessions as any[]).map(SecurityViewDto.getSecurityView);
   }
 
   async getUserSessionByProperties({
@@ -27,6 +33,16 @@ export class SecurityQueryRepository {
       $and: properties,
     });
     return userSession;
+  }
+
+  async getUserSessionByDeviceId(deviceId: any) {
+    const user = await this.database
+      .selectFrom('security_devices')
+      .selectAll()
+      .where('device_id', '=', deviceId)
+      .executeTakeFirst();
+
+    return user;
   }
 
   async getUserSessionByPropertiesPg(properties: any) {

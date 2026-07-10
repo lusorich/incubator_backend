@@ -70,9 +70,7 @@ export class SecurityService {
     userId: string;
   }) {
     const sessionByDeviceId =
-      await this.securityQueryRepository.getUserSessionByProperties({
-        properties: [{ deviceId }],
-      });
+      await this.securityQueryRepository.getUserSessionByDeviceId(deviceId);
 
     console.log('sessionByDeviceId', sessionByDeviceId);
 
@@ -83,7 +81,7 @@ export class SecurityService {
       });
     }
 
-    if (userId !== sessionByDeviceId.userId) {
+    if (userId !== sessionByDeviceId.user_id) {
       throw new DomainException({
         code: DomainExceptionCode.Forbidden,
         message: 'error',
@@ -92,7 +90,7 @@ export class SecurityService {
 
     return this.securityCommandsRepository.deleteDeviceSession({ deviceId });
   }
-
+  //done
   async deleteUserSessionsExceptCurrent({
     deviceId,
     userId,
