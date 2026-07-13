@@ -19,6 +19,8 @@ export class IsUserByConfirmationCodeExistConstraint
       arg,
     );
 
+    console.log('code', arg);
+
     if (!user) {
       return false;
     }

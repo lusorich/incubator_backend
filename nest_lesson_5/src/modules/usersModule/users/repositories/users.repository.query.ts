@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.entity';
-import { Model } from 'mongoose';
 import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
 import { UserViewDto } from '../models/users.dto';
 import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 import { Database } from 'src/modules/databaseModule/database';
+import { sql } from 'kysely';
 
 @Injectable()
 export class UsersQueryRepository {
-  constructor(
-    @InjectModel(User.name) private UserModel: Model<User>,
-    private database: Database,
-  ) {}
+  constructor(private database: Database) {}
 
   async getUsers({
     paginationParams = {},
@@ -28,23 +23,45 @@ export class UsersQueryRepository {
       searchLoginTerm,
     } = paginationParams;
 
-    const users = await this.UserModel.find({});
-    console.log(
-      'db',
-      await this.database.selectFrom('users').selectAll().execute(),
-    );
+    const users = await this.database.selectFrom('users').selectAll().execute();
 
-    const filteredUsers = (
-      await this.UserModel.find({
-        $and: [
-          { login: { $regex: searchLoginTerm || /./, $options: 'i' } },
-          { email: { $regex: searchEmailTerm || /./, $options: 'i' } },
-        ],
-      })
-        .limit(pageSize)
-        .skip((pageNumber - 1) * pageSize)
-        .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
-    ).map(UserViewDto.getUserView);
+    let query = this.database.selectFrom('users').selectAll();
+
+    if (searchEmailTerm || searchLoginTerm) {
+      query = query.where((eb) => {
+        const filters = [];
+
+        if (searchEmailTerm) {
+          filters.push(eb('email', 'ilike', `%${searchEmailTerm}%`));
+        }
+
+        if (searchLoginTerm) {
+          filters.push(eb('login', 'ilike', `%${searchLoginTerm}%`));
+        }
+
+        return eb.or(filters);
+      });
+    }
+
+    if (sortBy === 'createdAt' || sortBy === 'created_at') {
+      query = query.orderBy(
+        'created_at',
+        sortDirection === SORT_DIRECTION.ASC ? 'asc' : 'desc',
+      );
+    } else {
+      query = query.orderBy(
+        sql`${sql.raw(sortBy)} COLLATE "C"`,
+        sortDirection === SORT_DIRECTION.ASC ? 'asc' : 'desc',
+      );
+    }
+
+    let filteredUsers: any = await query
+
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize)
+      .execute();
+
+    filteredUsers = filteredUsers.map(UserViewDto.getUserView);
 
     if (searchLoginTerm || searchEmailTerm) {
       return PaginatedViewDto.getPaginatedDataDto({
@@ -82,22 +99,5 @@ export class UsersQueryRepository {
       .executeTakeFirst();
 
     return user as any;
-  }
-
-  async getByProperties(properties: Record<string, string>) {
-    const users = await this.database
-      .selectFrom('users')
-      .selectAll()
-      .where((eb) =>
-        eb.or([
-          eb('login', '=', properties['login']),
-          eb('email', '=', properties['email']),
-        ]),
-      )
-      .execute();
-
-    console.log('users', users);
-
-    return users;
   }
 }

@@ -17,15 +17,27 @@ export class UsersService {
   ) {}
 
   async create(createUserInput: CreateUserInput) {
-    const existedUsers = await this.usersQueryRepository.getByProperties({
-      email: createUserInput.email,
-      login: createUserInput.login,
-    });
+    const existedEmailUsers = await this.usersQueryRepository.getByProperty(
+      'email',
+      createUserInput.email,
+    );
 
-    if (existedUsers.length > 0) {
+    const existedLoginUsers = await this.usersQueryRepository.getByProperty(
+      'login',
+      createUserInput.login,
+    );
+
+    if (existedEmailUsers) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         errorsMessages: [{ field: 'email', message: 'not correct' }],
+      });
+    }
+
+    if (existedLoginUsers) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        errorsMessages: [{ field: 'login', message: 'not correct' }],
       });
     }
 

@@ -27,6 +27,8 @@ import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { SecurityService } from 'src/modules/securityModule/application/security.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { DomainException } from 'src/common/exceptions/domain.exceptions';
+import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 
 class RegistrationInputDto {
   @IsNotEmpty()
@@ -79,6 +81,7 @@ class RegistrationNewPasswordInputDto {
   recoveryCode: string;
 }
 
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -124,6 +127,8 @@ export class AuthController {
       html: emailTemplate,
     });
 
+    console.log('emailConfirmation', emailConfirmation);
+    console.log('userInput', userInput);
     const newUser = await this.authService.registration({
       ...userInput,
       ...emailConfirmation,
@@ -167,6 +172,9 @@ export class AuthController {
       from: 'eeugern@mail.ru',
     });
 
+    console.log('user resending', user);
+    console.log('resending', emailConfirmation);
+
     return await this.userService.updateUserEmailConfirmation(
       user,
       emailConfirmation,
@@ -181,6 +189,12 @@ export class AuthController {
     const user = await this.userService.getByProperty('email', userInput.email);
 
     if (user) {
+      if (user.email_confirmation_is_confirmed) {
+        throw new DomainException({
+          code: DomainExceptionCode.BadRequest,
+          errorsMessages: [{ field: 'email', message: 'not correct' }],
+        });
+      }
       const passwordRecovery =
         this.emailService.generatePasswordRecoveryConfirmation();
       const emailTemplate = this.emailService.generateRecoveryPasswordEmail({

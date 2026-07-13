@@ -32,10 +32,10 @@ export abstract class PaginatedViewDto<T> {
     totalCount: number;
   }): PaginatedViewDto<T> {
     return {
-      totalCount,
       pagesCount: Math.ceil(totalCount / pageSize),
       page,
       pageSize,
+      totalCount,
       items,
     };
   }

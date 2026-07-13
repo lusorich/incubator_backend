@@ -7,13 +7,13 @@ export class UserViewDto {
   private email: string;
   private createdAt: Date;
 
-  static getUserView(user: UserDocument): UserViewDto {
+  static getUserView(user: any): UserViewDto {
     const dto = new UserViewDto();
 
     dto.id = user.id;
     dto.login = user.login;
     dto.email = user.email;
-    dto.createdAt = user.createdAt;
+    dto.createdAt = user.created_at.toISOString() as any;
 
     return dto;
   }

@@ -29,7 +29,7 @@ import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.code
 import { SkipThrottle } from '@nestjs/throttler';
 
 enum USERS_SORT_BY {
-  'createdAt' = 'createdAt',
+  'createdAt' = 'created_at',
   'login' = 'login',
   'email' = 'email',
 }
@@ -57,7 +57,7 @@ class CreateUserInputDto implements CreateUserInputMongoType {
 }
 
 @SkipThrottle()
-@Controller('users')
+@Controller('/sa/users')
 export class UsersController {
   usersService: UsersService;
   constructor(
