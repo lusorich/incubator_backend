@@ -81,7 +81,6 @@ class RegistrationNewPasswordInputDto {
   recoveryCode: string;
 }
 
-@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
-import { UserViewDto } from '../models/users.dto';
-import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
+import { SORT_DIRECTION } from 'src/common/types';
+import { GetUsersQueryParams, UserViewDto } from '../models/users.dto';
 import { Database } from 'src/modules/databaseModule/database';
 import { sql } from 'kysely';
 
@@ -12,7 +11,7 @@ export class UsersQueryRepository {
   async getUsers({
     paginationParams = {},
   }: {
-    paginationParams?: PaginationParams;
+    paginationParams: Partial<GetUsersQueryParams & { sortBy: any }>;
   }) {
     const {
       sortBy,
@@ -43,7 +42,7 @@ export class UsersQueryRepository {
       });
     }
 
-    if (sortBy === 'createdAt' || sortBy === 'created_at') {
+    if (sortBy === 'created_at') {
       query = query.orderBy(
         'created_at',
         sortDirection === SORT_DIRECTION.ASC ? 'asc' : 'desc',
@@ -55,29 +54,18 @@ export class UsersQueryRepository {
       );
     }
 
-    let filteredUsers: any = await query
-
+    let filteredUsers = await query
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
       .execute();
 
-    filteredUsers = filteredUsers.map(UserViewDto.getUserView);
-
-    if (searchLoginTerm || searchEmailTerm) {
-      return PaginatedViewDto.getPaginatedDataDto({
-        totalCount: filteredUsers.length,
-        pageSize: Number(pageSize),
-        page: Number(pageNumber),
-        items: filteredUsers,
-      });
-    } else {
-      return PaginatedViewDto.getPaginatedDataDto({
-        totalCount: users.length,
-        pageSize: Number(pageSize),
-        page: Number(pageNumber),
-        items: filteredUsers,
-      });
-    }
+    return {
+      items: filteredUsers,
+      totalCount:
+        searchEmailTerm || searchLoginTerm
+          ? filteredUsers.length
+          : users.length,
+    };
   }
 
   async getById(id: string) {

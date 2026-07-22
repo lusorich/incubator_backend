@@ -12,7 +12,7 @@ export class SecurityViewDto {
 
     dto.ip = security.ip;
     dto.title = security.device_name;
-    dto.lastActiveDate = parseISO(formatISO(fromUnixTime(security.iat)));
+    dto.lastActiveDate = fromUnixTime(security.iat).toISOString() as any;
     dto.deviceId = security.device_id;
 
     return dto;

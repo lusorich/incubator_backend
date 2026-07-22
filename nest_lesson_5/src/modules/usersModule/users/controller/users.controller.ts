@@ -11,60 +11,23 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
-import { UsersQueryRepository } from '../repositories/users.repository.query';
-import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
-import { Trim } from 'src/common/trim.decorator';
+import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 import {
-  BaseSortablePaginationParams,
-  PaginatedViewDto,
-} from 'src/common/PaginationQuery.dto';
-import {
-  CreateUserInput,
-  CreateUserInputMongoType,
+  CreateUserInputDto,
+  GetUsersQueryParams,
   UserViewDto,
 } from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 import { SkipThrottle } from '@nestjs/throttler';
 
-enum USERS_SORT_BY {
-  'createdAt' = 'created_at',
-  'login' = 'login',
-  'email' = 'email',
-}
-
-class GetUsersQueryParams extends BaseSortablePaginationParams<USERS_SORT_BY> {
-  sortBy = USERS_SORT_BY.createdAt;
-  searchLoginTerm: string | null;
-  searchEmailTerm: string | null;
-}
-
-//TODO: Move to users.dto.ts
-class CreateUserInputDto implements CreateUserInputMongoType {
-  @IsNotEmpty()
-  @Length(3, 10)
-  @Matches(/^[a-zA-Z0-9_-]*$/)
-  login: string;
-
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @Trim()
-  @Length(6, 20)
-  password: string;
-}
-
 @SkipThrottle()
 @Controller('/sa/users')
 export class UsersController {
   usersService: UsersService;
-  constructor(
-    usersService: UsersService,
 
-    private readonly usersQueryRepository: UsersQueryRepository,
-  ) {
+  constructor(usersService: UsersService) {
     this.usersService = usersService;
   }
 
@@ -82,7 +45,7 @@ export class UsersController {
       searchLoginTerm,
     } = query;
 
-    const result = await this.usersQueryRepository.getUsers({
+    const result = await this.usersService.getUsers({
       paginationParams: {
         sortBy,
         sortDirection,
@@ -107,7 +70,7 @@ export class UsersController {
 
     const result = await this.usersService.create(createUser);
 
-    return this.usersQueryRepository.getById(result);
+    return this.usersService.getById(result);
   }
   // done
   @UseGuards(AuthGuardBasic)

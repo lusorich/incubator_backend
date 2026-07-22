@@ -19,8 +19,6 @@ export class SecurityQueryRepository {
       .where('user_id', '=', userId)
       .execute();
 
-    console.log('userSessions', userSessions);
-
     return (userSessions as any[]).map(SecurityViewDto.getSecurityView);
   }
 

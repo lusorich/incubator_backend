@@ -5,9 +5,15 @@ import {
 } from '@nestjs/common';
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
-import { CreateUserInput, CreateUserInputMongoType } from '../models/users.dto';
+import {
+  CreateUserInput,
+  CreateUserInputMongoType,
+  GetUsersQueryParams,
+  UserViewDto,
+} from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 
 @Injectable()
 export class UsersService {
@@ -83,5 +89,34 @@ export class UsersService {
 
   async updatePassword(user, newPassword) {
     return await this.usersCommandsRepository.updatePassword(user, newPassword);
+  }
+
+  async getUsers({
+    paginationParams,
+  }: {
+    paginationParams: Partial<GetUsersQueryParams>;
+  }) {
+    const { items, totalCount } = await this.usersQueryRepository.getUsers({
+      paginationParams: {
+        ...paginationParams,
+        sortBy:
+          !paginationParams.sortBy || paginationParams.sortBy === 'createdAt'
+            ? 'created_at'
+            : paginationParams.sortBy,
+      },
+    });
+
+    const viewItems = items.map(UserViewDto.getUserView);
+
+    return PaginatedViewDto.getPaginatedDataDto({
+      totalCount,
+      pageSize: paginationParams.pageSize,
+      page: paginationParams.pageNumber,
+      items: viewItems,
+    });
+  }
+
+  async getById(id) {
+    return await this.usersQueryRepository.getById(id);
   }
 }

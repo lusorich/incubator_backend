@@ -19,7 +19,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       secretOrKey: appSettings.api.SECRET_REFRESH_TOKEN,
       passReqToCallback: true,
       //20s
-      signOptions: { expiresIn: '6m' },
+      signOptions: { expiresIn: '20s' },
     });
   }
 
