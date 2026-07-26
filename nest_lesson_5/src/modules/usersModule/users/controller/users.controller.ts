@@ -58,17 +58,12 @@ export class UsersController {
 
     return result;
   }
-  // done
+
   @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() userInput: CreateUserInputDto) {
-    const createUser: any = {
-      ...userInput,
-      emailConfirmation: undefined,
-    };
-
-    const result = await this.usersService.create(createUser);
+    const result = await this.usersService.create(userInput);
 
     return this.usersService.getById(result);
   }

@@ -126,8 +126,6 @@ export class AuthController {
       html: emailTemplate,
     });
 
-    console.log('emailConfirmation', emailConfirmation);
-    console.log('userInput', userInput);
     const newUser = await this.authService.registration({
       ...userInput,
       ...emailConfirmation,

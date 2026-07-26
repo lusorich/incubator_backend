@@ -9,9 +9,9 @@ export class UsersQueryRepository {
   constructor(private database: Database) {}
 
   async getUsers({
-    paginationParams = {},
+    paginationParams,
   }: {
-    paginationParams: Partial<GetUsersQueryParams & { sortBy: any }>;
+    paginationParams: GetUsersQueryParams;
   }) {
     const {
       sortBy,
@@ -42,7 +42,7 @@ export class UsersQueryRepository {
       });
     }
 
-    if (sortBy === 'created_at') {
+    if (sortBy === 'createdAt') {
       query = query.orderBy(
         'created_at',
         sortDirection === SORT_DIRECTION.ASC ? 'asc' : 'desc',

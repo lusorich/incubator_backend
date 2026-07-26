@@ -35,6 +35,7 @@ interface DatabaseOptions {
 
         return new Database({
           dialect,
+          plugins: [],
         });
       },
     },

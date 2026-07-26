@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../domain/user.entity';
-import { CreateUserInput } from '../models/users.dto';
+import { CreateUserInputDto } from '../models/users.dto';
 import { Database } from 'src/modules/databaseModule/database';
 import { sql } from 'kysely';
 
 @Injectable()
 export class UsersCommandsRepository {
-  constructor(
-    @InjectModel(User.name) private UserModel: UserModelType,
-    private database: Database,
-  ) {}
+  constructor(private database: Database) {}
 
-  async create(createUserInput: CreateUserInput) {
+  async create(createUserInput: CreateUserInputDto) {
     const user = this.database
       .insertInto('users')
       .values(createUserInput)
@@ -20,10 +15,6 @@ export class UsersCommandsRepository {
       .executeTakeFirstOrThrow();
 
     return user;
-  }
-
-  async save(user: UserDocument) {
-    return user.save();
   }
 
   async updateUserIsConfirmed(user, isConfirmed) {
@@ -84,7 +75,6 @@ export class UsersCommandsRepository {
   }
 
   async deleteAll() {
-    await this.UserModel.deleteMany({});
     return await sql`TRUNCATE TABLE users CASCADE`.execute(this.database);
   }
 }

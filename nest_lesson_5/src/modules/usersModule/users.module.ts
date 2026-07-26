@@ -7,7 +7,6 @@ import { UsersService } from './users/application/users.service';
 import { UsersQueryRepository } from './users/repositories/users.repository.query';
 import { UsersCommandsRepository } from './users/repositories/users.repository.commands';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './users/domain/user.entity';
 import { CommonModule } from '../commonModule/common.module';
 import { NotificationModule } from '../notificationModule/notifications.module';
 import { IsUserNotExistConstraint } from './guards/IsUserNotExist';
@@ -27,7 +26,6 @@ import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfir
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
       global: true,
       secret: appSettings.api.SECRET_ACCESS_TOKEN,

@@ -1,7 +1,6 @@
 import { BaseSortablePaginationParams } from 'src/common/PaginationQuery.dto';
 import { Trim } from 'src/common/trim.decorator';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
-import { EmailConfirmation } from '../domain/user.entity';
 
 export class UserViewDto {
   private id: string;
@@ -21,13 +20,6 @@ export class UserViewDto {
   }
 }
 
-export class CreateUserInputMongoType {
-  login: string;
-  email: string;
-  password: string;
-  emailConfirmation?: EmailConfirmation;
-}
-
 export class CreateUserInput {
   login: string;
   email: string;
@@ -37,7 +29,7 @@ export class CreateUserInput {
   email_confirmation_is_confirmed: boolean | null;
 }
 
-export class CreateUserInputDto implements CreateUserInputMongoType {
+export class CreateUserInputDto {
   @IsNotEmpty()
   @Length(3, 10)
   @Matches(/^[a-zA-Z0-9_-]*$/)
@@ -55,7 +47,7 @@ export class CreateUserInputDto implements CreateUserInputMongoType {
 type UsersSortBy = 'createdAt' | 'login' | 'email';
 
 export class GetUsersQueryParams extends BaseSortablePaginationParams<UsersSortBy> {
-  sortBy: 'createdAt' | 'login' | 'email';
-  searchLoginTerm: string | null;
-  searchEmailTerm: string | null;
+  sortBy: UsersSortBy;
+  searchLoginTerm?: string | null;
+  searchEmailTerm?: string | null;
 }

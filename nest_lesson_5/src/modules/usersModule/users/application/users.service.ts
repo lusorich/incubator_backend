@@ -1,13 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import { UsersQueryRepository } from '../repositories/users.repository.query';
 import {
-  CreateUserInput,
-  CreateUserInputMongoType,
+  CreateUserInputDto,
   GetUsersQueryParams,
   UserViewDto,
 } from '../models/users.dto';
@@ -22,7 +17,7 @@ export class UsersService {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async create(createUserInput: CreateUserInput) {
+  async create(createUserInput: CreateUserInputDto) {
     const existedEmailUsers = await this.usersQueryRepository.getByProperty(
       'email',
       createUserInput.email,
@@ -94,15 +89,14 @@ export class UsersService {
   async getUsers({
     paginationParams,
   }: {
-    paginationParams: Partial<GetUsersQueryParams>;
+    paginationParams: GetUsersQueryParams;
   }) {
     const { items, totalCount } = await this.usersQueryRepository.getUsers({
       paginationParams: {
         ...paginationParams,
-        sortBy:
-          !paginationParams.sortBy || paginationParams.sortBy === 'createdAt'
-            ? 'created_at'
-            : paginationParams.sortBy,
+        sortBy: !paginationParams.sortBy
+          ? 'createdAt'
+          : paginationParams.sortBy,
       },
     });
 
