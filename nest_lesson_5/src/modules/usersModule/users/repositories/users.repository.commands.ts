@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserInputDto } from '../models/users.dto';
-import { Database } from 'src/modules/databaseModule/database';
+import { Database, User } from 'src/modules/databaseModule/database';
 import { sql } from 'kysely';
 
 @Injectable()
 export class UsersCommandsRepository {
   constructor(private database: Database) {}
 
-  async create(createUserInput: CreateUserInputDto) {
-    const user = this.database
+  async create(createUserInput: CreateUserInputDto): Promise<User> {
+    return await this.database
       .insertInto('users')
       .values(createUserInput)
       .returningAll()
       .executeTakeFirstOrThrow();
-
-    return user;
   }
 
   async updateUserIsConfirmed(user, isConfirmed) {
@@ -54,24 +52,10 @@ export class UsersCommandsRepository {
   }
 
   async delete(id: string) {
-    try {
-      await this.database
-        .deleteFrom('security_devices')
-        .where('user_id', '=', id)
-        .execute();
-      const res = await this.database
-        .deleteFrom('users')
-        .where('id', '=', id)
-        .executeTakeFirstOrThrow();
-
-      if (res.numDeletedRows.toString() === '0') {
-        throw new Error();
-      }
-
-      return res;
-    } catch (e) {
-      return { deletedCount: 0 };
-    }
+    return await this.database
+      .deleteFrom('users')
+      .where('id', '=', id)
+      .executeTakeFirst();
   }
 
   async deleteAll() {

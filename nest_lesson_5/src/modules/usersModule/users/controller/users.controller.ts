@@ -18,8 +18,6 @@ import {
   GetUsersQueryParams,
   UserViewDto,
 } from '../models/users.dto';
-import { DomainException } from 'src/common/exceptions/domain.exceptions';
-import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
@@ -45,7 +43,7 @@ export class UsersController {
       searchLoginTerm,
     } = query;
 
-    const result = await this.usersService.getUsers({
+    return await this.usersService.getUsers({
       paginationParams: {
         sortBy,
         sortDirection,
@@ -55,30 +53,23 @@ export class UsersController {
         searchLoginTerm,
       },
     });
-
-    return result;
   }
 
   @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() userInput: CreateUserInputDto) {
-    const result = await this.usersService.create(userInput);
+  async createUser(
+    @Body() userInput: CreateUserInputDto,
+  ): Promise<UserViewDto> {
+    const userId = await this.usersService.create(userInput);
 
-    return this.usersService.getById(result);
+    return await this.usersService.getById(userId);
   }
-  // done
+
   @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string) {
-    const result: any = await this.usersService.delete(id);
-
-    if (result.deletedCount < 1) {
-      throw new DomainException({
-        code: DomainExceptionCode.NotFound,
-        message: 'User not found',
-      });
-    }
+    return await this.usersService.delete(id);
   }
 }

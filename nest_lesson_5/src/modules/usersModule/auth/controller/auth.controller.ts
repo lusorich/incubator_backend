@@ -9,19 +9,10 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthService } from '../application/auth.service';
 import { LocalAuthGuard } from '../application/local.auth.guard';
 import { JwtAuthGuard } from '../application/jwt.auth.guard';
-import { Trim } from 'src/common/trim.decorator';
 import { UsersService } from '../../users/application/users.service';
-import { IsUserNotExist } from '../../guards/IsUserNotExist';
-import { IsUserByConfirmationCodeExist } from '../../guards/IsUserByConfirmationCodeExist';
-import { IsConfirmationCodeActive } from '../../guards/IsConfirmationCodeActive';
-import { IsUserAlreadyExist } from '../../guards/IsUserAlreadyExist';
-import { IsEmailNotConfirmed } from '../../guards/IsEmailNotConfirmed';
-import { IsUserByRecoveryCodeExist } from '../../guards/IsUserByRecoveryCodeExist';
-import { IsPasswordRecoveryCodeUsed } from '../../guards/IsPasswordRecoveryCodeUsed';
 import { EmailService } from 'src/modules/notificationModule/mail.service';
 import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
 import { JwtService } from '@nestjs/jwt';
@@ -29,57 +20,13 @@ import { SecurityService } from 'src/modules/securityModule/application/security
 import { SkipThrottle } from '@nestjs/throttler';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
-
-class RegistrationInputDto {
-  @IsNotEmpty()
-  @Length(3, 10)
-  @Matches(/^[a-zA-Z0-9_-]*$/)
-  @IsUserNotExist({ message: 'login already exist' })
-  login: string;
-
-  @IsEmail()
-  @IsUserNotExist({ message: 'email already exist' })
-  email: string;
-
-  @IsNotEmpty()
-  @Trim()
-  @Length(6, 20)
-  password: string;
-}
-
-class RegistrationConfirmationInputDto {
-  @IsNotEmpty()
-  @IsUserByConfirmationCodeExist({ message: 'user dont exist' })
-  @IsConfirmationCodeActive({
-    message: 'code has already been activated or expired',
-  })
-  code: string;
-}
-
-class RegistrationEmailResendingInputDto {
-  @IsNotEmpty()
-  @IsEmail()
-  @IsUserAlreadyExist({ message: 'user dont exist' })
-  @IsEmailNotConfirmed({ message: 'email already confirmed' })
-  email: string;
-}
-
-class RegistrationEmailPasswordRecoveryInputDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-}
-
-class RegistrationNewPasswordInputDto {
-  @IsNotEmpty()
-  @Length(6, 20)
-  newPassword: string;
-
-  @IsNotEmpty()
-  @IsUserByRecoveryCodeExist({ message: 'wrong recovery code' })
-  @IsPasswordRecoveryCodeUsed({ message: 'recovery code expired' })
-  recoveryCode: string;
-}
+import {
+  RegistrationConfirmationInputDto,
+  RegistrationEmailPasswordRecoveryInputDto,
+  RegistrationEmailResendingInputDto,
+  RegistrationInputDto,
+  RegistrationNewPasswordInputDto,
+} from '../models/auth.dto';
 
 @Controller('auth')
 export class AuthController {

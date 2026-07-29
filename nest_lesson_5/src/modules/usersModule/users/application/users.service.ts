@@ -50,6 +50,13 @@ export class UsersService {
   async delete(id: string) {
     const result = await this.usersCommandsRepository.delete(id);
 
+    if (result.numDeletedRows === 0n) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'User not found',
+      });
+    }
+
     return result;
   }
 
