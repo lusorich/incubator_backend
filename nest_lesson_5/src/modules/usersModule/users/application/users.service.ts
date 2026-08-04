@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { UsersCommandsRepository } from '../repositories/users.repository.commands';
-import { UsersQueryRepository } from '../repositories/users.repository.query';
 import {
   CreateUserInputDto,
   GetUsersQueryParams,
+  getUserView,
   UserViewDto,
 } from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
+import { UsersQueryRepository } from '../domain/user/UsersQueryRepository';
 
 @Injectable()
 export class UsersService {
@@ -107,13 +108,13 @@ export class UsersService {
       },
     });
 
-    const viewItems = items.map(UserViewDto.getUserView);
+    const usersView = items.map((item) => getUserView(item));
 
     return PaginatedViewDto.getPaginatedDataDto({
       totalCount,
       pageSize: paginationParams.pageSize,
       page: paginationParams.pageNumber,
-      items: viewItems,
+      items: usersView,
     });
   }
 

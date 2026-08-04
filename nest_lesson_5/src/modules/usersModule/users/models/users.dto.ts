@@ -1,23 +1,22 @@
 import { BaseSortablePaginationParams } from 'src/common/PaginationQuery.dto';
 import { Trim } from 'src/common/trim.decorator';
 import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import { UserSummary } from '../domain/user/UsersQueryRepository';
 
 export class UserViewDto {
-  private id: string;
-  private login: string;
-  private email: string;
-  private createdAt: Date;
+  id: string;
+  login: string;
+  email: string;
+  createdAt: string;
+}
 
-  static getUserView(user: any): UserViewDto {
-    const dto = new UserViewDto();
-
-    dto.id = user.id;
-    dto.login = user.login;
-    dto.email = user.email;
-    dto.createdAt = user.created_at.toISOString() as any;
-
-    return dto;
-  }
+export function getUserView(user: UserSummary): UserViewDto {
+  return {
+    id: user.id,
+    login: user.login,
+    email: user.email,
+    createdAt: user.createdAt.toISOString(),
+  };
 }
 
 export class CreateUserInput {

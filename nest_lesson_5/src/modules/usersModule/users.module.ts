@@ -4,9 +4,7 @@ import { UsersController } from './users/controller/users.controller';
 import { AuthCommandsRepository } from './auth/repositories/auth.repository.commands';
 import { AuthService } from './auth/application/auth.service';
 import { UsersService } from './users/application/users.service';
-import { UsersQueryRepository } from './users/repositories/users.repository.query';
 import { UsersCommandsRepository } from './users/repositories/users.repository.commands';
-import { MongooseModule } from '@nestjs/mongoose';
 import { CommonModule } from '../commonModule/common.module';
 import { NotificationModule } from '../notificationModule/notifications.module';
 import { IsUserNotExistConstraint } from './guards/IsUserNotExist';
@@ -23,6 +21,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { appSettings } from 'src/settings/appSettings';
 import { SecurityModule } from '../securityModule/security.module';
 import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfirmationCodeExist';
+import { UsersQueryRepository } from './users/domain/user/UsersQueryRepository';
+import { KyselyUsersQueryRepository } from './users/repositories/users.repository.query';
 
 @Module({
   imports: [
@@ -42,7 +42,7 @@ import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfir
     AuthService,
     UsersService,
     UsersCommandsRepository,
-    UsersQueryRepository,
+    { provide: UsersQueryRepository, useClass: KyselyUsersQueryRepository },
     IsUserNotExistConstraint,
     IsConfirmationCodeActiveConstraint,
     IsEmailNotConfirmedConstraint,

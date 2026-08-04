@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
-import { GetUsersQueryParams, UserViewDto } from '../models/users.dto';
+import {
+  GetUsersQueryParams,
+  getUserView,
+  UserViewDto,
+} from '../models/users.dto';
 import { Database } from 'src/modules/databaseModule/database';
 import { sql } from 'kysely';
+import {
+  UsersQueryRepository,
+  UserSummary,
+} from '../domain/user/UsersQueryRepository';
 
 @Injectable()
-export class UsersQueryRepository {
+export class KyselyUsersQueryRepository implements UsersQueryRepository {
   constructor(private database: Database) {}
 
   async getUsers({
@@ -60,7 +68,15 @@ export class UsersQueryRepository {
       .execute();
 
     return {
-      items: filteredUsers,
+      items: filteredUsers.map(
+        (user) =>
+          new UserSummary({
+            id: user.id,
+            login: user.login,
+            email: user.email,
+            createdAt: user.created_at,
+          }),
+      ),
       totalCount:
         searchEmailTerm || searchLoginTerm
           ? filteredUsers.length
@@ -75,7 +91,8 @@ export class UsersQueryRepository {
       .where('id', '=', id)
       .executeTakeFirst();
 
-    return UserViewDto.getUserView(user as any);
+    //wrong
+    return getUserView(user as any);
   }
 
   //ts
