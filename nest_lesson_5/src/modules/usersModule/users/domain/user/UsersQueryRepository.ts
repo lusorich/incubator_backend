@@ -1,18 +1,5 @@
 import { GetUsersQueryParams } from '../../models/users.dto';
-
-interface User {
-  login: string;
-  email: string;
-  id: string;
-  password: string;
-  created_at: Date;
-  email_confirmation_code: string | null;
-  email_confirmation_expire: Date | null;
-  email_confirmation_is_confirmed: boolean;
-  password_recovery_code: string | null;
-  password_recovery_is_used: boolean;
-  password_recovery_expire: Date | null;
-}
+import { User } from '../user.entity';
 
 export class UserSummary {
   id: string;
@@ -44,6 +31,6 @@ export abstract class UsersQueryRepository {
   }: {
     paginationParams: GetUsersQueryParams;
   }): Promise<{ items: UserSummary[]; totalCount: number }>;
-  abstract getById(id: string): any;
-  abstract getByProperty(property, value: string): any;
+  abstract getById(id: string): Promise<UserSummary>;
+  abstract getByProperty(property: string, value: string): Promise<User>;
 }

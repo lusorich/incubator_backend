@@ -4,7 +4,6 @@ import {
   CreateUserInputDto,
   GetUsersQueryParams,
   getUserView,
-  UserViewDto,
 } from '../models/users.dto';
 import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
@@ -118,7 +117,7 @@ export class UsersService {
     });
   }
 
-  async getById(id) {
-    return await this.usersQueryRepository.getById(id);
+  async getById(id: string) {
+    return getUserView(await this.usersQueryRepository.getById(id));
   }
 }

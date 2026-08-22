@@ -116,9 +116,6 @@ export class AuthController {
       from: 'eeugern@mail.ru',
     });
 
-    console.log('user resending', user);
-    console.log('resending', emailConfirmation);
-
     return await this.userService.updateUserEmailConfirmation(
       user,
       emailConfirmation,

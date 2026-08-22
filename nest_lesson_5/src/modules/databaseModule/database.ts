@@ -29,7 +29,7 @@ export interface DB {
   security_devices: SecurityDevicesTable;
 }
 
-export type User = Selectable<UserTable>;
+export type UserRow = Selectable<UserTable>;
 export type NewUser = Insertable<Exclude<UserTable, 'created_at' | 'id'>>;
 
 export class Database extends Kysely<DB> {}

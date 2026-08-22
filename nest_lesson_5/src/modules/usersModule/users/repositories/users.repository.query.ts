@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { SORT_DIRECTION } from 'src/common/types';
-import {
-  GetUsersQueryParams,
-  getUserView,
-  UserViewDto,
-} from '../models/users.dto';
-import { Database } from 'src/modules/databaseModule/database';
-import { sql } from 'kysely';
+import { GetUsersQueryParams } from '../models/users.dto';
+import { Database, DB } from 'src/modules/databaseModule/database';
+import { ReferenceExpression, sql } from 'kysely';
 import {
   UsersQueryRepository,
   UserSummary,
 } from '../domain/user/UsersQueryRepository';
+import { toUser } from './users.mapper';
 
 @Injectable()
 export class KyselyUsersQueryRepository implements UsersQueryRepository {
@@ -91,18 +88,21 @@ export class KyselyUsersQueryRepository implements UsersQueryRepository {
       .where('id', '=', id)
       .executeTakeFirst();
 
-    //wrong
-    return getUserView(user as any);
+    return new UserSummary({
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.created_at,
+    });
   }
 
-  //ts
-  async getByProperty(property: any, value: string) {
+  async getByProperty(property: string, value: string) {
     const user = await this.database
       .selectFrom('users')
       .selectAll()
-      .where(property, '=', value)
+      .where(property as ReferenceExpression<DB, 'users'>, '=', value)
       .executeTakeFirst();
 
-    return user as any;
+    return toUser(user);
   }
 }
