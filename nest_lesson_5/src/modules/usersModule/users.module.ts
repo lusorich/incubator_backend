@@ -4,7 +4,7 @@ import { UsersController } from './users/controller/users.controller';
 import { AuthCommandsRepository } from './auth/repositories/auth.repository.commands';
 import { AuthService } from './auth/application/auth.service';
 import { UsersService } from './users/application/users.service';
-import { UsersCommandsRepository } from './users/repositories/users.repository.commands';
+import { KyselyUsersCommandsRepository } from './users/repositories/users.repository.commands';
 import { CommonModule } from '../commonModule/common.module';
 import { NotificationModule } from '../notificationModule/notifications.module';
 import { IsUserNotExistConstraint } from './guards/IsUserNotExist';
@@ -23,6 +23,7 @@ import { SecurityModule } from '../securityModule/security.module';
 import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfirmationCodeExist';
 import { UsersQueryRepository } from './users/domain/user/UsersQueryRepository';
 import { KyselyUsersQueryRepository } from './users/repositories/users.repository.query';
+import { UsersCommandsRepository } from './users/domain/user/UsersCommandsRepository';
 
 @Module({
   imports: [
@@ -41,7 +42,10 @@ import { KyselyUsersQueryRepository } from './users/repositories/users.repositor
     AuthCommandsRepository,
     AuthService,
     UsersService,
-    UsersCommandsRepository,
+    {
+      provide: UsersCommandsRepository,
+      useClass: KyselyUsersCommandsRepository,
+    },
     { provide: UsersQueryRepository, useClass: KyselyUsersQueryRepository },
     IsUserNotExistConstraint,
     IsConfirmationCodeActiveConstraint,

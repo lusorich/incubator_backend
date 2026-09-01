@@ -7,22 +7,10 @@ import { add } from 'date-fns';
 export class EmailService {
   constructor(private mailerService: MailerService) {}
 
-  generateUserEmailConfirmation = () => ({
-    code: randomUUID(),
-    expire: add(new Date(), { days: 3 }),
-    isConfirmed: false,
-  });
-
   generateUserEmailConfirmationPg = () => ({
     email_confirmation_code: randomUUID(),
     email_confirmation_expire: add(new Date(), { days: 3 }),
     email_confirmation_is_confirmed: false,
-  });
-
-  generatePasswordRecoveryConfirmation = () => ({
-    recoveryCode: randomUUID(),
-    expire: add(new Date(), { days: 3 }),
-    isUsed: false,
   });
 
   generateRegistrationConfirmationEmail = ({

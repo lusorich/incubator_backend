@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UsersCommandsRepository } from '../repositories/users.repository.commands';
 import {
   CreateUserInputDto,
   GetUsersQueryParams,
@@ -9,6 +8,10 @@ import { DomainException } from 'src/common/exceptions/domain.exceptions';
 import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
 import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 import { UsersQueryRepository } from '../domain/user/UsersQueryRepository';
+import { User } from '../domain/user.entity';
+import { EmailConfirmation } from '../domain/email-confirmation';
+import { PasswordConfirmation } from '../domain/password-confirmation';
+import { UsersCommandsRepository } from '../domain/user/UsersCommandsRepository';
 
 @Injectable()
 export class UsersService {
@@ -50,7 +53,7 @@ export class UsersService {
   async delete(id: string) {
     const result = await this.usersCommandsRepository.delete(id);
 
-    if (result.numDeletedRows === 0n) {
+    if (!result) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'User not found',
@@ -64,14 +67,17 @@ export class UsersService {
     return await this.usersCommandsRepository.deleteAll();
   }
 
-  async updateUserIsConfirmed(user, isConfirmed) {
+  async updateUserIsConfirmed(user: User, isConfirmed: boolean) {
     return await this.usersCommandsRepository.updateUserIsConfirmed(
       user,
       isConfirmed,
     );
   }
 
-  async updateUserEmailConfirmation(user, emailConfirmation) {
+  async updateUserEmailConfirmation(
+    user: User,
+    emailConfirmation: EmailConfirmation,
+  ) {
     return await this.usersCommandsRepository.updateUserEmailConfirmation(
       user,
       emailConfirmation,
@@ -82,14 +88,17 @@ export class UsersService {
     return await this.usersQueryRepository.getByProperty(property, value);
   }
 
-  async updatePasswordRecovery(user, passwordRecovery) {
+  async updatePasswordRecovery(
+    user: User,
+    passwordRecovery: PasswordConfirmation,
+  ) {
     return await this.usersCommandsRepository.updatePasswordRecovery(
       user,
       passwordRecovery,
     );
   }
 
-  async updatePassword(user, newPassword) {
+  async updatePassword(user: User, newPassword: string) {
     return await this.usersCommandsRepository.updatePassword(user, newPassword);
   }
 

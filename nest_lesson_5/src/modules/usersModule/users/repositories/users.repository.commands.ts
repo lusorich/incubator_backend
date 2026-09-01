@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserInputDto } from '../models/users.dto';
-import { Database, UserRow } from 'src/modules/databaseModule/database';
+import { Database } from 'src/modules/databaseModule/database';
 import { sql } from 'kysely';
+import { User } from '../domain/user.entity';
+import { EmailConfirmation } from '../domain/email-confirmation';
+import { PasswordConfirmation } from '../domain/password-confirmation';
+import { UsersCommandsRepository } from '../domain/user/UsersCommandsRepository';
 
 @Injectable()
-export class UsersCommandsRepository {
+export class KyselyUsersCommandsRepository implements UsersCommandsRepository {
   constructor(private database: Database) {}
 
-  async create(createUserInput: CreateUserInputDto): Promise<UserRow> {
+  async create(createUserInput: CreateUserInputDto): Promise<User> {
     return await this.database
       .insertInto('users')
       .values(createUserInput)
@@ -15,47 +19,63 @@ export class UsersCommandsRepository {
       .executeTakeFirstOrThrow();
   }
 
-  async updateUserIsConfirmed(user, isConfirmed) {
-    return await this.database
+  async updateUserIsConfirmed(user: User, isConfirmed: boolean) {
+    const updateResult = await this.database
       .updateTable('users')
       .set('email_confirmation_is_confirmed', isConfirmed)
       .where('id', '=', user.id)
       .executeTakeFirst();
+
+    return updateResult.numUpdatedRows > 0n;
   }
 
-  async updateUserEmailConfirmation(user, emailConfirmation) {
-    return await this.database
+  async updateUserEmailConfirmation(
+    user: User,
+    emailConfirmation: EmailConfirmation,
+  ) {
+    const updateResult = await this.database
       .updateTable('users')
       .set('email_confirmation_is_confirmed', emailConfirmation.isConfirmed)
       .set('email_confirmation_code', emailConfirmation.code)
       .set('email_confirmation_expire', emailConfirmation.expire)
       .where('login', '=', user.login)
       .executeTakeFirst();
+
+    return updateResult.numUpdatedRows > 0n;
   }
 
-  async updatePasswordRecovery(user, passwordRecovery) {
-    return await this.database
+  async updatePasswordRecovery(
+    user: User,
+    passwordRecovery: PasswordConfirmation,
+  ) {
+    const updateResult = await this.database
       .updateTable('users')
       .set('password_recovery_is_used', passwordRecovery.isUsed)
       .set('password_recovery_code', passwordRecovery.recoveryCode)
       .set('password_recovery_expire', passwordRecovery.expire)
       .where('login', '=', user.login)
       .executeTakeFirst();
+
+    return updateResult.numUpdatedRows > 0n;
   }
 
-  async updatePassword(user, newPassword) {
-    return await this.database
+  async updatePassword(user: User, newPassword: string) {
+    const updateResult = await this.database
       .updateTable('users')
       .set('password', newPassword)
       .where('login', '=', user.login)
       .executeTakeFirst();
+
+    return updateResult.numUpdatedRows > 0n;
   }
 
   async delete(id: string) {
-    return await this.database
+    const updateResult = await this.database
       .deleteFrom('users')
       .where('id', '=', id)
       .executeTakeFirst();
+
+    return updateResult.numDeletedRows > 0n;
   }
 
   async deleteAll() {

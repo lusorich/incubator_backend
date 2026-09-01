@@ -27,6 +27,8 @@ import {
   RegistrationInputDto,
   RegistrationNewPasswordInputDto,
 } from '../models/auth.dto';
+import { EmailConfirmation } from '../../users/domain/email-confirmation';
+import { PasswordConfirmation } from '../../users/domain/password-confirmation';
 
 @Controller('auth')
 export class AuthController {
@@ -83,7 +85,6 @@ export class AuthController {
 
   // i don't like logic cause in guards we check our user by doing sql queries
   // and there we use getByProperty and search user again
-  // done
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistationConfirmation(
@@ -104,7 +105,7 @@ export class AuthController {
   ) {
     const user = await this.userService.getByProperty('email', userInput.email);
 
-    const emailConfirmation = this.emailService.generateUserEmailConfirmation();
+    const emailConfirmation = EmailConfirmation.generate();
     const emailTemplate =
       this.emailService.generateRegistrationConfirmationEmail({
         code: emailConfirmation.code,
@@ -136,8 +137,7 @@ export class AuthController {
           errorsMessages: [{ field: 'email', message: 'not correct' }],
         });
       }
-      const passwordRecovery =
-        this.emailService.generatePasswordRecoveryConfirmation();
+      const passwordRecovery = PasswordConfirmation.generate();
       const emailTemplate = this.emailService.generateRecoveryPasswordEmail({
         recoveryCode: passwordRecovery.recoveryCode,
       });
@@ -211,14 +211,14 @@ export class AuthController {
 
     return await this.userService.updatePassword(user, userInput.newPassword);
   }
-  // done
+
   @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async userInfo(@Request() req) {
     return req.user;
   }
-  // done
+
   @SkipThrottle()
   @UseGuards(JwtRefreshAuthGuard)
   @Post('logout')
