@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInputDto } from '../models/users.dto';
+import { CreateUserInput } from '../models/users.dto';
 import { Database } from 'src/modules/databaseModule/database';
 import { sql } from 'kysely';
 import { User } from '../domain/user.entity';
@@ -11,7 +11,7 @@ import { UsersCommandsRepository } from '../domain/user/UsersCommandsRepository'
 export class KyselyUsersCommandsRepository implements UsersCommandsRepository {
   constructor(private database: Database) {}
 
-  async create(createUserInput: CreateUserInputDto): Promise<User> {
+  async create(createUserInput: CreateUserInput): Promise<User> {
     return await this.database
       .insertInto('users')
       .values(createUserInput)

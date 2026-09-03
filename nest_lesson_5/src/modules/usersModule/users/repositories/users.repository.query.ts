@@ -103,6 +103,10 @@ export class KyselyUsersQueryRepository implements UsersQueryRepository {
       .where(property as ReferenceExpression<DB, 'users'>, '=', value)
       .executeTakeFirst();
 
+    if (!user) {
+      return undefined;
+    }
+
     return toUser(user);
   }
 }

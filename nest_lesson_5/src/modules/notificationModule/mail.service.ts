@@ -1,17 +1,9 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { add } from 'date-fns';
 
 @Injectable()
 export class EmailService {
   constructor(private mailerService: MailerService) {}
-
-  generateUserEmailConfirmationPg = () => ({
-    email_confirmation_code: randomUUID(),
-    email_confirmation_expire: add(new Date(), { days: 3 }),
-    email_confirmation_is_confirmed: false,
-  });
 
   generateRegistrationConfirmationEmail = ({
     link = 'localhost:3000/auth/registration-confirmation',

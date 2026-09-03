@@ -39,8 +39,7 @@ export class AuthController {
     private readonly jwtService: JwtService,
     private readonly securityService: SecurityService,
   ) {}
-  //TODO: Maybe wrong
-  // done
+
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -62,22 +61,8 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async userRegistration(@Body() userInput: RegistrationInputDto) {
-    const emailConfirmation =
-      this.emailService.generateUserEmailConfirmationPg();
-    const emailTemplate =
-      this.emailService.generateRegistrationConfirmationEmail({
-        code: emailConfirmation.email_confirmation_code,
-      });
-    // need try catch, but where?
-    await this.emailService.sendEmail({
-      from: 'eeugern@mail.ru',
-      to: userInput.email,
-      html: emailTemplate,
-    });
-
     const newUser = await this.authService.registration({
       ...userInput,
-      ...emailConfirmation,
     });
 
     return newUser;

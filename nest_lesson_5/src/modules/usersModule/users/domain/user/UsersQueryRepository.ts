@@ -32,5 +32,8 @@ export abstract class UsersQueryRepository {
     paginationParams: GetUsersQueryParams;
   }): Promise<{ items: UserSummary[]; totalCount: number }>;
   abstract getById(id: string): Promise<UserSummary>;
-  abstract getByProperty(property: string, value: string): Promise<User>;
+  abstract getByProperty(
+    property: string,
+    value: string,
+  ): Promise<User | undefined>;
 }

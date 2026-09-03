@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  CreateUserInput,
   CreateUserInputDto,
   GetUsersQueryParams,
   getUserView,
@@ -20,7 +21,7 @@ export class UsersService {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async create(createUserInput: CreateUserInputDto) {
+  async create(createUserInput: CreateUserInput | CreateUserInputDto) {
     const existedEmailUsers = await this.usersQueryRepository.getByProperty(
       'email',
       createUserInput.email,

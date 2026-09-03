@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth/controller/auth.controller';
 import { UsersController } from './users/controller/users.controller';
-import { AuthCommandsRepository } from './auth/repositories/auth.repository.commands';
 import { AuthService } from './auth/application/auth.service';
 import { UsersService } from './users/application/users.service';
 import { KyselyUsersCommandsRepository } from './users/repositories/users.repository.commands';
@@ -39,7 +38,6 @@ import { UsersCommandsRepository } from './users/domain/user/UsersCommandsReposi
   ],
   controllers: [AuthController, UsersController],
   providers: [
-    AuthCommandsRepository,
     AuthService,
     UsersService,
     {

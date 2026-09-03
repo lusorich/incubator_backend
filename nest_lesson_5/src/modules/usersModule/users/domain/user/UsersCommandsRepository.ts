@@ -7,6 +7,9 @@ export class CreateUserCommand {
     readonly login: string,
     readonly email: string,
     readonly password: string,
+    readonly email_confirmation_code?: string | null,
+    readonly email_confirmation_expire?: Date | null,
+    readonly email_confirmation_is_confirmed?: boolean | null,
   ) {}
 }
 

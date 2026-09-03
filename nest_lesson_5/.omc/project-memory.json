@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1783183717660,
+  "lastScanned": 1788457130609,
   "projectRoot": "D:\\kamasutra\\samurai\\nest_lesson_5",
   "techStack": {
     "languages": [
@@ -80,7 +80,7 @@
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 7,
-      "lastAccessed": 1783183717608,
+      "lastAccessed": 1788457130530,
       "keyFiles": [
         "app.module.d.ts",
         "app.module.js",
@@ -93,7 +93,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 2,
-      "lastAccessed": 1783183717609,
+      "lastAccessed": 1788457130532,
       "keyFiles": [
         "app.module.ts",
         "main.ts"
@@ -103,7 +103,7 @@
       "path": "test",
       "purpose": "Test files",
       "fileCount": 5,
-      "lastAccessed": 1783183717621,
+      "lastAccessed": 1788457130558,
       "keyFiles": [
         "app.test.ts",
         "auth.e2e-spec.ts",
@@ -116,7 +116,7 @@
       "path": "test\\helpers",
       "purpose": "Helper functions",
       "fileCount": 2,
-      "lastAccessed": 1783183717622,
+      "lastAccessed": 1788457130560,
       "keyFiles": [
         "auth.helpers.ts",
         "blogs.helpers.ts"
@@ -152,6 +152,60 @@
       "path": "src\\common\\bigint.interceptor.ts",
       "accessCount": 1,
       "lastAccessed": 1783183947464,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/usersModule/auth/controller/auth.controller.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788457165618,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/usersModule/auth/application/auth.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788457176775,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/usersModule/auth/application/local.auth.guard.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788457177303,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/usersModule/auth/application/jwt-refresh.auth.guard.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788457177620,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/usersModule/auth/application/auth.jwt.refresh-strategy.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788457204756,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/notificationModule/mail.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788457316062,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/dream/.claude/projects/D--kamasutra-samurai/memory/ground-advice-in-clean-architecture.md",
+      "accessCount": 1,
+      "lastAccessed": 1788457379818,
+      "type": "file"
+    },
+    {
+      "path": "C:/Users/dream/.claude/projects/D--kamasutra-samurai/memory/MEMORY.md",
+      "accessCount": 1,
+      "lastAccessed": 1788457387083,
+      "type": "file"
+    },
+    {
+      "path": "src/modules/usersModule/users/domain/user/UsersCommandsRepository.ts",
+      "accessCount": 1,
+      "lastAccessed": 1788460676094,
       "type": "file"
     }
   ],

@@ -15,7 +15,8 @@ export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
     const property = options.property;
     const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
-    if (user) {
+    // user.id is a hack cause getByProperty return user or {}
+    if (user && user?.id !== undefined) {
       return false;
     }
 
