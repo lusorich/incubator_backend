@@ -1,0 +1,216 @@
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthService } from '../application/auth.service';
+import { LocalAuthGuard } from '../application/local.auth.guard';
+import { JwtAuthGuard } from '../application/jwt.auth.guard';
+import { UsersService } from '../../users/application/users.service';
+import { EmailService } from 'src/modules/notificationModule/mail.service';
+import { JwtRefreshAuthGuard } from '../application/jwt-refresh.auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { SecurityService } from 'src/modules/securityModule/application/security.service';
+import { SkipThrottle } from '@nestjs/throttler';
+import { DomainException } from 'src/common/exceptions/domain.exceptions';
+import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+import {
+  RegistrationConfirmationInputDto,
+  RegistrationEmailPasswordRecoveryInputDto,
+  RegistrationEmailResendingInputDto,
+  RegistrationInputDto,
+  RegistrationNewPasswordInputDto,
+} from '../models/auth.dto';
+import { EmailConfirmation } from '../../users/domain/email-confirmation';
+import { PasswordConfirmation } from '../../users/domain/password-confirmation';
+
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly securityService: SecurityService,
+  ) {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async userLogin(@Request() req, @Res({ passthrough: true }) res) {
+    const { accessToken, refreshToken } = await this.authService.login({
+      user: req.user,
+      deviceName: req.get('User-Agent') ?? 'unknown',
+      ip: req.ip,
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken };
+  }
+  // done
+  @Post('registration')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistration(@Body() userInput: RegistrationInputDto) {
+    const newUser = await this.authService.registration({
+      ...userInput,
+    });
+
+    return newUser;
+  }
+
+  // i don't like logic cause in guards we check our user by doing sql queries
+  // and there we use getByProperty and search user again
+  @Post('registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistationConfirmation(
+    @Body() userInput: RegistrationConfirmationInputDto,
+  ) {
+    const user = await this.userService.getByProperty(
+      'email_confirmation_code',
+      userInput.code,
+    );
+
+    return await this.userService.updateUserIsConfirmed(user, true);
+  }
+  // done
+  @Post('registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistrationEmailResending(
+    @Body() userInput: RegistrationEmailResendingInputDto,
+  ) {
+    const user = await this.userService.getByProperty('email', userInput.email);
+
+    const emailConfirmation = EmailConfirmation.generate();
+    const emailTemplate =
+      this.emailService.generateRegistrationConfirmationEmail({
+        code: emailConfirmation.code,
+      });
+
+    await this.emailService.sendEmail({
+      html: emailTemplate,
+      to: userInput.email,
+      from: 'eeugern@mail.ru',
+    });
+
+    return await this.userService.updateUserEmailConfirmation(
+      user,
+      emailConfirmation,
+    );
+  }
+  // done
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistrationPasswordRecovery(
+    @Body() userInput: RegistrationEmailPasswordRecoveryInputDto,
+  ) {
+    const user = await this.userService.getByProperty('email', userInput.email);
+
+    if (user) {
+      if (user.email_confirmation_is_confirmed) {
+        throw new DomainException({
+          code: DomainExceptionCode.BadRequest,
+          errorsMessages: [{ field: 'email', message: 'not correct' }],
+        });
+      }
+      const passwordRecovery = PasswordConfirmation.generate();
+      const emailTemplate = this.emailService.generateRecoveryPasswordEmail({
+        recoveryCode: passwordRecovery.recoveryCode,
+      });
+
+      await this.emailService.sendEmail({
+        html: emailTemplate,
+        to: userInput.email,
+        from: 'eeugern@mail.ru',
+      });
+
+      return await this.userService.updatePasswordRecovery(
+        user,
+        passwordRecovery,
+      );
+    }
+  }
+  //done but need refactoring
+  @SkipThrottle()
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  async updateTokens(@Request() req, @Res({ passthrough: true }) res) {
+    const decodedPrevRefreshToken = this.jwtService.decode(
+      req.user.refreshToken,
+    );
+
+    const payload = {
+      login: decodedPrevRefreshToken.login,
+      email: decodedPrevRefreshToken.email,
+      userId: decodedPrevRefreshToken.userId,
+      deviceId: decodedPrevRefreshToken.deviceId,
+      deviceName: decodedPrevRefreshToken.deviceName,
+    };
+
+    const { accessToken, refreshToken } =
+      await this.authService.getTokens(payload);
+    const decodedRefreshToken = this.jwtService.decode(refreshToken);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    await this.securityService.updateDeviceSession({
+      userId: decodedPrevRefreshToken.userId,
+      deviceId: decodedPrevRefreshToken.deviceId,
+      iat: decodedRefreshToken?.iat ?? '',
+      exp: decodedRefreshToken?.exp
+        ? new Date(decodedRefreshToken.exp * 1000)
+        : '',
+    });
+
+    return { accessToken };
+  }
+  // done
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async userRegistrationNewPassword(
+    @Body() userInput: RegistrationNewPasswordInputDto,
+  ) {
+    const user = await this.userService.getByProperty(
+      'password_recovery_code',
+      userInput.recoveryCode,
+    );
+
+    await this.userService.updatePasswordRecovery(user, {
+      isUsed: true,
+      recoveryCode: null,
+      expire: null,
+    });
+
+    return await this.userService.updatePassword(user, userInput.newPassword);
+  }
+
+  @SkipThrottle()
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async userInfo(@Request() req) {
+    return req.user;
+  }
+
+  @SkipThrottle()
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Request() req) {
+    const { userId, deviceId } = req.user;
+
+    return await this.securityService.deleteDeviceSession({ userId, deviceId });
+  }
+}
