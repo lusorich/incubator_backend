@@ -2,14 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { BlogsCommandsRepository } from '../repositories/blogs.repository.commands';
 import { PostsQueryRepository } from '../../posts/repositories/posts.repository.query';
 import { LikesService } from '../../likes/application/likes.service';
+import { BlogsQueryRepository } from '../repositories/blogs.repository.query';
 
 @Injectable()
 export class BlogsService {
   constructor(
     private blogsCommandsRepository: BlogsCommandsRepository,
+    private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
     private likesService: LikesService,
   ) {}
+
+  async getBlogs({ paginationParams, searchNameTerm }) {
+    const result = await this.blogsQueryRepository.getBlogs({
+      paginationParams,
+      searchNameTerm,
+    });
+
+    return result;
+  }
 
   async create({ description, websiteUrl, name }) {
     const result = await this.blogsCommandsRepository.create({

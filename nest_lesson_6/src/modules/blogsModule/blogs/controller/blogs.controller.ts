@@ -93,7 +93,7 @@ export class BlogsController {
     const { sortBy, sortDirection, pageSize, pageNumber, searchNameTerm } =
       query;
 
-    const result = await this.blogsQueryRepository.getBlogs({
+    return await this.blogsService.getBlogs({
       paginationParams: {
         sortBy,
         sortDirection,
@@ -102,8 +102,6 @@ export class BlogsController {
       },
       searchNameTerm,
     });
-
-    return result;
   }
 
   @UseGuards(AuthGuardBasic)

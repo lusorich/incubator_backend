@@ -24,9 +24,19 @@ export interface SecurityDevicesTable {
   ip: string;
 }
 
+export interface BlogTable {
+  id: Generated<string>;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  created_at: ColumnType<Date, string | undefined, string>;
+  isMembership: boolean;
+}
+
 export interface DB {
   users: UserTable;
   security_devices: SecurityDevicesTable;
+  blogs: BlogTable;
 }
 
 export type UserRow = Selectable<UserTable>;
