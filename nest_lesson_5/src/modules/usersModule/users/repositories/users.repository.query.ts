@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.entity';
-import { Model } from 'mongoose';
-import { PaginationParams, SORT_DIRECTION } from 'src/common/types';
-import { UserViewDto } from '../models/users.dto';
-import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
+import { SORT_DIRECTION } from 'src/common/types';
+import { GetUsersQueryParams } from '../models/users.dto';
+import { Database, DB } from 'src/modules/databaseModule/database';
+import { ReferenceExpression, sql } from 'kysely';
+import {
+  UsersQueryRepository,
+  UserSummary,
+} from '../domain/user/UsersQueryRepository';
+import { toUser } from './users.mapper';
 
 @Injectable()
-export class UsersQueryRepository {
-  constructor(@InjectModel(User.name) private UserModel: Model<User>) {}
+export class KyselyUsersQueryRepository implements UsersQueryRepository {
+  constructor(private database: Database) {}
 
   async getUsers({
-    paginationParams = {},
+    paginationParams,
   }: {
-    paginationParams?: PaginationParams;
+    paginationParams: GetUsersQueryParams;
   }) {
     const {
       sortBy,
@@ -24,54 +27,86 @@ export class UsersQueryRepository {
       searchLoginTerm,
     } = paginationParams;
 
-    const users = await this.UserModel.find({});
+    const users = await this.database.selectFrom('users').selectAll().execute();
 
-    const filteredUsers = (
-      await this.UserModel.find({
-        $and: [
-          { login: { $regex: searchLoginTerm || /./, $options: 'i' } },
-          { email: { $regex: searchEmailTerm || /./, $options: 'i' } },
-        ],
-      })
-        .limit(pageSize)
-        .skip((pageNumber - 1) * pageSize)
-        .sort({ [sortBy]: sortDirection === SORT_DIRECTION.ASC ? 1 : -1 })
-    ).map(UserViewDto.getUserView);
+    let query = this.database.selectFrom('users').selectAll();
 
-    if (searchLoginTerm || searchEmailTerm) {
-      return PaginatedViewDto.getPaginatedDataDto({
-        totalCount: filteredUsers.length,
-        pageSize: Number(pageSize),
-        page: Number(pageNumber),
-        items: filteredUsers,
-      });
-    } else {
-      return PaginatedViewDto.getPaginatedDataDto({
-        totalCount: users.length,
-        pageSize: Number(pageSize),
-        page: Number(pageNumber),
-        items: filteredUsers,
+    if (searchEmailTerm || searchLoginTerm) {
+      query = query.where((eb) => {
+        const filters = [];
+
+        if (searchEmailTerm) {
+          filters.push(eb('email', 'ilike', `%${searchEmailTerm}%`));
+        }
+
+        if (searchLoginTerm) {
+          filters.push(eb('login', 'ilike', `%${searchLoginTerm}%`));
+        }
+
+        return eb.or(filters);
       });
     }
+
+    if (sortBy === 'createdAt') {
+      query = query.orderBy(
+        'created_at',
+        sortDirection === SORT_DIRECTION.ASC ? 'asc' : 'desc',
+      );
+    } else {
+      query = query.orderBy(
+        sql`${sql.raw(sortBy)} COLLATE "C"`,
+        sortDirection === SORT_DIRECTION.ASC ? 'asc' : 'desc',
+      );
+    }
+
+    let filteredUsers = await query
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize)
+      .execute();
+
+    return {
+      items: filteredUsers.map(
+        (user) =>
+          new UserSummary({
+            id: user.id,
+            login: user.login,
+            email: user.email,
+            createdAt: user.created_at,
+          }),
+      ),
+      totalCount:
+        searchEmailTerm || searchLoginTerm
+          ? filteredUsers.length
+          : users.length,
+    };
   }
 
   async getById(id: string) {
-    const user = await this.UserModel.findById(id);
+    const user = await this.database
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
 
-    return UserViewDto.getUserView(user);
+    return new UserSummary({
+      id: user.id,
+      login: user.login,
+      email: user.email,
+      createdAt: user.created_at,
+    });
   }
 
   async getByProperty(property: string, value: string) {
-    const user = await this.UserModel.findOne({ [property]: value });
+    const user = await this.database
+      .selectFrom('users')
+      .selectAll()
+      .where(property as ReferenceExpression<DB, 'users'>, '=', value)
+      .executeTakeFirst();
 
-    return user;
-  }
+    if (!user) {
+      return undefined;
+    }
 
-  async getByProperties(properties: Record<string, string>[]) {
-    const user = await this.UserModel.findOne({
-      $or: properties,
-    });
-
-    return user;
+    return toUser(user);
   }
 }

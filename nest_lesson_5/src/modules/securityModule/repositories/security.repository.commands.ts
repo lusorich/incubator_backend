@@ -6,20 +6,28 @@ import {
   SecurityModelType,
 } from '../domain/security.entity';
 import { CreateDeviceSessionInput } from '../models/security.model';
+import { Database } from 'src/modules/databaseModule/database';
 
 @Injectable()
 export class SecurityCommandsRepository {
   constructor(
     @InjectModel(Security.name) private SecurityModel: SecurityModelType,
+    private database: Database,
   ) {}
 
-  async createDeviceSession(
-    createDeviceSessionInput: CreateDeviceSessionInput,
-  ) {
-    const deviceSession: SecurityDocument =
-      this.SecurityModel.createDeviceSession(createDeviceSessionInput);
-
-    return this.save(deviceSession);
+  async createDeviceSession(createDeviceSessionInput: {
+    user_id: string;
+    device_id: string;
+    device_name: string;
+    iat: string | number;
+    exp: Date;
+    ip: string;
+  }) {
+    return await this.database
+      .insertInto('security_devices')
+      .values(createDeviceSessionInput)
+      .returningAll()
+      .executeTakeFirst();
   }
 
   async updateDeviceSession({
@@ -30,21 +38,23 @@ export class SecurityCommandsRepository {
   }: {
     userId: string;
     deviceId: string;
-    iat: string;
-    exp: string;
+    iat: number | string;
+    exp: Date | string;
   }) {
-    return this.SecurityModel.updateOne(
-      {
-        $and: [{ userId }, { deviceId }],
-      },
-      {
-        $set: { iat, exp },
-      },
-    );
+    return await this.database
+      .updateTable('security_devices')
+      .set('iat', iat)
+      .set('exp', exp)
+      .where('user_id', '=', userId)
+      .where('device_id', '=', deviceId)
+      .executeTakeFirst();
   }
 
   async deleteDeviceSession({ deviceId }: { deviceId: string }) {
-    return this.SecurityModel.deleteOne({ deviceId });
+    return await this.database
+      .deleteFrom('security_devices')
+      .where('device_id', '=', deviceId)
+      .executeTakeFirst();
   }
 
   async deleteUserSessionsExceptCurrent({
@@ -54,14 +64,17 @@ export class SecurityCommandsRepository {
     userId: string;
     deviceId: string;
   }) {
-    return this.SecurityModel.deleteMany({
-      userId,
-      deviceId: { $ne: deviceId },
-    });
+    return await this.database
+      .deleteFrom('security_devices')
+      .where((eb) =>
+        eb.and([eb('user_id', '=', userId), eb('device_id', '!=', deviceId)]),
+      )
+      .executeTakeFirst();
   }
 
   async deleteAll() {
-    return this.SecurityModel.deleteMany({});
+    await this.SecurityModel.deleteMany({});
+    return await this.database.deleteFrom('security_devices').execute();
   }
   async save(deviceSession: SecurityDocument) {
     return deviceSession.save();

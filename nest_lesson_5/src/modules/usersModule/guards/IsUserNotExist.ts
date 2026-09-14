@@ -5,7 +5,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from '../users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/domain/user/UsersQueryRepository';
 
 @ValidatorConstraint({ async: true })
 export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
@@ -15,7 +15,8 @@ export class IsUserNotExistConstraint implements ValidatorConstraintInterface {
     const property = options.property;
     const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
-    if (user) {
+    // user.id is a hack cause getByProperty return user or {}
+    if (user && user?.id !== undefined) {
       return false;
     }
 

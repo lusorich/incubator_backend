@@ -4,7 +4,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from '../users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/domain/user/UsersQueryRepository';
 
 @ValidatorConstraint({ async: true })
 export class IsUserByRecoveryCodeExistConstraint
@@ -14,7 +14,7 @@ export class IsUserByRecoveryCodeExistConstraint
 
   async validate(arg: string) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'passwordRecovery.recoveryCode',
+      'password_recovery_code',
       arg,
     );
 

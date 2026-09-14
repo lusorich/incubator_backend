@@ -5,7 +5,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { isAfter } from 'date-fns';
-import { UsersQueryRepository } from '../users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/domain/user/UsersQueryRepository';
 
 @ValidatorConstraint({ async: true })
 export class IsPasswordRecoveryCodeUsedConstraint
@@ -15,15 +15,15 @@ export class IsPasswordRecoveryCodeUsedConstraint
 
   async validate(arg: string) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'passwordRecovery.recoveryCode',
+      'password_recovery_code',
       arg,
     );
 
-    if (user && isAfter(new Date(), user.passwordRecovery.expire)) {
+    if (user && isAfter(new Date(), user.password_recovery_expire)) {
       return false;
     }
 
-    if (user && user.passwordRecovery.isUsed) {
+    if (user && user.password_recovery_is_used) {
       return false;
     }
 

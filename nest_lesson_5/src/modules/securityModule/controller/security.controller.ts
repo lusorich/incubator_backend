@@ -22,12 +22,13 @@ export class SecurityController {
     private readonly securityService: SecurityService,
   ) {}
 
+  // done
   @UseGuards(JwtRefreshAuthGuard)
   @Get('devices')
   async getDevices(@Request() req): Promise<SecurityViewDto[]> {
-    return await this.securityQueryRepository.getUserSessions({
+    return (await this.securityQueryRepository.getUserSessions({
       userId: req.user.userId,
-    });
+    })) as any;
   }
 
   @UseGuards(JwtRefreshAuthGuard)

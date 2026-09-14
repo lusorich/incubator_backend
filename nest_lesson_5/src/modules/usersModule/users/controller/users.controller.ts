@@ -11,56 +11,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
-import { UsersQueryRepository } from '../repositories/users.repository.query';
-import { IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
 import { AuthGuardBasic } from 'src/common/auth.guard.basic';
-import { Trim } from 'src/common/trim.decorator';
+import { PaginatedViewDto } from 'src/common/PaginationQuery.dto';
 import {
-  BaseSortablePaginationParams,
-  PaginatedViewDto,
-} from 'src/common/PaginationQuery.dto';
-import { CreateUserInput, UserViewDto } from '../models/users.dto';
-import { DomainException } from 'src/common/exceptions/domain.exceptions';
-import { DomainExceptionCode } from 'src/common/exceptions/domain.exception.codes';
+  CreateUserInputDto,
+  GetUsersQueryParams,
+  UserViewDto,
+} from '../models/users.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 
-enum USERS_SORT_BY {
-  'createdAt' = 'createdAt',
-  'login' = 'login',
-  'email' = 'email',
-}
-
-class GetUsersQueryParams extends BaseSortablePaginationParams<USERS_SORT_BY> {
-  sortBy = USERS_SORT_BY.createdAt;
-  searchLoginTerm: string | null;
-  searchEmailTerm: string | null;
-}
-
-//TODO: Move to users.dto.ts
-class CreateUserInputDto implements CreateUserInput {
-  @IsNotEmpty()
-  @Length(3, 10)
-  @Matches(/^[a-zA-Z0-9_-]*$/)
-  login: string;
-
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @Trim()
-  @Length(6, 20)
-  password: string;
-}
-
 @SkipThrottle()
-@Controller('users')
+@Controller('/sa/users')
 export class UsersController {
   usersService: UsersService;
-  constructor(
-    usersService: UsersService,
 
-    private readonly usersQueryRepository: UsersQueryRepository,
-  ) {
+  constructor(usersService: UsersService) {
     this.usersService = usersService;
   }
 
@@ -78,7 +43,7 @@ export class UsersController {
       searchLoginTerm,
     } = query;
 
-    const result = await this.usersQueryRepository.getUsers({
+    return await this.usersService.getUsers({
       paginationParams: {
         sortBy,
         sortDirection,
@@ -88,35 +53,23 @@ export class UsersController {
         searchLoginTerm,
       },
     });
-
-    return result;
   }
 
   @UseGuards(AuthGuardBasic)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() userInput: CreateUserInputDto) {
-    const createUser: CreateUserInput = {
-      ...userInput,
-      emailConfirmation: undefined,
-    };
+  async createUser(
+    @Body() userInput: CreateUserInputDto,
+  ): Promise<UserViewDto> {
+    const userId = await this.usersService.create(userInput);
 
-    const result = await this.usersService.create(createUser);
-
-    return this.usersQueryRepository.getById(result);
+    return await this.usersService.getById(userId);
   }
 
   @UseGuards(AuthGuardBasic)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string) {
-    const result = await this.usersService.delete(id);
-
-    if (result.deletedCount < 1) {
-      throw new DomainException({
-        code: DomainExceptionCode.NotFound,
-        message: 'User not found',
-      });
-    }
+    return await this.usersService.delete(id);
   }
 }

@@ -1,13 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth/controller/auth.controller';
 import { UsersController } from './users/controller/users.controller';
-import { AuthCommandsRepository } from './auth/repositories/auth.repository.commands';
 import { AuthService } from './auth/application/auth.service';
 import { UsersService } from './users/application/users.service';
-import { UsersQueryRepository } from './users/repositories/users.repository.query';
-import { UsersCommandsRepository } from './users/repositories/users.repository.commands';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './users/domain/user.entity';
+import { KyselyUsersCommandsRepository } from './users/repositories/users.repository.commands';
 import { CommonModule } from '../commonModule/common.module';
 import { NotificationModule } from '../notificationModule/notifications.module';
 import { IsUserNotExistConstraint } from './guards/IsUserNotExist';
@@ -24,10 +20,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { appSettings } from 'src/settings/appSettings';
 import { SecurityModule } from '../securityModule/security.module';
 import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfirmationCodeExist';
+import { UsersQueryRepository } from './users/domain/user/UsersQueryRepository';
+import { KyselyUsersQueryRepository } from './users/repositories/users.repository.query';
+import { UsersCommandsRepository } from './users/domain/user/UsersCommandsRepository';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
       global: true,
       secret: appSettings.api.SECRET_ACCESS_TOKEN,
@@ -40,11 +38,13 @@ import { IsUserByConfirmationCodeExistConstraint } from './guards/IsUserByConfir
   ],
   controllers: [AuthController, UsersController],
   providers: [
-    AuthCommandsRepository,
     AuthService,
     UsersService,
-    UsersCommandsRepository,
-    UsersQueryRepository,
+    {
+      provide: UsersCommandsRepository,
+      useClass: KyselyUsersCommandsRepository,
+    },
+    { provide: UsersQueryRepository, useClass: KyselyUsersQueryRepository },
     IsUserNotExistConstraint,
     IsConfirmationCodeActiveConstraint,
     IsEmailNotConfirmedConstraint,

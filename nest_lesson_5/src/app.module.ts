@@ -11,9 +11,19 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { SecurityModule } from './modules/securityModule/security.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { DatabaseModule } from './modules/databaseModule/database.module';
 
 @Module({
   imports: [
+    DatabaseModule.forRootAsync({
+      useFactory: () => ({
+        host: 'localhost', // appSettings.get('POSTGRES_HOST'),
+        port: 5433, // appSettings.get('POSTGRES_PORT'),
+        user: 'postgres', // appSettings.get('POSTGRES_USER'),
+        password: 'root', // appSettings.get('POSTGRES_PASSWORD'),
+        database: 'kamasutra', //appSettings.get('POSTGRES_DB'),
+      }),
+    }),
     MongooseModule.forRoot(
       appSettings.env.isTesting()
         ? appSettings.api.MONGO_CONNECTION_URI_FOR_TESTS

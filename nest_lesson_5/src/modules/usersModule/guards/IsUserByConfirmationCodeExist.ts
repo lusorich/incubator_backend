@@ -5,7 +5,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from '../users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/domain/user/UsersQueryRepository';
 
 @ValidatorConstraint({ async: true })
 export class IsUserByConfirmationCodeExistConstraint
@@ -15,7 +15,7 @@ export class IsUserByConfirmationCodeExistConstraint
 
   async validate(arg: string, options: ValidationArguments) {
     const user = await this.UsersQueryRepository.getByProperty(
-      'emailConfirmation.code',
+      'email_confirmation_code',
       arg,
     );
 

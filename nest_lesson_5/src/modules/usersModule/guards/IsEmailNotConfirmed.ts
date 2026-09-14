@@ -5,7 +5,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersQueryRepository } from '../users/repositories/users.repository.query';
+import { UsersQueryRepository } from '../users/domain/user/UsersQueryRepository';
 
 @ValidatorConstraint({ async: true })
 export class IsEmailNotConfirmedConstraint
@@ -15,9 +15,10 @@ export class IsEmailNotConfirmedConstraint
 
   async validate(arg: string, options: ValidationArguments) {
     const property = options.property;
+
     const user = await this.UsersQueryRepository.getByProperty(property, arg);
 
-    if (user && user.emailConfirmation.isConfirmed) {
+    if (user && user.email_confirmation_is_confirmed) {
       return false;
     }
 
